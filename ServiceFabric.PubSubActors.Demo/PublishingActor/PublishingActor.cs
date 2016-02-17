@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Common.DataContracts;
 using PublishingActor.Interfaces;
-using ServiceFabric.PubSubActors;
+
+using ServiceFabric.PubSubActors.PublisherActors;
 
 namespace PublishingActor
 {

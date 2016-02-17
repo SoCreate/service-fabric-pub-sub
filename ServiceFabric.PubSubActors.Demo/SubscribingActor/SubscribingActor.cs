@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Common.DataContracts;
 using Microsoft.ServiceFabric.Actors;
-using ServiceFabric.PubSubActors;
 using ServiceFabric.PubSubActors.Interfaces;
 using SubscribingActor.Interfaces;
+using ServiceFabric.PubSubActors.SubscriberActors;
 
 namespace SubscribingActor
 {
