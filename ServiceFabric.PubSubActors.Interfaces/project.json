@@ -1,12 +1,14 @@
 ﻿{
   "version": "0.9.0-preview",
+  "copyright": "2016",
+  "title": "ServiceFabric.PubSubActors.Interfaces",
   "requireLicenseAcceptance": true,
   "description": "Used by ServiceFabric.PubSubActors, which adds pub/sub behaviour to your Reliable Actors in Service Fabric. Add this package to your Reliable Actor.Interfaces projects.",
   "summary": "Main Package 'ServiceFabric.PubSubActors' lets a 'Publisher Actor' publish messages to 'Subscriber Actors', without the need to know anything about those Subscriber Actors.",
   "authors": [ "Loek Duys" ],
   "tags": [ "ServiceFabric", "Service", "Fabric", "Actor", "Pub", "Sub", "Reliable" ],
   "projectUrl": "https://github.com/loekd/ServiceFabric.PubSubActors",
-  "licenseUrl": "https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/LICENSE",
+  "licenseUrl": "https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/LICENSE.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/loekd/ServiceFabric.PubSubActors.git"
