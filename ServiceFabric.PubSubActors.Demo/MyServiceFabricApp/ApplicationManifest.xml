@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="MyServiceFabricAppType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+   <Parameters>
+      <Parameter Name="ISubscribingActor_PartitionCount" DefaultValue="10" />
+      <Parameter Name="IBrokerActor_PartitionCount" DefaultValue="10" />
+      <Parameter Name="IBrokerActor_MinReplicaSetSize" DefaultValue="2" />
+      <Parameter Name="IBrokerActor_TargetReplicaSetSize" DefaultValue="3" />
+      <Parameter Name="PublishingActorService_PartitionCount" DefaultValue="10" />
+   </Parameters>
+   <ServiceManifestImport>
+      <ServiceManifestRef ServiceManifestName="SubscribingActorPkg" ServiceManifestVersion="1.0.0" />
+   </ServiceManifestImport>
+   <ServiceManifestImport>
+      <ServiceManifestRef ServiceManifestName="PubSubActorPkg" ServiceManifestVersion="1.0.0" />
+   </ServiceManifestImport>
+   <ServiceManifestImport>
+      <ServiceManifestRef ServiceManifestName="PublishingActorPkg" ServiceManifestVersion="1.0.0" />
+   </ServiceManifestImport>
+   <DefaultServices>
+      <Service Name="ISubscribingActor" GeneratedIdRef="3d871438-e941-4b57-b4e5-86074f6c3e1e">
+         <StatelessService ServiceTypeName="ISubscribingActorType">
+            <UniformInt64Partition PartitionCount="[ISubscribingActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+         </StatelessService>
+      </Service>
+      <Service Name="IBrokerActor" GeneratedIdRef="9c71704d-7bda-4cc8-a383-59edec1b5e40">
+         <StatefulService ServiceTypeName="IBrokerActorType" TargetReplicaSetSize="[IBrokerActor_TargetReplicaSetSize]" MinReplicaSetSize="[IBrokerActor_MinReplicaSetSize]">
+            <UniformInt64Partition PartitionCount="[IBrokerActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+         </StatefulService>
+      </Service>
+      <Service Name="PublishingActorService" GeneratedIdRef="94a6c297-1ea7-478c-9299-3936fdc1e79e">
+         <StatelessService ServiceTypeName="PublishingActorServiceType">
+            <UniformInt64Partition PartitionCount="[PublishingActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+         </StatelessService>
+      </Service>
+   </DefaultServices>
+</ApplicationManifest>
