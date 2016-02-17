@@ -120,15 +120,21 @@ namespace ServiceFabric.PubSubActors
 					ActorMessages = new Dictionary<ActorReference, Queue<QueuedMessageWrapper>>(),
 					ActorDeadLetters = new Dictionary<ActorReference, Queue<QueuedMessageWrapper>>()
 				};
-				
+
+
+				ActorEventSourceMessage($"State initialized.");
+			}
+
+			if (_timer == null)
+			{
 				_timer = RegisterTimer(async _ =>
 				{
 					await ProcessQueuesAsync();
 				}, null, DueTime, Period);
 
+				ActorEventSourceMessage($"Timer initialized.");
 			}
-
-			ActorEventSourceMessage($"State initialized to {State}");
+			
 			return Task.FromResult(true);
 		}
 
