@@ -71,9 +71,11 @@ namespace TestClient
 					{
 						subActor = ActorProxy.Create<ISubscribingActor>(actorId, applicationName, nameof(ISubscribingActor));
 						subActor.RegisterAsync().GetAwaiter().GetResult();
+						
 					}
 					catch
 					{
+						subActor = null;
 						Thread.Sleep(200);
 					}
 				}
