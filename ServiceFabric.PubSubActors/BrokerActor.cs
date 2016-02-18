@@ -36,18 +36,20 @@ namespace ServiceFabric.PubSubActors
 		/// <summary>
 		/// Gets or sets the maximum amount of attempts to broadcast a message to subscribers. (default: 5)
 		/// </summary>
+		[Obsolete("No longer used.")]
 		protected int MaxRetryCount { get; set; } = 5;
 
 		/// <summary>
 		/// Gets or sets the delay between retrying attempts to broadcast a message to subscribers. (default: 1s)
 		/// </summary>
+		[Obsolete("No longer used.")]
 		protected TimeSpan RetryInterval { get; set; } = TimeSpan.FromSeconds(1);
 
 		/// <summary>
 		/// When Set, this callback will be used to trace Actor messages to.
 		/// </summary>
 		protected Action<string> ActorEventSourceMessageCallback { get; set; }
-		
+
 		/// <summary>
 		/// Registers this Actor as a subscriber for messages.
 		/// </summary>
@@ -56,9 +58,10 @@ namespace ServiceFabric.PubSubActors
 		{
 			ActorEventSourceMessage($"Registering Subscriber '{actor.ServiceUri}' for messages of type '{_messageType}'");
 
-			if (!State.ActorMessages.ContainsKey(actor))
+			var actorReference = new ActorReferenceWrapper(actor);
+			if (!State.ActorMessages.ContainsKey(actorReference))
 			{
-				State.ActorMessages.Add(actor, new Queue<QueuedMessageWrapper>());
+				State.ActorMessages.Add(actorReference, new Queue<QueuedMessageWrapper>());
 			}
 			return Task.FromResult(true);
 		}
@@ -91,12 +94,15 @@ namespace ServiceFabric.PubSubActors
 		/// <param name="flushQueue">Publish any remaining messages.</param>
 		public async Task UnregisterSubscriberAsync(ActorReference actor, bool flushQueue)
 		{
+			if (actor == null) throw new ArgumentNullException(nameof(actor));
+
+			var actorReference = new ActorReferenceWrapper(actor);
 			Queue<QueuedMessageWrapper> queue;
-			if (flushQueue && State.ActorMessages.TryGetValue(actor, out queue))
+			if (flushQueue && State.ActorMessages.TryGetValue(actorReference, out queue))
 			{
-				await ProcessQueueAsync(new KeyValuePair<ActorReference, Queue<QueuedMessageWrapper>>(actor, queue));
+				await ProcessQueueAsync(new KeyValuePair<ActorReferenceWrapper, Queue<QueuedMessageWrapper>>(actorReference, queue));
 			}
-			State.ActorMessages.Remove(actor);
+			State.ActorMessages.Remove(actorReference);
 		}
 
 		/// <summary>
@@ -117,12 +123,11 @@ namespace ServiceFabric.PubSubActors
 				// Set the actor's initial state values.
 				State = new BrokerActorState
 				{
-					ActorMessages = new Dictionary<ActorReference, Queue<QueuedMessageWrapper>>(),
-					ActorDeadLetters = new Dictionary<ActorReference, Queue<QueuedMessageWrapper>>()
+					ActorMessages = new Dictionary<ActorReferenceWrapper, Queue<QueuedMessageWrapper>>(),
+					ActorDeadLetters = new Dictionary<ActorReferenceWrapper, Queue<QueuedMessageWrapper>>()
 				};
-
-
-				ActorEventSourceMessage($"State initialized.");
+				
+				ActorEventSourceMessage("State initialized.");
 			}
 
 			if (_timer == null)
@@ -132,9 +137,9 @@ namespace ServiceFabric.PubSubActors
 					await ProcessQueuesAsync();
 				}, null, DueTime, Period);
 
-				ActorEventSourceMessage($"Timer initialized.");
+				ActorEventSourceMessage("Timer initialized.");
 			}
-			
+
 			return Task.FromResult(true);
 		}
 
@@ -158,16 +163,16 @@ namespace ServiceFabric.PubSubActors
 		}
 
 		/// <summary>
-		/// When overridden, handles an undeliverable message <paramref name="message"/> for Actor <paramref name="reference"/>.
+		/// When overridden, handles an undeliverable message <paramref name="message"/> for Actor <paramref name="actorReference"/>.
 		/// By default, it will be added to State.ActorDeadLetters.
 		/// </summary>
-		/// <param name="reference"></param>
+		/// <param name="actorReference"></param>
 		/// <param name="message"></param>
-		protected virtual void HandleUndeliverableMessage(ActorReference reference, QueuedMessageWrapper message)
+		protected virtual void HandleUndeliverableMessage(ActorReferenceWrapper actorReference, QueuedMessageWrapper message)
 		{
-			ActorEventSourceMessage($"Adding undeliverable message to Actor Dead Letter Queue (Actor:{reference.ActorId})");
-			var deadLetters = GetOrAddActorDeadLetterQueue(reference);
-			ValidateQueueDepth(reference, deadLetters);
+			ActorEventSourceMessage($"Adding undeliverable message to Actor Dead Letter Queue (Actor:{actorReference.ActorReference.ActorId})");
+			var deadLetters = GetOrAddActorDeadLetterQueue(actorReference);
+			ValidateQueueDepth(actorReference, deadLetters);
 			deadLetters.Enqueue(message);
 		}
 
@@ -176,7 +181,7 @@ namespace ServiceFabric.PubSubActors
 		/// </summary>
 		/// <param name="actorReference"></param>
 		/// <returns></returns>
-		private Queue<QueuedMessageWrapper> GetOrAddActorDeadLetterQueue(ActorReference actorReference)
+		private Queue<QueuedMessageWrapper> GetOrAddActorDeadLetterQueue(ActorReferenceWrapper actorReference)
 		{
 			Queue<QueuedMessageWrapper> actorDeadLetters;
 			if (!State.ActorDeadLetters.TryGetValue(actorReference, out actorDeadLetters))
@@ -187,19 +192,19 @@ namespace ServiceFabric.PubSubActors
 
 			return actorDeadLetters;
 		}
-		
+
 		/// <summary>
 		/// Ensures the Queue depth is less than the allowed maximum.
 		/// </summary>
 		/// <param name="actorReference"></param>
 		/// <param name="actorDeadLetters"></param>
-		private void ValidateQueueDepth(ActorReference actorReference, Queue<QueuedMessageWrapper> actorDeadLetters)
+		private void ValidateQueueDepth(ActorReferenceWrapper actorReference, Queue<QueuedMessageWrapper> actorDeadLetters)
 		{
 			var queueDepth = actorDeadLetters.Count;
 			if (queueDepth > MaxDeadLetterCount)
 			{
 				ActorEventSourceMessage(
-					$"Actor Dead Letter Queue for Actor '{actorReference.ActorId}' has {queueDepth} items, which is more than the allowed {MaxDeadLetterCount}. Clearing it.");
+					$"Actor Dead Letter Queue for Actor '{actorReference.ActorReference.ActorId}' has {queueDepth} items, which is more than the allowed {MaxDeadLetterCount}. Clearing it.");
 				actorDeadLetters.Clear();
 			}
 		}
@@ -221,10 +226,10 @@ namespace ServiceFabric.PubSubActors
 		/// </summary>
 		/// <param name="actorMessageQueue"></param>
 		/// <returns></returns>
-		private async Task ProcessQueueAsync(KeyValuePair<ActorReference, Queue<QueuedMessageWrapper>> actorMessageQueue)
+		private async Task ProcessQueueAsync(KeyValuePair<ActorReferenceWrapper, Queue<QueuedMessageWrapper>> actorMessageQueue)
 		{
 			ActorEventSourceMessage(
-				$"Processing {actorMessageQueue.Value.Count} queued messages for Actor '{actorMessageQueue.Key.ActorId}'.");
+				$"Processing {actorMessageQueue.Value.Count} queued messages for Actor '{actorMessageQueue.Key.ActorReference.ActorId}'.");
 			int messagesProcessed = 0;
 			while (actorMessageQueue.Value.Count > 0)
 			{
@@ -246,34 +251,20 @@ namespace ServiceFabric.PubSubActors
 		/// <param name="reference"></param>
 		/// <param name="message"></param>
 		/// <returns></returns>
-		private async Task PublishMessageToActorAsync(ActorReference reference, QueuedMessageWrapper message)
+		private async Task PublishMessageToActorAsync(ActorReferenceWrapper reference, QueuedMessageWrapper message)
 		{
-			int attempts = 0;
-			ISubscriberActor actor = (ISubscriberActor)reference.Bind(typeof(ISubscriberActor));
-			Func<Task> publish = async () =>
+			ISubscriberActor actor = (ISubscriberActor)reference.ActorReference.Bind(typeof(ISubscriberActor));
+			ActorEventSourceMessage($"Publishing message to subscribed Actor {reference.ActorReference.ActorId}");
+            try
 			{
 				await actor.ReceiveMessageAsync(message.MessageWrapper);
-			};
-
-			do
-			{
-				try
-				{
-					await publish();
-					break;
-				}
-				catch (Exception ex)
-				{
-					if (attempts <= MaxRetryCount)
-					{
-						continue;
-					}
-					await Task.Delay(RetryInterval + TimeSpan.FromSeconds(RetryInterval.TotalSeconds * attempts));
-					HandleUndeliverableMessage(reference, message);
-					ActorEventSourceMessage($"Non fatal error while sending message to subscribed Actor {reference.ActorId}. Error: {ex.Message}.");
-				}
+				ActorEventSourceMessage($"Published message to subscribed Actor {reference.ActorReference.ActorId}");
 			}
-			while (attempts++ < MaxRetryCount);
+			catch (Exception ex)
+			{
+				HandleUndeliverableMessage(reference, message);
+				ActorEventSourceMessage($"Suppressed error while publishing message to subscribed Actor {reference.ActorReference.ActorId}. Error: {ex}.");
+			}
 		}
 
 		/// <summary>

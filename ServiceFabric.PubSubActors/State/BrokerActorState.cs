@@ -14,12 +14,12 @@ namespace ServiceFabric.PubSubActors.State
 		/// Contains messages that could not be be sent to subscribed Actors. (has a limit)
 		/// </summary>
 		[DataMember]
-		public Dictionary<ActorReference, Queue<QueuedMessageWrapper>> ActorDeadLetters { get; set; }
+		public Dictionary<ActorReferenceWrapper, Queue<QueuedMessageWrapper>> ActorDeadLetters { get; set; }
 		
 		/// <summary>
 		/// Contains messages to be sent to subscribed Actors.
 		/// </summary>
 		[DataMember]
-		public Dictionary<ActorReference, Queue<QueuedMessageWrapper>> ActorMessages{ get; set; }
+		public Dictionary<ActorReferenceWrapper, Queue<QueuedMessageWrapper>> ActorMessages{ get; set; }
 	}
 }
