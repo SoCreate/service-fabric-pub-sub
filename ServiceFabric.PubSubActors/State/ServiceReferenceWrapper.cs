@@ -1,47 +1,47 @@
-﻿using System;
+using System;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Actors;
 using ServiceFabric.PubSubActors.Interfaces;
+using ServiceFabric.PubSubActors.SubscriberServices;
 
 namespace ServiceFabric.PubSubActors.State
 {
 	/// <summary>
-	/// Persistable reference to an actor.
+	/// Persistable reference to a Service.
 	/// </summary>
 	[DataContract]
-	public class ActorReferenceWrapper : ReferenceWrapper
+	public class ServiceReferenceWrapper : ReferenceWrapper
 	{
-		private readonly ActorId _id;
+		private readonly string _id;
 
 		public override string Name
 		{
-			get { return $"{ActorReference.ServiceUri}\t{ActorReference.ActorId}"; }
+			get { return ServiceReference.ID; }
 		}
 
 		/// <summary>
-		/// Gets the wrapped <see cref="Microsoft.ServiceFabric.Actors.ActorReference"/>
+		/// Gets the wrapped <see cref="ServiceReference"/>
 		/// </summary>
 		[DataMember]
-		public ActorReference ActorReference { get; set; }
+		public ServiceReference ServiceReference { get; set; }
 
 		/// <summary>
 		/// Creates a new instance, for Serializer use only.
 		/// </summary>
 		[Obsolete("Only for Serializer use.")]
-		public ActorReferenceWrapper()
+		public ServiceReferenceWrapper()
 		{
 		}
 
 		/// <summary>
-		/// Creates a new instance using the provided <see cref="Microsoft.ServiceFabric.Actors.ActorReference"/>.
+		/// Creates a new instance using the provided <see cref="ServiceReference"/>.
 		/// </summary>
-		/// <param name="actorReference"></param>
-		public ActorReferenceWrapper(ActorReference actorReference)
+		/// <param name="serviceReference"></param>
+		public ServiceReferenceWrapper(ServiceReference serviceReference)
 		{
-			if (actorReference == null) throw new ArgumentNullException(nameof(actorReference));
-			ActorReference = actorReference;
-			_id = actorReference.ActorId;
+			if (serviceReference == null) throw new ArgumentNullException(nameof(serviceReference));
+			ServiceReference = serviceReference;
+			_id = serviceReference.ID;
 		}
 
 		/// <summary>
@@ -51,10 +51,10 @@ namespace ServiceFabric.PubSubActors.State
 		/// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
 		/// </returns>
 		/// <param name="other">An object to compare with this object.</param>
-		public bool Equals(ActorReferenceWrapper other)
+		public bool Equals(ServiceReferenceWrapper other)
 		{
-			if (other == null) return false;
-			return Equals(other.ActorReference.ActorId, _id);
+			if (other?.ServiceReference?.ID == null) return false;
+			return Equals(other.ServiceReference.ID, _id);
 		}
 
 		/// <summary>
@@ -66,7 +66,7 @@ namespace ServiceFabric.PubSubActors.State
 		/// <param name="obj">The object to compare with the current object. </param><filterpriority>2</filterpriority>
 		public override bool Equals(object obj)
 		{
-			return Equals(obj as ActorReferenceWrapper);
+			return Equals(obj as ServiceReferenceWrapper);
 		}
 
 		/// <summary>
@@ -89,7 +89,7 @@ namespace ServiceFabric.PubSubActors.State
 		/// <param name="other">An object to compare with this object.</param>
 		public override bool Equals(ReferenceWrapper other)
 		{
-			return Equals(other as ActorReferenceWrapper);
+			return Equals(other as ServiceReferenceWrapper);
 		}
 
 		/// <summary>
@@ -99,8 +99,8 @@ namespace ServiceFabric.PubSubActors.State
 		/// <returns></returns>
 		public override Task PublishAsync(MessageWrapper message)
 		{
-			ISubscriberActor actor = (ISubscriberActor)ActorReference.Bind(typeof(ISubscriberActor));
-			return actor.ReceiveMessageAsync(message);
+			var client = SubscriberServicePartitionClient.Create(ServiceReference);
+			return client.ReceiveMessageAsync(message);
 		}
 	}
 }

@@ -1,25 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Microsoft.ServiceFabric.Actors;
+using ServiceFabric.PubSubActors.Interfaces;
 
 namespace ServiceFabric.PubSubActors.State
 {
 	/// <summary>
-	/// State for <see cref="BrokerActor"/>. Contains a regular queue and a dead letter queue for every registered Actor.
+	/// State for <see cref="BrokerActor"/>. Contains a regular queue and a dead letter queue for every registered listener.
 	/// </summary>
 	[DataContract]
 	public sealed class BrokerActorState
 	{
 		/// <summary>
-		/// Contains messages that could not be be sent to subscribed Actors. (has a limit)
+		/// Contains messages that could not be be sent to subscribed listeners. (has a limit)
 		/// </summary>
 		[DataMember]
-		public Dictionary<ActorReferenceWrapper, Queue<QueuedMessageWrapper>> ActorDeadLetters { get; set; }
-		
+		public Dictionary<ReferenceWrapper, Queue<MessageWrapper>> SubscriberDeadLetters { get; set; }
+
 		/// <summary>
-		/// Contains messages to be sent to subscribed Actors.
+		/// Contains messages to be sent to subscribed listeners.
 		/// </summary>
 		[DataMember]
-		public Dictionary<ActorReferenceWrapper, Queue<QueuedMessageWrapper>> ActorMessages{ get; set; }
+		public Dictionary<ReferenceWrapper, Queue<MessageWrapper>> SubscriberMessages{ get; set; }
 	}
 }

@@ -21,6 +21,7 @@
       "dependencies": {
         "ServiceFabric.PubSubActors.Interfaces": "1.0.0-preview",
         "Microsoft.ServiceFabric.Actors": "1.5.175-preview",
+        "Microsoft.ServiceFabric.Services": "1.5.175-preview",
         "Newtonsoft.Json": "8.0.2"
       }
     },
@@ -28,6 +29,7 @@
       "dependencies": {
         "ServiceFabric.PubSubActors.Interfaces": "1.0.0-preview",
         "Microsoft.ServiceFabric.Actors": "1.5.175-preview",
+        "Microsoft.ServiceFabric.Services": "1.5.175-preview",
         "Newtonsoft.Json": "8.0.2"
       }
     }
