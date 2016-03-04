@@ -3,7 +3,7 @@
   "copyright": "2016",
   "title": "ServiceFabric.PubSubActors.Interfaces",
   "requireLicenseAcceptance": true,
-  "description": "Used by ServiceFabric.PubSubActors, which adds pub/sub behaviour to your Reliable Actors in Service Fabric. Add this package to your Reliable Actor.Interfaces projects.",
+  "description": "Used by ServiceFabric.PubSubActors, which adds pub/sub behaviour to your Reliable Actors in Service Fabric. Add this package to your Reliable Actor.Interfaces projects. How to use this package: https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/README.md",
   "summary": "Main Package 'ServiceFabric.PubSubActors' lets a 'Publisher Actor' publish messages to 'Subscriber Actors', without the need to know anything about those Subscriber Actors.",
   "authors": [ "Loek Duys" ],
   "tags": [ "ServiceFabric", "Service", "Fabric", "Actor", "Pub", "Sub", "Reliable" ],
@@ -16,13 +16,13 @@
   "frameworks": {
     "net451": {
       "dependencies": {
-        "Microsoft.ServiceFabric.Actors": "1.4.87-preview",
+        "Microsoft.ServiceFabric.Actors": "1.5.175-preview",
         "Newtonsoft.Json": "8.0.2"
       }
     },
     "net460": {
       "dependencies": {
-        "Microsoft.ServiceFabric.Actors": "1.4.87-preview",
+        "Microsoft.ServiceFabric.Actors": "1.5.175-preview",
         "Newtonsoft.Json": "8.0.2"
       }
     }
