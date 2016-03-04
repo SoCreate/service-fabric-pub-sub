@@ -1,5 +1,5 @@
 ﻿{
-  "version": "0.9.2-preview",
+  "version": "1.0.0-preview",
   "copyright": "2016",
   "title": "ServiceFabric.PubSubActors.Interfaces",
   "requireLicenseAcceptance": true,
