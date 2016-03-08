@@ -1,21 +1,25 @@
 # Service Fabric Pub/Sub Actors
 
 ## Nuget:
-https://www.nuget.org/packages/ServiceFabric.PubSubActors/0.9.2-preview
-https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces/0.9.2-preview
+https://www.nuget.org/packages/ServiceFabric.PubSubActors/2.0.0-preview
+https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces/2.0.0-preview
 
 ## Introduction
-Using this package you can reliably send messages from PublisherActor to many SubscriberActors. 
+Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services). 
 This is done using an intermediate, called BrokerActor.
 Add this package to all Reliable Actor projects that participate in the pub/sub messaging.
 Add the package 'ServiceFabric.PubSubActors.Interfaces' to all (*ReliableActor).Interfaces projects.
 
 |    publisher  |     broker    |subscriber|
 | ------------- |:-------------:| -----:|
-|[PublisherActor]||
+|[Publishing Actor]||
 ||[BrokerActor]|
-|||[SubscriberActor]|
-|||[SubscriberActor]|
+|||[Subscribing Actors]|
+|||[Subscribing Services]|
+|[Publishing Service]||
+||[BrokerActor]|
+|||[Subscribing Services]|
+|||[Subscribing Actors]|
 
 ## How to use:
 
@@ -97,7 +101,7 @@ subActor.RegisterAsync().GetAwaiter().GetResult();
 ```
 
 
-### Publishing messages
+### Publishing messages from Actors
 *Create a sample Actor that publishes messages.*
 In this example, the Actor called 'PublishingActor' publishes messages of Type 'PublishedMessageOne'.
 
@@ -118,13 +122,14 @@ public interface IPublishingActor : IActor
 Now open the file PublishingActor.cs in the project 'PublishingActor' and replace the contents with this code:
 **notice that this Actor now inherits from 'StatelessPublisherActor'.**
 ```javascript
+using ServiceFabric.PubSubActors.PublisherActors;
 //no attribute required.
-internal class PublishingActor : StatelessPublisherActor, IPublishingActor
+internal class PublishingActor : StatelessActor, IPublishingActor
 {
 	async Task<string> IPublishingActor.PublishMessageOneAsync()
 	{
 		ActorEventSource.Current.ActorMessage(this, "Publishing Message");
-		await PublishMessageAsync(new PublishedMessageOne {Content = "Hello PubSub World!"});
+		await this.PublishMessageAsync(new PublishedMessageOne {Content = "Hello PubSub World, from Actor!"});
 		return "Message published";
 	}
 }
@@ -138,4 +143,37 @@ pubActor = ActorProxy.Create<IPublishingActor>(actorId, applicationName);
 pubActor.PublishMessageOneAsync()
 ```
 
+### Publishing messages from Services
+*Create a sample Service that publishes messages.*
+In this example, the Service called 'PublishingStatelessService' publishes messages of Type 'PublishedMessageOne'.
 
+Add a Reliable Stateless Service project called 'PublishingStatelessService'.
+Add Nuget package 'ServiceFabric.PubSubActors'.
+Add a reference to the shared data contracts library ('DataContracts').
+Go to the project 'DataContracts' and add an interface file IPublishingStatelessService.cs. 
+Add the code below:
+```javascript
+[ServiceContract]
+public interface IPublishingStatelessService : IService
+{
+	[OperationContract]
+	Task<string> PublishMessageOneAsync();
+}
+```
+Open the file 'PublishingStatelessService.cs'. Replace the contents with the code below:
+```javascript
+internal sealed class PublishingStatelessService : StatelessService, IPublishingStatelessService
+{
+	protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+	{
+		yield return new ServiceInstanceListener(parameters => new ServiceRemotingListener<IPublishingStatelessService>(parameters, this));
+	}
+
+	async Task<string> IPublishingStatelessService.PublishMessageOneAsync()
+	{
+		ServiceEventSource.Current.ServiceMessage(this, "Publishing Message");
+		await this.PublishMessageAsync(new PublishedMessageOne { Content = "Hello PubSub World, from Service!" });
+		return "Message published";
+	}
+}
+```
