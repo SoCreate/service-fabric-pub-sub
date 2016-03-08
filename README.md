@@ -54,7 +54,7 @@ public class PublishedMessageOne
 }
 ```
 
-### Subscribing to messages
+### Subscribing to messages using Actors
 *Create a sample Actor that implements 'ISubscriberActor', to become a subscriber to messages.*
 In this example, the Actor called 'SubscribingActor' subscribes to messages of Type 'PublishedMessageOne'.
 
@@ -100,6 +100,55 @@ ISubscriberActor subActor = ActorProxy.Create<ISubscribingActor>(actorId, applic
 subActor.RegisterAsync().GetAwaiter().GetResult();
 ```
 
+### Subscribing to messages using Services
+*Create a sample Service that implements 'ISubscriberService', to become a subscriber to messages.*
+In this example, the Service called 'SubscribingStatefulService' subscribes to messages of Type 'PublishedMessageOne'.
+
+Add a Reliable Stateless Service project called 'SubscribingStatefulService'.
+Add Nuget package 'ServiceFabric.PubSubActors'.
+Add a reference to the shared data contracts library ('DataContracts').
+Implement 'ServiceFabric.PubSubActors.SubscriberServices.ISubscriberService'.
+
+Now open the file SubscribingStatefulService.cs in the project 'SubscribingStatefulService' and replace the contents with this code:
+
+```javascript
+using ServiceFabric.PubSubActors.PublisherActors;
+internal sealed class SubscribingStatefulService : StatefulService, ISubscriberService
+{
+	protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
+	{
+		//add SubscriberCommunicationListener for receiving published messages.
+		yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p));
+	}
+
+	public Task RegisterAsync()
+	{
+		return this.RegisterMessageTypeAsync(typeof(PublishedMessageOne));
+	}
+
+	public Task UnregisterAsync()
+	{
+		return this.UnregisterMessageTypeAsync(typeof(PublishedMessageOne), true);
+	}
+
+	//receives published messages:
+	public Task ReceiveMessageAsync(MessageWrapper message)
+	{
+		var payload = this.Deserialize<PublishedMessageOne>(message);
+		ServiceEventSource.Current.ServiceMessage(this, $"Received message: {payload.Content}");
+		//TODO: handle message
+		return Task.FromResult(true);
+	}
+}
+```
+Call 'RegisterAsync' to make the service register itself as subscriber.
+You can do that from the outside, or within the service itself, provided 'CreateServiceReplicaListeners' has been called first.
+
+```javascript
+var pubActor = ServiceProxy.Create<IPublishingStatelessService>(serviceName);
+pubActor.RegisterAsync().GetAwaiter().GetResult();
+```
+
 
 ### Publishing messages from Actors
 *Create a sample Actor that publishes messages.*
@@ -120,7 +169,7 @@ public interface IPublishingActor : IActor
 ```
 
 Now open the file PublishingActor.cs in the project 'PublishingActor' and replace the contents with this code:
-**notice that this Actor now inherits from 'StatelessPublisherActor'.**
+
 ```javascript
 using ServiceFabric.PubSubActors.PublisherActors;
 //no attribute required.
