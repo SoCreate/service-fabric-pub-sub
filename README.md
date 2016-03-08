@@ -1,4 +1,8 @@
 # Service Fabric Pub/Sub Actors
+Do you want to create an Event Driven Architecture while using Azure Service Fabric?
+Do you need to reliably broadcast messages between Actors and Services?
+This code will help you do that.
+It supports both Actors and Services as publishers and subscribers.
 
 ## Nuget:
 https://www.nuget.org/packages/ServiceFabric.PubSubActors/2.0.0-preview
