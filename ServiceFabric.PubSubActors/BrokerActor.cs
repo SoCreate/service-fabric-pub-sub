@@ -10,7 +10,7 @@ namespace ServiceFabric.PubSubActors
 {
 	/// <remarks>
 	/// Base class for a Stateful Actor that serves as a Broker that accepts messages 
-	/// from <see cref="StatefulPublisherActor"/> Actors and/or <see cref="StatelessPublisherActor"/> Actors
+	/// from Actors calling <see cref="PublisherActorExtensions.PublishMessageAsync"/>
 	/// and forwards them to <see cref="ISubscriberActor"/> Actors.
 	/// Every message type results in 1 BrokerActor instance.
 	/// </remarks>
@@ -32,18 +32,6 @@ namespace ServiceFabric.PubSubActors
 		/// Gets or sets the interval to wait between batches of publishing messages. (Default: 5s)
 		/// </summary>
 		protected TimeSpan Period { get; set; } = TimeSpan.FromSeconds(5);
-
-		/// <summary>
-		/// Gets or sets the maximum amount of attempts to broadcast a message to subscribers. (default: 5)
-		/// </summary>
-		[Obsolete("No longer used.")]
-		protected int MaxRetryCount { get; set; } = 5;
-
-		/// <summary>
-		/// Gets or sets the delay between retrying attempts to broadcast a message to subscribers. (default: 1s)
-		/// </summary>
-		[Obsolete("No longer used.")]
-		protected TimeSpan RetryInterval { get; set; } = TimeSpan.FromSeconds(1);
 
 		/// <summary>
 		/// When Set, this callback will be used to trace Actor messages to.

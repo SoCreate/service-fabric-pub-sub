@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Fabric;
-using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading;
 using System.Threading.Tasks;
