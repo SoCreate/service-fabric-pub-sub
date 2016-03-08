@@ -4,21 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
-    <ProjectGuid>{4E31404A-F896-45A0-B8F0-360C4E2F5732}</ProjectGuid>
+    <ProjectGuid>{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PublishingActor</RootNamespace>
-    <AssemblyName>PublishingActor</AssemblyName>
+    <RootNamespace>PublishingStatelessService</RootNamespace>
+    <AssemblyName>PublishingStatelessService</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup>
-    <UpdateServiceFabricManifestEnabled>true</UpdateServiceFabricManifestEnabled>
-    <ServicePackagePath>PackageRoot</ServicePackagePath>
-    <ServicePackagePrefix>$(MSBuildProjectName)</ServicePackagePrefix>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AdditionalFileItemNames>$(AdditionalFileItemNames);None</AdditionalFileItemNames>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -84,13 +82,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PublishingActor.cs" />
+    <Compile Include="PublishingStatelessService.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ActorEventSource.cs" />
+    <Compile Include="ServiceEventSource.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PackageRoot\ServiceManifest.xml" />
     <None Include="PackageRoot\Config\Settings.xml" />
+    <None Include="PackageRoot\ServiceManifest.xml" />
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="readme.md" />
@@ -99,10 +97,6 @@
     <ProjectReference Include="..\Common.DataContracts\Common.DataContracts.csproj">
       <Project>{1a90aae2-4ceb-4c60-a024-f9f5b517d38a}</Project>
       <Name>Common.DataContracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PublishingActor.Interfaces\PublishingActor.Interfaces.csproj">
-      <Project>{915B97D7-5A58-4617-B508-1825062FDAD9}</Project>
-      <Name>PublishingActor.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -113,4 +107,11 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.ServiceFabric.Actors.1.5.175-preview\build\Microsoft.ServiceFabric.Actors.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ServiceFabric.Actors.1.5.175-preview\build\Microsoft.ServiceFabric.Actors.targets'))" />
   </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>

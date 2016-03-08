@@ -74,6 +74,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IPublishingStatelessService.cs" />
     <Compile Include="PublishedMessageOne.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

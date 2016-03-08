@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubscribingStatelessService
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubscribingStatefulService", "SubscribingStatefulService\SubscribingStatefulService.csproj", "{80D0ED08-2554-4EF2-811D-3D1956703261}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublishingStatelessService", "PublishingStatelessService\PublishingStatelessService.csproj", "{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,12 @@ Global
 		{80D0ED08-2554-4EF2-811D-3D1956703261}.Release|Any CPU.ActiveCfg = Release|x64
 		{80D0ED08-2554-4EF2-811D-3D1956703261}.Release|x64.ActiveCfg = Release|x64
 		{80D0ED08-2554-4EF2-811D-3D1956703261}.Release|x64.Build.0 = Release|x64
+		{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}.Debug|x64.ActiveCfg = Debug|x64
+		{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}.Debug|x64.Build.0 = Debug|x64
+		{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}.Release|Any CPU.ActiveCfg = Release|x64
+		{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}.Release|x64.ActiveCfg = Release|x64
+		{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -124,5 +132,6 @@ Global
 		{AAA9AA78-B1C6-41EE-BDDB-B489E2306405} = {85FFC245-2F7D-47DA-A6C7-E1C57AB08CA0}
 		{C6AEE050-41BD-4F06-A392-E479B833DC7D} = {90F5DC3F-1A65-4C64-9071-13392D8D8176}
 		{80D0ED08-2554-4EF2-811D-3D1956703261} = {90F5DC3F-1A65-4C64-9071-13392D8D8176}
+		{66C029AB-982A-459F-B3C3-B7B2ED99BD9F} = {FD0D0D22-5BC4-4589-8D02-794539BE1877}
 	EndGlobalSection
 EndGlobal

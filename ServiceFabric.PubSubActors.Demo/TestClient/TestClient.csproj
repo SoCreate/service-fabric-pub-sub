@@ -59,8 +59,8 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ServiceFabric.PubSubActors.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceFabric.PubSubActors.Interfaces.1.0.0-preview\lib\net460\ServiceFabric.PubSubActors.Interfaces.dll</HintPath>
+    <Reference Include="ServiceFabric.PubSubActors.Interfaces, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceFabric.PubSubActors.Interfaces.2.0.0-preview\lib\net460\ServiceFabric.PubSubActors.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -87,6 +87,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common.DataContracts\Common.DataContracts.csproj">
+      <Project>{1a90aae2-4ceb-4c60-a024-f9f5b517d38a}</Project>
+      <Name>Common.DataContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PublishingActor.Interfaces\PublishingActor.Interfaces.csproj">
       <Project>{915b97d7-5a58-4617-b508-1825062fdad9}</Project>
       <Name>PublishingActor.Interfaces</Name>

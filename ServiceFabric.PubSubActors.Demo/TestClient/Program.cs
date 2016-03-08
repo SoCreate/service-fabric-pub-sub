@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.DataContracts;
 using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Services.Remoting.Client;
 using PublishingActor.Interfaces;
 using ServiceFabric.PubSubActors.Interfaces;
 using SubscribingActor.Interfaces;
@@ -15,9 +17,67 @@ namespace TestClient
 	{
 		static void Main(string[] args)
 		{
-			string applicationName = "fabric:/MyServiceFabricApp";
-			var actorId = new ActorId("PubActor");
+			var applicationName = "fabric:/MyServiceFabricApp";
+			var serviceName = $"{applicationName}/PublishingStatelessService";
+			var pubActor = GetPublishingActor(applicationName);
+			var pubService = GetPublishingService(new Uri(serviceName));
+
+			RegisterSubscribers(applicationName);
+			
+
+			while (true)
+			{
+				Console.Clear();
+				Console.WriteLine("Hit 1 to send message one, using an Actor.");
+				Console.WriteLine("Hit 2 to send message one, using a Service");
+				Console.WriteLine("Hit escape to exit.");
+				var key = Console.ReadKey(true);
+
+				switch (key.Key)
+				{
+					case ConsoleKey.D1:
+						{
+							pubActor.PublishMessageOneAsync().GetAwaiter().GetResult();
+							Console.WriteLine("Sent message one from Actor!");
+						}
+						break;
+					case ConsoleKey.D2:
+						{
+							pubService.PublishMessageOneAsync().GetAwaiter().GetResult();
+							Console.WriteLine("Sent message one from Service!");
+						}
+						break;
+
+					case ConsoleKey.Escape:
+						return;
+				}
+
+			}
+
+		}
+
+		private static IPublishingStatelessService GetPublishingService(Uri serviceName)
+		{
+			IPublishingStatelessService pubService = null;
+
+			while (pubService == null)
+			{
+				try
+				{
+					pubService = ServiceProxy.Create<IPublishingStatelessService>(serviceName);
+				}
+				catch
+				{
+					Thread.Sleep(200);
+				}
+			}
+			return pubService;
+		}
+
+		private static IPublishingActor GetPublishingActor(string applicationName)
+		{
 			IPublishingActor pubActor = null;
+			var actorId = new ActorId("PubActor");
 
 			while (pubActor == null)
 			{
@@ -30,37 +90,12 @@ namespace TestClient
 					Thread.Sleep(200);
 				}
 			}
-
-			
-			RegisterSubscribers(applicationName);
-			
-
-			while (true)
-			{
-				Console.Clear();
-				Console.WriteLine("Hit 1 to send message one, or hit escape to exit.");
-				var key = Console.ReadKey(true);
-
-				switch (key.Key)
-				{
-					case ConsoleKey.D1:
-						{
-							pubActor.PublishMessageOneAsync().GetAwaiter().GetResult();
-							Console.WriteLine("Sent message one!");
-						}
-						break;
-
-					case ConsoleKey.Escape:
-						return;
-				}
-
-			}
-
+			return pubActor;
 		}
 
 		private static void RegisterSubscribers(string applicationName)
 		{
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 3; i++)
 			{
 				var actorId = new ActorId("SubActor" + i.ToString("0000"));
 

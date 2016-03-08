@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="MyServiceFabricAppType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
    <Parameters>
+      <Parameter Name="PublishingStatelessService_InstanceCount" DefaultValue="-1" />
       <Parameter Name="SubscribingStatefulService_MinReplicaSetSize" DefaultValue="2" />
       <Parameter Name="SubscribingStatefulService_PartitionCount" DefaultValue="1" />
       <Parameter Name="SubscribingStatefulService_TargetReplicaSetSize" DefaultValue="3" />
@@ -11,6 +12,10 @@
       <Parameter Name="IBrokerActor_TargetReplicaSetSize" DefaultValue="3" />
       <Parameter Name="PublishingActorService_PartitionCount" DefaultValue="10" />
    </Parameters>
+   <ServiceManifestImport>
+      <ServiceManifestRef ServiceManifestName="PublishingStatelessServicePkg" ServiceManifestVersion="1.0.0" />
+      <ConfigOverrides />
+   </ServiceManifestImport>
    <ServiceManifestImport>
       <ServiceManifestRef ServiceManifestName="SubscribingStatefulServicePkg" ServiceManifestVersion="1.0.0" />
       <ConfigOverrides />
@@ -29,6 +34,11 @@
       <ServiceManifestRef ServiceManifestName="PublishingActorPkg" ServiceManifestVersion="1.0.0" />
    </ServiceManifestImport>
    <DefaultServices>
+      <Service Name="PublishingStatelessService">
+         <StatelessService ServiceTypeName="PublishingStatelessServiceType" InstanceCount="[PublishingStatelessService_InstanceCount]">
+            <SingletonPartition />
+         </StatelessService>
+      </Service>
       <Service Name="SubscribingStatefulService">
          <StatefulService ServiceTypeName="SubscribingStatefulServiceType" TargetReplicaSetSize="[SubscribingStatefulService_TargetReplicaSetSize]" MinReplicaSetSize="[SubscribingStatefulService_MinReplicaSetSize]">
             <UniformInt64Partition PartitionCount="[SubscribingStatefulService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />

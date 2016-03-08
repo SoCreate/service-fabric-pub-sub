@@ -65,12 +65,12 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ServiceFabric.PubSubActors, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceFabric.PubSubActors.1.0.0-preview\lib\net451\ServiceFabric.PubSubActors.dll</HintPath>
+    <Reference Include="ServiceFabric.PubSubActors, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceFabric.PubSubActors.2.0.0-preview\lib\net451\ServiceFabric.PubSubActors.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ServiceFabric.PubSubActors.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceFabric.PubSubActors.Interfaces.1.0.0-preview\lib\net451\ServiceFabric.PubSubActors.Interfaces.dll</HintPath>
+    <Reference Include="ServiceFabric.PubSubActors.Interfaces, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceFabric.PubSubActors.Interfaces.2.0.0-preview\lib\net451\ServiceFabric.PubSubActors.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
