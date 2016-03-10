@@ -12,8 +12,6 @@ namespace ServiceFabric.PubSubActors.State
 	[DataContract]
 	public class ActorReferenceWrapper : ReferenceWrapper
 	{
-		private readonly ActorId _id;
-
 		public override string Name
 		{
 			get { return $"{ActorReference.ServiceUri}\t{ActorReference.ActorId}"; }
@@ -40,8 +38,9 @@ namespace ServiceFabric.PubSubActors.State
 		public ActorReferenceWrapper(ActorReference actorReference)
 		{
 			if (actorReference == null) throw new ArgumentNullException(nameof(actorReference));
+			if (actorReference.ActorId == null) throw new ArgumentException(nameof(actorReference.ActorId));
+
 			ActorReference = actorReference;
-			_id = actorReference.ActorId;
 		}
 
 		/// <summary>
@@ -54,7 +53,7 @@ namespace ServiceFabric.PubSubActors.State
 		public bool Equals(ActorReferenceWrapper other)
 		{
 			if (other == null) return false;
-			return Equals(other.ActorReference.ActorId, _id);
+			return Equals(other.ActorReference.ActorId, ActorReference.ActorId);
 		}
 
 		/// <summary>
@@ -77,7 +76,8 @@ namespace ServiceFabric.PubSubActors.State
 		/// </returns>
 		public override int GetHashCode()
 		{
-			return _id.GetHashCode();
+			// ReSharper disable NonReadonlyMemberInGetHashCode  - need to support Serialization.
+			return ActorReference.ActorId.GetHashCode();
 		}
 
 		/// <summary>

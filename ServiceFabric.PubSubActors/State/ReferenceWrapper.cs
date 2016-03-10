@@ -6,7 +6,7 @@ using ServiceFabric.PubSubActors.Interfaces;
 namespace ServiceFabric.PubSubActors.State
 {
 	/// <summary>
-	/// Encapsulates an <see cref="Microsoft.ServiceFabric.Actors.ActorReference"/> to make it equatable.
+	/// Encapsulates an <see cref="Microsoft.ServiceFabric.Actors.ActorReference"/> or <see cref="ServiceReference"/> to make it equatable.
 	/// </summary>
 	[DataContract]
 	[KnownType(typeof(ActorReferenceWrapper))]

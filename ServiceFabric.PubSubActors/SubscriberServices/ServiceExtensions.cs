@@ -106,7 +106,8 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 			{
 				ApplicationName = parameters.CodePackageActivationContext.ApplicationName,
 				PartitionKind = info.Kind,
-				ServiceUri = parameters.ServiceName
+				ServiceUri = parameters.ServiceName,
+				PartitionGuid = parameters.PartitionId,
 			};
 
 			var longInfo = info as Int64RangePartitionInformation;

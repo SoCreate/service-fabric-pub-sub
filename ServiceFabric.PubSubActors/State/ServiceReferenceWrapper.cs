@@ -12,11 +12,9 @@ namespace ServiceFabric.PubSubActors.State
 	[DataContract]
 	public class ServiceReferenceWrapper : ReferenceWrapper
 	{
-		private readonly string _id;
-
 		public override string Name
 		{
-			get { return ServiceReference.ID; }
+			get { return ServiceReference.Description; }
 		}
 
 		/// <summary>
@@ -40,8 +38,8 @@ namespace ServiceFabric.PubSubActors.State
 		public ServiceReferenceWrapper(ServiceReference serviceReference)
 		{
 			if (serviceReference == null) throw new ArgumentNullException(nameof(serviceReference));
+			
 			ServiceReference = serviceReference;
-			_id = serviceReference.ID;
 		}
 
 		/// <summary>
@@ -53,8 +51,8 @@ namespace ServiceFabric.PubSubActors.State
 		/// <param name="other">An object to compare with this object.</param>
 		public bool Equals(ServiceReferenceWrapper other)
 		{
-			if (other?.ServiceReference?.ID == null) return false;
-			return Equals(other.ServiceReference.ID, _id);
+			if (other?.ServiceReference?.PartitionGuid == null) return false;
+			return Equals(other.ServiceReference.PartitionGuid, ServiceReference.PartitionGuid);
 		}
 
 		/// <summary>
@@ -77,7 +75,8 @@ namespace ServiceFabric.PubSubActors.State
 		/// </returns>
 		public override int GetHashCode()
 		{
-			return _id.GetHashCode();
+			// ReSharper disable NonReadonlyMemberInGetHashCode  - need to support Serialization.
+			return ServiceReference.PartitionGuid.GetHashCode();
 		}
 
 		/// <summary>

@@ -29,7 +29,11 @@ namespace ServiceFabric.PubSubActors.Interfaces
 		[DataMember(IsRequired = false)]
 		public long? PartitionID { get; set; }
 
-		public string ID
+
+		[DataMember(IsRequired = false)]
+		public Guid PartitionGuid { get; set; }
+
+		public string Description
 		{
 
 			get
@@ -39,16 +43,16 @@ namespace ServiceFabric.PubSubActors.Interfaces
 				switch (PartitionKind)
 				{
 					case ServicePartitionKind.Invalid:
-						description = $"{ServiceUri} - ID:invalid";
+						description = $"{ServiceUri} - ID:invalid - Guid:{PartitionGuid}";
 						break;
 					case ServicePartitionKind.Singleton:
-						description = $"{ServiceUri} - ID:singleton";
+						description = $"{ServiceUri} - ID:singleton - Guid:{PartitionGuid}";
 						break;
 					case ServicePartitionKind.Int64Range:
-						description = $"{ServiceUri} - ID:{PartitionID}";
+						description = $"{ServiceUri} - ID:{PartitionID} - Guid:{PartitionGuid}";
 						break;
 					case ServicePartitionKind.Named:
-						description = $"{ServiceUri} - ID:{PartitionName}";
+						description = $"{ServiceUri} - ID:{PartitionName} - Guid:{PartitionGuid}";
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();
