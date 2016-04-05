@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Fabric;
 using System.Threading;
 using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Runtime;
 using ServiceFabric.PubSubActors;
 
 namespace PublishingActor
@@ -16,20 +17,12 @@ namespace PublishingActor
 		{
 			try
 			{
-				// Creating a FabricRuntime connects this host process to the Service Fabric runtime on this node.
-				using (FabricRuntime fabricRuntime = FabricRuntime.Create())
-				{
-					// This line registers your actor class with the Fabric Runtime.
-					// The contents of your ServiceManifest.xml and ApplicationManifest.xml files
-					// are automatically populated when you build this project.
-					// For information, see http://aka.ms/servicefabricactorsplatform
-					fabricRuntime.RegisterActor<PublishingActor>();
-					Thread.Sleep(Timeout.Infinite);  // Prevents this host process from terminating so services keeps running.
-				}
+				ActorRuntime.RegisterActorAsync<PublishingActor>().GetAwaiter().GetResult();
+				Thread.Sleep(Timeout.Infinite);  // Prevents this host process from terminating so services keeps running.
 			}
 			catch (Exception e)
 			{
-				ActorEventSource.Current.ActorHostInitializationFailed(e.ToString());
+				ActorEventSource.Current.ActorHostInitializationFailed(e);
 				throw;
 			}
 		}

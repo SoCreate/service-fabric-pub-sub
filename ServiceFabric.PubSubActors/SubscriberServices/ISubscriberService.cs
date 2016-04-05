@@ -1,5 +1,6 @@
 ﻿using System.ServiceModel;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Services.Remoting;
 using ServiceFabric.PubSubActors.Interfaces;
 
 namespace ServiceFabric.PubSubActors.SubscriberServices
@@ -8,7 +9,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 	/// Defines a common interface for all Subscriber Services. 
 	/// </summary>
 	[ServiceContract]
-	public interface ISubscriberService
+	public interface ISubscriberService : IService
     {
 		/// <summary>
 		/// Registers this Service as a subscriber for messages.

@@ -13,31 +13,29 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 	/// <see cref="ICommunicationListener"/> implementation for receiving messages in Subscriber Services.
 	/// Note: implement <see cref="ISubscriberService"/> on your Reliable Service, and pass it in the ctor and
 	/// return a new instance of <see cref="SubscriberCommunicationListener"/> from <see cref="StatefulService.CreateServiceReplicaListeners"/> or 
-	/// <see cref="StatelessServiceBase.CreateServiceInstanceListeners"/>.
+	/// <see cref="StatelessService.CreateServiceInstanceListeners"/>.
 	/// </summary>
 	public class SubscriberCommunicationListener : ICommunicationListener
 	{
 		public const string EndpointResourceName = "Subscriber";
 		private readonly ISubscriberService _subscriberService;
-		private readonly ServiceInitializationParameters _serviceInitializationParameters;
-		private WcfCommunicationListener _wrappedCommunicationListener;
+		private readonly ServiceContext _serviceContext;
+		private ICommunicationListener _wrappedCommunicationListener;
 
 		/// <summary>
 		/// Creates a new communication listener that receives published messages from 
 		/// <see cref="BrokerActor"/> after being registered there.
 		/// </summary>
 		/// <param name="subscriberService"></param>
-		/// <param name="serviceInitializationParameters"></param>
-		public SubscriberCommunicationListener(ISubscriberService subscriberService, ServiceInitializationParameters serviceInitializationParameters)
+		/// <param name="serviceContext"></param>
+		public SubscriberCommunicationListener(ISubscriberService subscriberService, ServiceContext serviceContext)
 		{
 			if (subscriberService == null) throw new ArgumentNullException(nameof(subscriberService));
-			if (serviceInitializationParameters == null)
-				throw new ArgumentNullException(nameof(serviceInitializationParameters));
+			if (serviceContext == null) throw new ArgumentNullException(nameof(serviceContext));
 
 			_subscriberService = subscriberService;
-			_serviceInitializationParameters = serviceInitializationParameters;
+			_serviceContext = serviceContext;
 		}
-
 		
 		/// <summary>
 		/// This method causes the communication listener to be opened. Once the Open
@@ -50,13 +48,8 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		/// </returns>
 		public Task<string> OpenAsync(CancellationToken cancellationToken)
 		{
-			_wrappedCommunicationListener = new WcfCommunicationListener(_serviceInitializationParameters,
-			   typeof(ISubscriberService), _subscriberService)
-			{
-				EndpointResourceName = EndpointResourceName,
-				Binding = CreateBinding(),
-			};
-
+			_wrappedCommunicationListener = new WcfCommunicationListener<ISubscriberService>(_serviceContext, _subscriberService,
+				CreateBinding(), EndpointResourceName);
 			
 			return _wrappedCommunicationListener.OpenAsync(cancellationToken);
 		}

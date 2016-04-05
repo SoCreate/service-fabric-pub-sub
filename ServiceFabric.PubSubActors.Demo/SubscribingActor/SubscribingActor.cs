@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Common.DataContracts;
 using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Runtime;
 using ServiceFabric.PubSubActors.Interfaces;
 using SubscribingActor.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberActors;
@@ -13,16 +14,17 @@ namespace SubscribingActor
 	/// reference) defines the operations exposed by SubscribingActor objects.
 	/// </remarks>
 	[ActorService(Name = nameof(ISubscribingActor))]
-	internal class SubscribingActor : StatelessSubscriberActor, ISubscribingActor
+	[StatePersistence(StatePersistence.None)]
+	internal class SubscribingActor : Actor, ISubscribingActor
 	{
 		public Task RegisterAsync()
 		{
-			return RegisterMessageTypeAsync(typeof(PublishedMessageOne)); //register as subscriber for this type of messages
+			return this.RegisterMessageTypeAsync(typeof(PublishedMessageOne)); //register as subscriber for this type of messages
 		}
 
 		public Task ReceiveMessageAsync(MessageWrapper message)
 		{
-			var payload = Deserialize<PublishedMessageOne>(message);
+			var payload = this.Deserialize<PublishedMessageOne>(message);
 			ActorEventSource.Current.ActorMessage(this, $"Received message: {payload.Content}");
 			//TODO: handle message
 			return Task.FromResult(true);

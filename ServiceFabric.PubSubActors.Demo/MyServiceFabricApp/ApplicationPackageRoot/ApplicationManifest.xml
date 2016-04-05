@@ -11,6 +11,10 @@
       <Parameter Name="IBrokerActor_MinReplicaSetSize" DefaultValue="2" />
       <Parameter Name="IBrokerActor_TargetReplicaSetSize" DefaultValue="3" />
       <Parameter Name="PublishingActorService_PartitionCount" DefaultValue="10" />
+      <Parameter Name="PublishingActorService_MinReplicaSetSize" DefaultValue="1" />
+      <Parameter Name="PublishingActorService_TargetReplicaSetSize" DefaultValue="1" />
+      <Parameter Name="ISubscribingActor_MinReplicaSetSize" DefaultValue="1" />
+      <Parameter Name="ISubscribingActor_TargetReplicaSetSize" DefaultValue="1" />
    </Parameters>
    <ServiceManifestImport>
       <ServiceManifestRef ServiceManifestName="PublishingStatelessServicePkg" ServiceManifestVersion="1.0.0" />
@@ -49,20 +53,20 @@
             <SingletonPartition />
          </StatelessService>
       </Service>
-      <Service Name="ISubscribingActor" GeneratedIdRef="3d871438-e941-4b57-b4e5-86074f6c3e1e">
-         <StatelessService ServiceTypeName="ISubscribingActorType">
+      <Service Name="ISubscribingActor" GeneratedIdRef="16067bff-424d-40d1-b72e-2d892236ed11|None">
+         <StatefulService ServiceTypeName="ISubscribingActorType" TargetReplicaSetSize="[ISubscribingActor_TargetReplicaSetSize]" MinReplicaSetSize="[ISubscribingActor_MinReplicaSetSize]">
             <UniformInt64Partition PartitionCount="[ISubscribingActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
-         </StatelessService>
+         </StatefulService>
       </Service>
-      <Service Name="IBrokerActor" GeneratedIdRef="9c71704d-7bda-4cc8-a383-59edec1b5e40">
+      <Service Name="IBrokerActor" GeneratedIdRef="a4642aa5-7f04-4e8e-a783-2e03f8f11570|None">
          <StatefulService ServiceTypeName="IBrokerActorType" TargetReplicaSetSize="[IBrokerActor_TargetReplicaSetSize]" MinReplicaSetSize="[IBrokerActor_MinReplicaSetSize]">
             <UniformInt64Partition PartitionCount="[IBrokerActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
          </StatefulService>
       </Service>
-      <Service Name="PublishingActorService" GeneratedIdRef="94a6c297-1ea7-478c-9299-3936fdc1e79e">
-         <StatelessService ServiceTypeName="PublishingActorServiceType">
+      <Service Name="PublishingActorService" GeneratedIdRef="22068388-3b11-4506-8354-cef82a7e8c56|None">
+         <StatefulService ServiceTypeName="PublishingActorServiceType" TargetReplicaSetSize="[PublishingActorService_TargetReplicaSetSize]" MinReplicaSetSize="[PublishingActorService_MinReplicaSetSize]">
             <UniformInt64Partition PartitionCount="[PublishingActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
-         </StatelessService>
+         </StatefulService>
       </Service>
    </DefaultServices>
 </ApplicationManifest>

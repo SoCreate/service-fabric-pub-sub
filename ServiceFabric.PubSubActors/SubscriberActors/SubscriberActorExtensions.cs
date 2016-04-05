@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Client;
+using Microsoft.ServiceFabric.Actors.Runtime;
 using Newtonsoft.Json;
 using ServiceFabric.PubSubActors.Interfaces;
 
 namespace ServiceFabric.PubSubActors.SubscriberActors
 {
 	/// <summary>
-	/// Common operations for Actors of type <see cref="ServiceFabric.PubSubActors.SubscriberActors"/>
+	/// Common operations for Actors to become Subscribers
 	/// </summary>
-	internal static class SubscriberActorExtensions
+	public static class SubscriberActorExtensions
 	{
 		/// <summary>
 		/// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/>.
 		/// </summary>
 		/// <returns></returns>
-		public static async Task CommonRegisterAsync(this ActorBase actor, Type messageType)
+		public static async Task RegisterMessageTypeAsync(this ActorBase actor, Type messageType)
 		{
 			if (actor == null) throw new ArgumentNullException(nameof(actor));
 			ActorId actorId = new ActorId(messageType.FullName);
@@ -28,7 +30,7 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
 		/// </summary>
 		/// <typeparam name="TResult"></typeparam>
 		/// <returns></returns>
-		public static TResult CommonDeserialize<TResult>(this ActorBase actor, MessageWrapper message)
+		public static TResult Deserialize<TResult>(this ActorBase actor, MessageWrapper message)
 		{
 			var payload = JsonConvert.DeserializeObject<TResult>(message.Payload);
 			return payload;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Runtime;
 using PubSubActor.Interfaces;
 using ServiceFabric.PubSubActors.Interfaces;
 

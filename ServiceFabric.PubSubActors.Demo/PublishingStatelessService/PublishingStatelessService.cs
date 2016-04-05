@@ -9,8 +9,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.DataContracts;
 using Microsoft.ServiceFabric.Services.Remoting;
+using Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using ServiceFabric.PubSubActors.PublisherServices;
+using System.Fabric;
 
 namespace PublishingStatelessService
 {
@@ -19,13 +21,17 @@ namespace PublishingStatelessService
 	/// </summary>
 	internal sealed class PublishingStatelessService : StatelessService, IPublishingStatelessService
 	{
+		public PublishingStatelessService(StatelessServiceContext serviceContext) : base(serviceContext)
+		{
+		}
+
 		/// <summary>
 		/// Optional override to create listeners (like tcp, http) for this service instance.
 		/// </summary>
 		/// <returns>The collection of listeners.</returns>
 		protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
 		{
-			yield return new ServiceInstanceListener(parameters => new ServiceRemotingListener<IPublishingStatelessService>(parameters, this));
+			yield return new ServiceInstanceListener(context => new FabricTransportServiceRemotingListener(context, this));
 		}
 
 		/// <summary>

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Fabric;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Client;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Newtonsoft.Json;
 using ServiceFabric.PubSubActors.Interfaces;
@@ -15,8 +17,11 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		/// </summary>
 		/// <typeparam name="TResult"></typeparam>
 		/// <returns></returns>
-		public static TResult Deserialize<TResult>(this StatefulService service, MessageWrapper message)
+		public static TResult Deserialize<TResult>(this StatefulServiceBase service, MessageWrapper message)
 		{
+			if (message == null) throw new ArgumentNullException(nameof(message));
+			if (string.IsNullOrWhiteSpace(message.Payload)) throw new ArgumentNullException(nameof(message.Payload));
+
 			var payload = JsonConvert.DeserializeObject<TResult>(message.Payload);
 			return payload;
 		}
@@ -26,8 +31,11 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		/// </summary>
 		/// <typeparam name="TResult"></typeparam>
 		/// <returns></returns>
-		public static TResult Deserialize<TResult>(this StatelessServiceBase service, MessageWrapper message)
+		public static TResult Deserialize<TResult>(this StatelessService service, MessageWrapper message)
 		{
+			if (message == null) throw new ArgumentNullException(nameof(message));
+			if (string.IsNullOrWhiteSpace(message.Payload)) throw new ArgumentNullException(nameof(message.Payload));
+
 			var payload = JsonConvert.DeserializeObject<TResult>(message.Payload);
 			return payload;
 		}
@@ -36,9 +44,10 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		/// Registers a service as a subscriber for messages of type <paramref name="messageType"/>.
 		/// </summary>
 		/// <returns></returns>
-		public static Task RegisterMessageTypeAsync(this StatefulService service, Type messageType)
+		public static Task RegisterMessageTypeAsync(this StatefulServiceBase service, Type messageType)
 		{
-			return RegisterMessageTypeAsync(service.ServiceInitializationParameters, service.ServicePartition.PartitionInfo, messageType);
+			if (service == null) throw new ArgumentNullException(nameof(service));
+			return RegisterMessageTypeAsync(service.Context, service.GetServicePartition().PartitionInfo, messageType);
 		}
 
 		/// <summary>
@@ -47,7 +56,8 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		/// <returns></returns>
 		public static Task RegisterMessageTypeAsync(this StatelessService service, Type messageType)
 		{
-			return RegisterMessageTypeAsync(service.ServiceInitializationParameters, service.ServicePartition.PartitionInfo, messageType);
+			if (service == null) throw new ArgumentNullException(nameof(service));
+			return RegisterMessageTypeAsync(service.Context, service.GetServicePartition().PartitionInfo, messageType);
 		}
 
 		/// <summary>
@@ -56,16 +66,46 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		/// <returns></returns>
 		public static Task UnregisterMessageTypeAsync(this StatelessService service, Type messageType, bool flushQueue)
 		{
-			return UnregisterMessageTypeAsync(service.ServiceInitializationParameters, service.ServicePartition.PartitionInfo, messageType, flushQueue);
+			if (service == null) throw new ArgumentNullException(nameof(service));
+			return UnregisterMessageTypeAsync(service.Context, service.GetServicePartition().PartitionInfo, messageType, flushQueue);
 		}
 
 		/// <summary>
 		/// Unregisters a service as a subscriber for messages of type <paramref name="messageType"/>.
 		/// </summary>
 		/// <returns></returns>
-		public static Task UnregisterMessageTypeAsync(this StatefulService service, Type messageType, bool flushQueue)
+		public static Task UnregisterMessageTypeAsync(this StatefulServiceBase service, Type messageType, bool flushQueue)
 		{
-			return UnregisterMessageTypeAsync(service.ServiceInitializationParameters, service.ServicePartition.PartitionInfo, messageType, flushQueue);
+			if (service == null) throw new ArgumentNullException(nameof(service));
+			return UnregisterMessageTypeAsync(service.Context, service.GetServicePartition().PartitionInfo, messageType, flushQueue);
+		}
+
+		/// <summary>
+		/// Gets the Partition info for the provided StatefulServiceBase instance.
+		/// </summary>
+		/// <param name="serviceBase"></param>
+		/// <returns></returns>
+		public static IStatefulServicePartition GetServicePartition(this StatefulServiceBase serviceBase)
+		{
+			if (serviceBase == null) throw new ArgumentNullException(nameof(serviceBase));
+			return (IStatefulServicePartition)serviceBase
+				.GetType()
+				.GetProperty("Partition", BindingFlags.Instance | BindingFlags.NonPublic)
+				.GetValue(serviceBase);
+		}
+
+		/// <summary>
+		/// Gets the Partition info for the provided StatelessService instance.
+		/// </summary>
+		/// <param name="serviceBase"></param>
+		/// <returns></returns>
+		public static IStatelessServicePartition GetServicePartition(this StatelessService serviceBase)
+		{
+			if (serviceBase == null) throw new ArgumentNullException(nameof(serviceBase));
+			return (IStatelessServicePartition)serviceBase
+				.GetType()
+				.GetProperty("Partition", BindingFlags.Instance | BindingFlags.NonPublic)
+				.GetValue(serviceBase);
 		}
 
 		/// <summary>
@@ -76,7 +116,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		{
 			ActorId actorId = new ActorId(messageType.FullName);
 			IBrokerActor brokerActor = ActorProxy.Create<IBrokerActor>(actorId, serviceReference.ApplicationName, nameof(IBrokerActor));
-			//await Task.FromResult(true);
+
 			await brokerActor.RegisterServiceSubscriberAsync(serviceReference);
 		}
 
@@ -88,29 +128,28 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		{
 			ActorId actorId = new ActorId(messageType.FullName);
 			IBrokerActor brokerActor = ActorProxy.Create<IBrokerActor>(actorId, serviceReference.ApplicationName, nameof(IBrokerActor));
-			//await Task.FromResult(true);
 
 			await brokerActor.UnregisterServiceSubscriberAsync(serviceReference, flushQueue);
 		}
 
 		/// <summary>
-		/// Creates a <see cref="ServiceReference"/> for the provided service parameters and partition info.
+		/// Creates a <see cref="ServiceReference"/> for the provided service context and partition info.
 		/// </summary>
-		/// <param name="parameters"></param>
+		/// <param name="context"></param>
 		/// <param name="info"></param>
 		/// <returns></returns>
-		internal static ServiceReference CreateServiceReference(ServiceInitializationParameters parameters,
-			ServicePartitionInformation info)
+		internal static ServiceReference CreateServiceReference(ServiceContext context, ServicePartitionInformation info)
 		{
 			var serviceReference = new ServiceReference
 			{
-				ApplicationName = parameters.CodePackageActivationContext.ApplicationName,
+				ApplicationName = context.CodePackageActivationContext.ApplicationName,
 				PartitionKind = info.Kind,
-				ServiceUri = parameters.ServiceName,
-				PartitionGuid = parameters.PartitionId,
+				ServiceUri = context.ServiceName,
+				PartitionGuid = context.PartitionId,
 			};
 
 			var longInfo = info as Int64RangePartitionInformation;
+			
 			//unsure why this is lowkey
 			if (longInfo != null)
 			{
@@ -131,9 +170,9 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		/// Registers a service as a subscriber for messages of type <paramref name="messageType"/>.
 		/// </summary>
 		/// <returns></returns>
-		private static Task RegisterMessageTypeAsync(ServiceInitializationParameters parameters, ServicePartitionInformation info, Type messageType)
+		private static Task RegisterMessageTypeAsync(ServiceContext context, ServicePartitionInformation info, Type messageType)
 		{
-			var serviceReference = CreateServiceReference(parameters, info);
+			var serviceReference = CreateServiceReference(context, info);
 			return RegisterMessageTypeAsync(serviceReference, messageType);
 		}
 
@@ -141,11 +180,10 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		/// Unregisters a service as a subscriber for messages of type <paramref name="messageType"/>.
 		/// </summary>
 		/// <returns></returns>
-		private static Task UnregisterMessageTypeAsync(ServiceInitializationParameters parameters, ServicePartitionInformation info, Type messageType, bool flushQueue)
+		private static Task UnregisterMessageTypeAsync(ServiceContext context, ServicePartitionInformation info, Type messageType, bool flushQueue)
 		{
-			var serviceReference = CreateServiceReference(parameters, info);
+			var serviceReference = CreateServiceReference(context, info);
 			return UnregisterMessageTypeAsync(serviceReference, messageType, flushQueue);
 		}
-
 	}
 }

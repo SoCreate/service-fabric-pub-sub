@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.DataContracts;
 using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using PublishingActor.Interfaces;
 using ServiceFabric.PubSubActors.Interfaces;

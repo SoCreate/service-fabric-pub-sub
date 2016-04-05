@@ -43,13 +43,13 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		}
 
 		private SubscriberServicePartitionClient(ICommunicationClientFactory<WcfCommunicationClient<ISubscriberService>> factory, Uri serviceName, string partitionKey)
-			: base(factory, serviceName, partitionKey)
+			: base(factory, serviceName, new ServicePartitionKey(partitionKey))
 		{
 		}
 
 		private SubscriberServicePartitionClient(ICommunicationClientFactory<WcfCommunicationClient<ISubscriberService>> factory, Uri serviceName, long partitionKey)
-			: base(factory, serviceName, partitionKey)
-		{
+			: base(factory, serviceName, new ServicePartitionKey(partitionKey))
+		{ 
 		}
 
 		public Task RegisterAsync()
@@ -74,9 +74,8 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 	internal class WcfCommunicationClientFactory : WcfCommunicationClientFactory<ISubscriberService>
 	{
 		public WcfCommunicationClientFactory()
-			: base(ServicePartitionResolver.GetDefault(), CreateBinding())
+			: base(CreateBinding())
 		{
-
 		}
 
 		private static Binding CreateBinding()

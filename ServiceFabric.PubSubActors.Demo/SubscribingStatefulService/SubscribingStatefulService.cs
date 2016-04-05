@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.DataContracts;
+using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Interfaces;
@@ -15,40 +17,48 @@ namespace SubscribingStatefulService
 	/// </summary>
 	internal sealed class SubscribingStatefulService : StatefulService, ISubscriberService
 	{
-		protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
+		public SubscribingStatefulService(StatefulServiceContext serviceContext) : base(serviceContext)
 		{
-			BeginRegistration();
-			yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p));
-
 		}
 
-		private void BeginRegistration()
+		public SubscribingStatefulService(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica) : base(serviceContext, reliableStateManagerReplica)
 		{
-			ThreadPool.QueueUserWorkItem(async _ =>
+		}
+
+		protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
+		{
+			yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p));
+		}
+
+		protected override async Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
+		{
+			await TryRegisterAsync();
+		}
+
+		private async Task TryRegisterAsync()
+		{
+			int retries = 0;
+			const int maxRetries = 10;
+			Thread.Yield();
+			while (true)
 			{
-				int retries = 0;
-				const int maxRetries = 10;
-				Thread.Yield();
-				while (true)
+				try
 				{
-					try
-					{
-						await RegisterAsync();
-						ServiceEventSource.Current.ServiceMessage(this, $"Registered Service:'{nameof(SubscribingStatefulService)}' Replica:'{ServiceInitializationParameters.ReplicaId}' as Subscriber.");
-						break;
-					}
-					catch (Exception ex)
-					{
-						if (retries++ < maxRetries)
-						{
-							await Task.Delay(TimeSpan.FromMilliseconds(500));
-							continue;
-						}
-						ServiceEventSource.Current.ServiceMessage(this, $"Failed to register Service:'{nameof(SubscribingStatefulService)}' Replica:'{ServiceInitializationParameters.ReplicaId}' as Subscriber. Error:'{ex}'");
-						break;
-					}
+					await RegisterAsync();
+					ServiceEventSource.Current.ServiceMessage(this, $"Registered Service:'{nameof(SubscribingStatefulService)}' Replica:'{Context.ReplicaId}' as Subscriber.");
+					break;
 				}
-			});
+				catch (Exception ex)
+				{
+					if (retries++ < maxRetries)
+					{
+						await Task.Delay(TimeSpan.FromMilliseconds(500));
+						continue;
+					}
+					ServiceEventSource.Current.ServiceMessage(this, $"Failed to register Service:'{nameof(SubscribingStatefulService)}' Replica:'{Context.ReplicaId}' as Subscriber. Error:'{ex}'");
+					break;
+				}
+			}
 		}
 
 		public Task RegisterAsync()
