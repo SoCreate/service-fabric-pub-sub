@@ -5,13 +5,13 @@ This code will help you do that.
 It supports both Actors and Services as publishers and subscribers.
 
 ## Nuget:
-https://www.nuget.org/packages/ServiceFabric.PubSubActors/2.0.0-preview
-https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces/2.0.0-preview
+https://www.nuget.org/packages/ServiceFabric.PubSubActors/3.0.0
+https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces/3.0.0  (for Actor interfaces)
 
 ## Introduction
 Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services). 
 This is done using an intermediate, called BrokerActor.
-Add this package to all Reliable Actor projects that participate in the pub/sub messaging.
+Add this package to all Reliable Actor & Service projects that participate in the pub/sub messaging.
 Add the package 'ServiceFabric.PubSubActors.Interfaces' to all (*ReliableActor).Interfaces projects.
 
 |    publisher  |     broker    |subscriber|
@@ -74,28 +74,33 @@ public interface ISubscribingActor : ISubscriberActor
 ```
 
 Open the file 'SubscribingActor.cs' and replace the contents with the code below.
-**notice that this Actor now inherits from 'StatelessSubscriberActor'.**
+**notice that this Actor now implements 'ISubscriberActor'.**
 ```javascript
-[ActorService(Name = nameof(ISubscribingActor))] //required because of interface operations
-internal class SubscribingActor : StatelessSubscriberActor, ISubscribingActor
+using ServiceFabric.PubSubActors.SubscriberActors;
+
+[ActorService(Name = nameof(ISubscribingActor))]//required because of interface operations
+[StatePersistence(StatePersistence.None)] 
+internal class SubscribingActor : Actor, ISubscribingActor
 {
 	public Task RegisterAsync()
 	{
-		return RegisterMessageTypeAsync(typeof(PublishedMessageOne));  //register as subscriber for this type of messages
+		return this.RegisterMessageTypeAsync(typeof(PublishedMessageOne));  //register as subscriber for this type of messages
 	}
 
 	public Task ReceiveMessageAsync(MessageWrapper message)
 	{
-		var payload = Deserialize<PublishedMessageOne>(message);
+		var payload = this.Deserialize<PublishedMessageOne>(message);
 		ActorEventSource.Current.ActorMessage(this, $"Received message: {payload.Content}");
 		//TODO: handle message
 		return Task.FromResult(true);
 	}
 }
 ```
-You can now register 'SubscriberActor' using 'RegisterAsync' to receive messages from the PubSubActor using 'ReceiveMessageAsync'. 
-Do so by adding this code to the Program.Main method.
-__Add this code after this line: 'fabricRuntime.RegisterActor<SubscribingActor>();' and before 'Thread.Sleep(Timeout.Infinite);'__
+You can now register 'SubscriberActor' using 'RegisterAsync' to receive messages from the PubSubActor using 'ReceiveMessageAsync'.
+
+Do so by adding this code to the Program.Main method. (for instance)
+__Add this code after this line: 'ActorRuntime.RegisterActorAsync<SubscribingActor>().GetAwaiter().GetResult();' 
+and before 'Thread.Sleep(Timeout.Infinite);'__
 
 ```javascript
 ActorId actorId = new ActorId("SubActor");
@@ -108,23 +113,37 @@ subActor.RegisterAsync().GetAwaiter().GetResult();
 *Create a sample Service that implements 'ISubscriberService', to become a subscriber to messages.*
 In this example, the Service called 'SubscribingStatefulService' subscribes to messages of Type 'PublishedMessageOne'.
 
-Add a Reliable Stateless Service project called 'SubscribingStatefulService'.
+Add a Reliable Stateful Service project called 'SubscribingStatefulService'.
 Add Nuget package 'ServiceFabric.PubSubActors'.
 Add a reference to the shared data contracts library ('DataContracts').
-Implement 'ServiceFabric.PubSubActors.SubscriberServices.ISubscriberService'.
+ 
 
 Now open the file SubscribingStatefulService.cs in the project 'SubscribingStatefulService' and replace the contents with this code:
+(Implement 'ServiceFabric.PubSubActors.SubscriberServices.ISubscriberService' and self-register.)
 
 ```javascript
 using ServiceFabric.PubSubActors.PublisherActors;
 internal sealed class SubscribingStatefulService : StatefulService, ISubscriberService
 {
+	public SubscribingStatefulService(StatefulServiceContext serviceContext) : base(serviceContext)
+	{
+	}
+
+	public SubscribingStatefulService(StatefulServiceContext serviceContext, IReliableStateManagerReplica 						reliableStateManagerReplica) : base(serviceContext, reliableStateManagerReplica)
+	{
+	}
+		
 	protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
 	{
 		//add SubscriberCommunicationListener for receiving published messages.
 		yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p));
 	}
 
+	protected override async Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
+	{
+		return RegisterAsync();
+	}
+		
 	public Task RegisterAsync()
 	{
 		return this.RegisterMessageTypeAsync(typeof(PublishedMessageOne));
@@ -146,7 +165,7 @@ internal sealed class SubscribingStatefulService : StatefulService, ISubscriberS
 }
 ```
 Call 'RegisterAsync' to make the service register itself as subscriber.
-You can do that from the outside, or within the service itself, provided 'CreateServiceReplicaListeners' has been called first.
+You can do that from the outside, or within the service itself, provided 'OnOpenAsync' has been called first.
 
 ```javascript
 var pubActor = ServiceProxy.Create<IPublishingStatelessService>(serviceName);
@@ -163,11 +182,12 @@ Add a Reliable Stateless Actor project called 'PublishingActor'.
 Add Nuget package 'ServiceFabric.PubSubActors'.
 Add a reference to the shared data contracts library ('DataContracts').
 Go to the project 'PublishingActor.Interfaces' and open the file IPublishingActor.cs. 
-Replace the contents with the code below:
+Replace the contents with the code below, to allow external callers to trigger a publish action:
 
 ```javascript
 public interface IPublishingActor : IActor
 {
+	//enables external callers to trigger a publish action, not required for functionality
 	Task<string> PublishMessageOneAsync();
 }
 ```
@@ -176,8 +196,8 @@ Now open the file PublishingActor.cs in the project 'PublishingActor' and replac
 
 ```javascript
 using ServiceFabric.PubSubActors.PublisherActors;
-//no attribute required.
-internal class PublishingActor : StatelessActor, IPublishingActor
+[StatePersistence(StatePersistence.None)]
+internal class PublishingActor : Actor, IPublishingActor
 {
 	async Task<string> IPublishingActor.PublishMessageOneAsync()
 	{
@@ -209,6 +229,7 @@ Add the code below:
 [ServiceContract]
 public interface IPublishingStatelessService : IService
 {
+	//allows external callers to trigger a publish action, not required for functionality
 	[OperationContract]
 	Task<string> PublishMessageOneAsync();
 }
@@ -219,7 +240,7 @@ internal sealed class PublishingStatelessService : StatelessService, IPublishing
 {
 	protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
 	{
-		yield return new ServiceInstanceListener(parameters => new ServiceRemotingListener<IPublishingStatelessService>(parameters, this));
+		yield return new ServiceInstanceListener(context => new FabricTransportServiceRemotingListener(context, this));
 	}
 
 	async Task<string> IPublishingStatelessService.PublishMessageOneAsync()
