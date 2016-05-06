@@ -27,7 +27,7 @@ namespace SubscribingStatefulService
 
 		protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
 		{
-			yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p));
+			yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p), "StatefulSubscriberCommunicationListener");
 		}
 
 		protected override async Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)

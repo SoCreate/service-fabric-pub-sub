@@ -22,7 +22,7 @@ namespace SubscribingStatelessService
 
 		protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
 		{
-			yield return new ServiceInstanceListener(p => new SubscriberCommunicationListener(this, p));
+			yield return new ServiceInstanceListener(p => new SubscriberCommunicationListener(this, p), "StatelessSubscriberCommunicationListener");
 		}
 
 		protected override async Task OnOpenAsync(CancellationToken cancellationToken)
