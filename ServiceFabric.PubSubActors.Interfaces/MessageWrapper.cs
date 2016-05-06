@@ -10,6 +10,12 @@ namespace ServiceFabric.PubSubActors.Interfaces
 	public class MessageWrapper
 	{
 		/// <summary>
+		/// Indicates whether this message was relayed.
+		/// </summary>
+		[DataMember]
+		public bool IsRelayed { get; set; }
+
+		/// <summary>
 		/// CLR Type Full Name of serialized payload.
 		/// </summary>
 		[DataMember]

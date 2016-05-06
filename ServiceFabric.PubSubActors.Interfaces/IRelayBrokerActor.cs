@@ -5,11 +5,11 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 namespace ServiceFabric.PubSubActors.Interfaces
 {
 	/// <summary>
-	/// Acts as a registry for Subscriber Actors that publishing Actors can publish to.
+	/// Acts as a relay registry for Subscriber Actors that <see cref="IBrokerActor"/> -Actors can publish to.
 	/// Don't forget to mark implementing <see cref="Actor"/> classes with
-	/// the attribute <see cref="ActorServiceAttribute"/> like: [ActorService(Name = nameof(IBrokerActor))]
+	/// the attribute <see cref="ActorServiceAttribute"/> like: [ActorService(Name = nameof(IRelayBrokerActor))]
 	/// </summary>
-	public interface IBrokerActor : IActor
+	public interface IRelayBrokerActor : ISubscriberActor, IActor
 	{
 		/// <summary>
 		/// Registers an Actor as a subscriber for messages.
@@ -37,11 +37,6 @@ namespace ServiceFabric.PubSubActors.Interfaces
 		/// <param name="flushQueue">Publish any remaining messages.</param>
 		Task UnregisterServiceSubscriberAsync(ServiceReference actor, bool flushQueue);
 
-		/// <summary>
-		/// Takes a published message and forwards it (indirectly) to all Subscribers.
-		/// </summary>
-		/// <param name="message">The message to publish</param>
-		/// <returns></returns>
-		Task PublishMessageAsync(MessageWrapper message);
+		
 	}
 }

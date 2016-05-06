@@ -52,18 +52,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		{ 
 		}
 
-		public Task RegisterAsync()
-		{
-			return InvokeWithRetryAsync(
-			   client => client.Channel.RegisterAsync());
-		}
-
-		public Task UnregisterAsync()
-		{
-			return InvokeWithRetryAsync(
-				client => client.Channel.UnregisterAsync());
-		}
-
+		
 		public Task ReceiveMessageAsync(MessageWrapper message)
 		{
 			return InvokeWithRetryAsync(

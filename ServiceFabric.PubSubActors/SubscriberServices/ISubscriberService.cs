@@ -12,20 +12,6 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 	public interface ISubscriberService : IService
     {
 		/// <summary>
-		/// Registers this Service as a subscriber for messages.
-		/// </summary>
-		/// <returns></returns>
-		[OperationContract(IsOneWay = true)]
-		Task RegisterAsync();
-
-		/// <summary>
-		/// Unregisters this Service as a subscriber for messages.
-		/// </summary>
-		/// <returns></returns>
-		[OperationContract(IsOneWay = true)]
-		Task UnregisterAsync();
-
-		/// <summary>
 		/// Receives a published message.
 		/// </summary>
 		/// <param name="message"></param>
