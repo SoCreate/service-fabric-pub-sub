@@ -13,12 +13,14 @@
     <None Include="Scripts\Deploy-FabricApplication.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PubkSubRelayActor\PubkSubRelayActor.csproj" />
     <ProjectReference Include="..\PublishingActor\PublishingActor.csproj" />
     <ProjectReference Include="..\PublishingStatelessService\PublishingStatelessService.csproj" />
     <ProjectReference Include="..\PubSubActor\PubSubActor.csproj" />
     <ProjectReference Include="..\SubscribingActor\SubscribingActor.csproj" />
     <ProjectReference Include="..\SubscribingStatefulService\SubscribingStatefulService.csproj" />
     <ProjectReference Include="..\SubscribingStatelessService\SubscribingStatelessService.csproj" />
+    <ProjectReference Include="..\SubscribingToRelayStatefulService\SubscribingToRelayStatefulService.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ApplicationPackageRoot\ApplicationManifest.xml" />

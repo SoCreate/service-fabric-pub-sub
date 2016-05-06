@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "MyServiceFabricApp", "MyServiceFabricApp\MyServiceFabricApp.sfproj", "{26672E0C-A08A-47E9-A097-F58157992D39}"
 EndProject
@@ -32,6 +32,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubscribingStatefulService", "SubscribingStatefulService\SubscribingStatefulService.csproj", "{80D0ED08-2554-4EF2-811D-3D1956703261}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublishingStatelessService", "PublishingStatelessService\PublishingStatelessService.csproj", "{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubkSubRelayActor", "PubkSubRelayActor\PubkSubRelayActor.csproj", "{DFC5BD11-AFCF-45F1-A2F0-797CE7F017E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubkSubRelayActor.Interfaces", "PubkSubRelayActor.Interfaces\PubkSubRelayActor.Interfaces.csproj", "{3E870BE2-6DBD-48ED-A6D0-58FDC93A8C2A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RelayBroker", "RelayBroker", "{046CF58A-E05F-4BE3-8F4F-76E14EC6389D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubscribingToRelayStatefulService", "SubscribingToRelayStatefulService\SubscribingToRelayStatefulService.csproj", "{AE7F64D6-D4B4-4320-8415-D8A3D0D6C1DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,6 +127,24 @@ Global
 		{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}.Release|Any CPU.ActiveCfg = Release|x64
 		{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}.Release|x64.ActiveCfg = Release|x64
 		{66C029AB-982A-459F-B3C3-B7B2ED99BD9F}.Release|x64.Build.0 = Release|x64
+		{DFC5BD11-AFCF-45F1-A2F0-797CE7F017E0}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{DFC5BD11-AFCF-45F1-A2F0-797CE7F017E0}.Debug|x64.ActiveCfg = Debug|x64
+		{DFC5BD11-AFCF-45F1-A2F0-797CE7F017E0}.Debug|x64.Build.0 = Debug|x64
+		{DFC5BD11-AFCF-45F1-A2F0-797CE7F017E0}.Release|Any CPU.ActiveCfg = Release|x64
+		{DFC5BD11-AFCF-45F1-A2F0-797CE7F017E0}.Release|x64.ActiveCfg = Release|x64
+		{DFC5BD11-AFCF-45F1-A2F0-797CE7F017E0}.Release|x64.Build.0 = Release|x64
+		{3E870BE2-6DBD-48ED-A6D0-58FDC93A8C2A}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{3E870BE2-6DBD-48ED-A6D0-58FDC93A8C2A}.Debug|x64.ActiveCfg = Debug|x64
+		{3E870BE2-6DBD-48ED-A6D0-58FDC93A8C2A}.Debug|x64.Build.0 = Debug|x64
+		{3E870BE2-6DBD-48ED-A6D0-58FDC93A8C2A}.Release|Any CPU.ActiveCfg = Release|x64
+		{3E870BE2-6DBD-48ED-A6D0-58FDC93A8C2A}.Release|x64.ActiveCfg = Release|x64
+		{3E870BE2-6DBD-48ED-A6D0-58FDC93A8C2A}.Release|x64.Build.0 = Release|x64
+		{AE7F64D6-D4B4-4320-8415-D8A3D0D6C1DC}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{AE7F64D6-D4B4-4320-8415-D8A3D0D6C1DC}.Debug|x64.ActiveCfg = Debug|x64
+		{AE7F64D6-D4B4-4320-8415-D8A3D0D6C1DC}.Debug|x64.Build.0 = Debug|x64
+		{AE7F64D6-D4B4-4320-8415-D8A3D0D6C1DC}.Release|Any CPU.ActiveCfg = Release|x64
+		{AE7F64D6-D4B4-4320-8415-D8A3D0D6C1DC}.Release|x64.ActiveCfg = Release|x64
+		{AE7F64D6-D4B4-4320-8415-D8A3D0D6C1DC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -133,5 +159,8 @@ Global
 		{C6AEE050-41BD-4F06-A392-E479B833DC7D} = {90F5DC3F-1A65-4C64-9071-13392D8D8176}
 		{80D0ED08-2554-4EF2-811D-3D1956703261} = {90F5DC3F-1A65-4C64-9071-13392D8D8176}
 		{66C029AB-982A-459F-B3C3-B7B2ED99BD9F} = {FD0D0D22-5BC4-4589-8D02-794539BE1877}
+		{DFC5BD11-AFCF-45F1-A2F0-797CE7F017E0} = {046CF58A-E05F-4BE3-8F4F-76E14EC6389D}
+		{3E870BE2-6DBD-48ED-A6D0-58FDC93A8C2A} = {046CF58A-E05F-4BE3-8F4F-76E14EC6389D}
+		{AE7F64D6-D4B4-4320-8415-D8A3D0D6C1DC} = {90F5DC3F-1A65-4C64-9071-13392D8D8176}
 	EndGlobalSection
 EndGlobal

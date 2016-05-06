@@ -10,6 +10,31 @@ namespace SubscribingActor.Interfaces
 {
 	public interface ISubscribingActor : ISubscriberActor
 	{
-		Task<string> DoWorkAsync();
+
+		/// <summary>
+		/// Registers this Actor as a subscriber for messages.
+		/// </summary>
+		/// <returns></returns>
+		Task RegisterAsync();
+
+		/// <summary>
+		/// Unregisters this Actor as a subscriber for messages.
+		/// </summary>
+		/// <returns></returns>
+		Task UnregisterAsync();
+
+
+
+		/// <summary>
+		/// Registers this Actor as a subscriber for messages using a relay broker.
+		/// </summary>
+		/// <returns></returns>
+		Task RegisterWithRelayAsync();
+
+		/// <summary>
+		/// Unregisters this Actor as a subscriber for messages.
+		/// </summary>
+		/// <returns></returns>
+		Task UnregisterWithRelayAsync();
 	}
 }

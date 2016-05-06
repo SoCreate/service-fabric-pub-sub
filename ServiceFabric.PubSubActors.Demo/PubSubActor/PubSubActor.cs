@@ -6,9 +6,7 @@ using ServiceFabric.PubSubActors.Interfaces;
 namespace PubSubActor
 {
 	/// <remarks>
-	/// Each ActorID maps to an instance of this class.
-	/// The IProjName  interface (in a separate DLL that client code can
-	/// reference) defines the operations exposed by ProjName objects.
+	/// The default Broker Actor (instance per message type)
 	/// </remarks>
 	[ActorService(Name = nameof(IBrokerActor))]
 	internal class PubSubActor : ServiceFabric.PubSubActors.BrokerActor, IPubSubActor

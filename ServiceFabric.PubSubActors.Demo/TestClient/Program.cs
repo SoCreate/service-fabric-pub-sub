@@ -24,7 +24,7 @@ namespace TestClient
 			var pubService = GetPublishingService(new Uri(serviceName));
 
 			RegisterSubscribers(applicationName);
-			
+
 
 			while (true)
 			{
@@ -96,7 +96,7 @@ namespace TestClient
 
 		private static void RegisterSubscribers(string applicationName)
 		{
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 4; i++)
 			{
 				var actorId = new ActorId("SubActor" + i.ToString("0000"));
 
@@ -106,8 +106,15 @@ namespace TestClient
 					try
 					{
 						subActor = ActorProxy.Create<ISubscribingActor>(actorId, applicationName, nameof(ISubscribingActor));
-						subActor.RegisterAsync().GetAwaiter().GetResult();
-						
+
+						if (i%2 == 0)
+						{
+							subActor.RegisterAsync().GetAwaiter().GetResult();
+						}
+						else
+						{
+							subActor.RegisterWithRelayAsync().GetAwaiter().GetResult();
+						}
 					}
 					catch
 					{
