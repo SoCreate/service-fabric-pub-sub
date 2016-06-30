@@ -1,4 +1,4 @@
-# Service Fabric Pub/Sub Actors
+# Service Fabric Pub/Sub (Not just for anymore!)
 Do you want to create an Event Driven Architecture while using Azure Service Fabric?
 Do you need to reliably broadcast messages between Actors and Services?
 This code will help you do that.
