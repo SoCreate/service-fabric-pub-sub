@@ -1,5 +1,5 @@
 {
-  "version": "4.0.1",
+  "version": "4.0.2",
   "copyright": "2016",
   "title": "ServiceFabric.PubSubActors.Interfaces",
   "requireLicenseAcceptance": true,
@@ -14,13 +14,13 @@
     "url": "https://github.com/loekd/ServiceFabric.PubSubActors.git"
   },
   "frameworks": {
-    "net451": {
+    "net451": {     
     },
     "net460": {
     }
   },
   "dependencies": {
-    "Microsoft.ServiceFabric.Actors": "2.0.217",
-    "Newtonsoft.Json": "8.0.3"
+    "Microsoft.ServiceFabric.Actors": "2.1.150",
+    "Newtonsoft.Json": "9.0.1"
   }
 } 
