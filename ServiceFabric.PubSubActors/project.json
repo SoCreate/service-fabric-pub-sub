@@ -10,7 +10,7 @@
     "summary": "Lets 'Publisher' Actors & Services publish messages to 'Subscriber' Actors & Services, without the need to have references to those Subscriber Actors & Services.",
     "tags": [ "ServiceFabric", "Service", "Fabric", "Actor", "Pub", "Sub", "Reliable" ],
     "files": {
-      "Content/": "Content/readme.*"
+      "include": "Content/readme.md"
     },
     "requireLicenseAcceptance": true,
     "repository": {
