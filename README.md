@@ -9,7 +9,12 @@ It uses extension methods to
 - StatelessService
 - StatefulService
 
+
 so minimal inheritance is required. (only for Broker Actors, which need to be added as services)
+
+##Release notes:
+- 4.0.2 updated nuget packages (new SDK)
+
 ## Nuget:
 https://www.nuget.org/packages/ServiceFabric.PubSubActors/4.0.0
 https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces/4.0.0  (for Actor interfaces)
