@@ -1,29 +1,34 @@
 {
   "copyright": "2016",
   "title": "ServiceFabric.PubSubActors",
-  "version": "4.0.2",
-  "requireLicenseAcceptance": true,
+  "version": "4.0.3",
   "description": "ServiceFabric.PubSubActors adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. How to use this package: https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/README.md",
-  "summary": "Lets 'Publisher' Actors & Services publish messages to 'Subscriber' Actors & Services, without the need to have references to those Subscriber Actors & Services.",
   "authors": [ "Loek Duys" ],
-  "tags": [ "ServiceFabric", "Service", "Fabric", "Actor", "Pub", "Sub", "Reliable" ],
-  "projectUrl": "https://github.com/loekd/ServiceFabric.PubSubActors",
-  "licenseUrl": "https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/LICENSE.md",
-  "packInclude": {
-    "Content/": "Content/readme.*"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/loekd/ServiceFabric.PubSubActors.git"
+  "packOptions": {
+    "projectUrl": "https://github.com/loekd/ServiceFabric.PubSubActors",
+    "licenseUrl": "https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/LICENSE.md",
+    "summary": "Lets 'Publisher' Actors & Services publish messages to 'Subscriber' Actors & Services, without the need to have references to those Subscriber Actors & Services.",
+    "tags": [ "ServiceFabric", "Service", "Fabric", "Actor", "Pub", "Sub", "Reliable" ],
+    "files": {
+      "Content/": "Content/readme.*"
+    },
+    "requireLicenseAcceptance": true,
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/loekd/ServiceFabric.PubSubActors.git"
+    }
   },
   "frameworks": {
-    "net451": {     
+    "net451": {
     },
     "net460": {
     }
   },
+  "buildOptions": {
+    "platform": "x64"
+  },
   "dependencies": {
-    "ServiceFabric.PubSubActors.Interfaces": "4.0.2",
+    "ServiceFabric.PubSubActors.Interfaces": "4.0.3",
     "Microsoft.ServiceFabric.Actors": "2.1.150",
     "Microsoft.ServiceFabric.Services": "2.1.150",
     "Microsoft.ServiceFabric.Services.Wcf": "2.1.150",

@@ -1,26 +1,31 @@
 {
-  "version": "4.0.2",
+  "version": "4.0.3",
   "copyright": "2016",
   "title": "ServiceFabric.PubSubActors.Interfaces",
-  "requireLicenseAcceptance": true,
-  "description": "Used by ServiceFabric.PubSubActors, which adds pub/sub behaviour to your Reliable Actors in Service Fabric. ServiceFabric.PubSubActors adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. How to use this package: https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/README.md",
-  "summary": "Main Package 'ServiceFabric.PubSubActors' lets 'Publishing' Actors & Services publish messages to 'Subscribing' Actors and Services, without the need to know anything about them.",
   "authors": [ "Loek Duys" ],
-  "tags": [ "ServiceFabric", "Service", "Fabric", "Actor", "Pub", "Sub", "Reliable" ],
-  "projectUrl": "https://github.com/loekd/ServiceFabric.PubSubActors",
-  "licenseUrl": "https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/LICENSE.md",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/loekd/ServiceFabric.PubSubActors.git"
+  "packOptions": {
+    "requireLicenseAcceptance": true,
+    "description": "Used by ServiceFabric.PubSubActors, which adds pub/sub behaviour to your Reliable Actors in Service Fabric. ServiceFabric.PubSubActors adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. How to use this package: https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/README.md",
+    "summary": "Main Package 'ServiceFabric.PubSubActors' lets 'Publishing' Actors & Services publish messages to 'Subscribing' Actors and Services, without the need to know anything about them.",
+    "tags": [ "ServiceFabric", "Service", "Fabric", "Actor", "Pub", "Sub", "Reliable" ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/loekd/ServiceFabric.PubSubActors.git"
+    },
+    "projectUrl": "https://github.com/loekd/ServiceFabric.PubSubActors",
+    "licenseUrl": "https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/LICENSE.md"
   },
   "frameworks": {
-    "net451": {     
+    "net451": {
     },
     "net460": {
     }
+  },
+  "buildOptions": {
+    "platform": "x64"
   },
   "dependencies": {
     "Microsoft.ServiceFabric.Actors": "2.1.150",
     "Newtonsoft.Json": "9.0.1"
   }
-} 
+}
