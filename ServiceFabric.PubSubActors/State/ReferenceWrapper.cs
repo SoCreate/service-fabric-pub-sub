@@ -11,7 +11,7 @@ namespace ServiceFabric.PubSubActors.State
 	[DataContract]
 	[KnownType(typeof(ActorReferenceWrapper))]
 	[KnownType(typeof(ServiceReferenceWrapper))]
-	public abstract class ReferenceWrapper : IEquatable<ReferenceWrapper>
+	public abstract class ReferenceWrapper : IEquatable<ReferenceWrapper>, IComparable<ReferenceWrapper>
 	{
 		public abstract string Name { get; }
 
@@ -23,5 +23,11 @@ namespace ServiceFabric.PubSubActors.State
 		/// <param name="message"></param>
 		/// <returns></returns>
 		public abstract Task PublishAsync(MessageWrapper message);
-	}
+
+        int IComparable<ReferenceWrapper>.CompareTo(ReferenceWrapper other)
+        {
+            if (other == null) return -1;
+            return other.GetHashCode().CompareTo(GetHashCode());
+        }
+    }
 }

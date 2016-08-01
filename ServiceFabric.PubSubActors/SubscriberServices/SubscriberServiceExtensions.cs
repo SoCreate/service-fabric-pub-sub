@@ -172,14 +172,96 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 			return UnregisterMessageTypeWithRelayBrokerAsync(service.Context, service.GetServicePartition().PartitionInfo, messageType, relayBrokerActorId, sourceBrokerActorId, flushQueue);
 		}
 
-		
+        /// <summary>
+        /// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
+        /// </summary>
+        /// <returns></returns>
+        public static async Task RegisterMessageTypeWithBrokerServiceAsync(this StatelessService service, Type messageType, Uri brokerServiceName = null)
+        {
+            if (service == null) throw new ArgumentNullException(nameof(service));
+            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
+            if (brokerServiceName == null)
+            {
+                brokerServiceName = await PublisherServices.PublisherServiceExtensions.DiscoverBrokerServiceNameAsync(new Uri(service.Context.CodePackageActivationContext.ApplicationName));
+                if (brokerServiceName == null)
+                {
+                    throw new InvalidOperationException("No brokerServiceName was provided or discovered in the current application.");
+                }
+            }
+            var brokerService = await PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
+            var serviceReference = CreateServiceReference(service.Context, service.GetServicePartition().PartitionInfo);
+            await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName);
+        }
 
-		/// <summary>
-		/// Gets the Partition info for the provided StatefulServiceBase instance.
-		/// </summary>
-		/// <param name="serviceBase"></param>
-		/// <returns></returns>
-		private static IStatefulServicePartition GetServicePartition(this StatefulServiceBase serviceBase)
+        /// <summary>
+        /// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
+        /// </summary>
+        /// <returns></returns>
+        public static async Task UnregisterMessageTypeWithBrokerServiceAsync(this StatelessService service, Type messageType, bool flushQueue, Uri brokerServiceName = null)
+        {
+            if (service == null) throw new ArgumentNullException(nameof(service));
+            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
+            if (brokerServiceName == null)
+            {
+                brokerServiceName = await PublisherServices.PublisherServiceExtensions.DiscoverBrokerServiceNameAsync(new Uri(service.Context.CodePackageActivationContext.ApplicationName));
+                if (brokerServiceName == null)
+                {
+                    throw new InvalidOperationException("No brokerServiceName was provided or discovered in the current application.");
+                }
+            }
+            var brokerService = await PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
+            var serviceReference = CreateServiceReference(service.Context, service.GetServicePartition().PartitionInfo);
+            await brokerService.UnregisterServiceSubscriberAsync(serviceReference, messageType.FullName, flushQueue);
+        }
+
+        /// <summary>
+        /// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
+        /// </summary>
+        /// <returns></returns>
+        public static async Task RegisterMessageTypeWithBrokerServiceAsync(this StatefulService service, Type messageType, Uri brokerServiceName = null)
+        {
+            if (service == null) throw new ArgumentNullException(nameof(service));
+            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
+            if (brokerServiceName == null)
+            {
+                brokerServiceName = await PublisherServices.PublisherServiceExtensions.DiscoverBrokerServiceNameAsync(new Uri(service.Context.CodePackageActivationContext.ApplicationName));
+                if (brokerServiceName == null)
+                {
+                    throw new InvalidOperationException("No brokerServiceName was provided or discovered in the current application.");
+                }
+            }
+            var brokerService = await PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
+            var serviceReference = CreateServiceReference(service.Context, service.GetServicePartition().PartitionInfo);
+            await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName);
+        }
+
+        /// <summary>
+        /// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
+        /// </summary>
+        /// <returns></returns>
+        public static async Task UnregisterMessageTypeWithBrokerServiceAsync(this StatefulService service, Type messageType, bool flushQueue, Uri brokerServiceName = null)
+        {
+            if (service == null) throw new ArgumentNullException(nameof(service));
+            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
+            if (brokerServiceName == null)
+            {
+                brokerServiceName = await PublisherServices.PublisherServiceExtensions.DiscoverBrokerServiceNameAsync(new Uri(service.Context.CodePackageActivationContext.ApplicationName));
+                if (brokerServiceName == null)
+                {
+                    throw new InvalidOperationException("No brokerServiceName was provided or discovered in the current application.");
+                }
+            }
+            var brokerService = await PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
+            var serviceReference = CreateServiceReference(service.Context, service.GetServicePartition().PartitionInfo);
+            await brokerService.UnregisterServiceSubscriberAsync(serviceReference, messageType.FullName, flushQueue);
+        }
+
+        /// <summary>
+        /// Gets the Partition info for the provided StatefulServiceBase instance.
+        /// </summary>
+        /// <param name="serviceBase"></param>
+        /// <returns></returns>
+        private static IStatefulServicePartition GetServicePartition(this StatefulServiceBase serviceBase)
 		{
 			if (serviceBase == null) throw new ArgumentNullException(nameof(serviceBase));
 			return (IStatefulServicePartition)serviceBase

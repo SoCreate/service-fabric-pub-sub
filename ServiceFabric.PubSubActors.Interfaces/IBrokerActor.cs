@@ -4,12 +4,12 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 
 namespace ServiceFabric.PubSubActors.Interfaces
 {
-	/// <summary>
-	/// Acts as a registry for Subscriber Actors that publishing Actors can publish to.
-	/// Don't forget to mark implementing <see cref="Actor"/> classes with
-	/// the attribute <see cref="ActorServiceAttribute"/> like: [ActorService(Name = nameof(IBrokerActor))]
-	/// </summary>
-	public interface IBrokerActor : IActor
+    /// <summary>
+    /// Acts as a registry for Subscriber Actors and Services that publishing Actors and Services can publish to.
+    /// Don't forget to mark implementing <see cref="Actor"/> classes with
+    /// the attribute <see cref="ActorServiceAttribute"/> like: [ActorService(Name = nameof(IBrokerActor))]
+    /// </summary>
+    public interface IBrokerActor : IActor
 	{
 		/// <summary>
 		/// Registers an Actor as a subscriber for messages.

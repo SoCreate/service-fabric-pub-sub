@@ -1,7 +1,7 @@
 {
   "copyright": "2016",
   "title": "ServiceFabric.PubSubActors",
-  "version": "4.0.4",
+  "version": "4.2.0",
   "description": "ServiceFabric.PubSubActors adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. How to use this package: https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/README.md",
   "authors": [ "Loek Duys" ],
   "packOptions": {
@@ -28,10 +28,10 @@
     "platform": "x64"
   },
   "dependencies": {
-    "ServiceFabric.PubSubActors.Interfaces": "4.0.4",
-    "Microsoft.ServiceFabric.Actors": "2.1.150",
-    "Microsoft.ServiceFabric.Services": "2.1.150",
-    "Microsoft.ServiceFabric.Services.Wcf": "2.1.150",
-    "Newtonsoft.Json": "9.0.1"
+    "ServiceFabric.PubSubActors.Interfaces": "4.2.0",
+    "Newtonsoft.Json": "9.0.1",
+    "Microsoft.ServiceFabric.Services": "2.1.163",
+    "Microsoft.ServiceFabric.Services.Wcf": "2.1.163",
+    "Microsoft.ServiceFabric.Actors": "2.1.163"
   }
 }

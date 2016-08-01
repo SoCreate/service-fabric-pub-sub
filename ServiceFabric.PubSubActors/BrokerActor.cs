@@ -9,13 +9,13 @@ using ServiceFabric.PubSubActors.State;
 
 namespace ServiceFabric.PubSubActors
 {
-	/// <remarks>
-	/// Base class for a Stateful Actor that serves as a Broker that accepts messages 
-	/// from Actors calling <see cref="PublisherActorExtensions.PublishMessageAsync"/>
-	/// and forwards them to <see cref="ISubscriberActor"/> Actors.
-	/// Every message type results in 1 BrokerActor instance.
-	/// </remarks>
-	[StatePersistence(StatePersistence.Persisted)]
+    /// <remarks>
+    /// Base class for a Stateful Actor that serves as a Broker that accepts messages 
+    /// from Actors & Services calling <see cref="PublisherActorExtensions.PublishMessageAsync"/>
+    /// and forwards them to <see cref="ISubscriberActor"/> Actors and <see cref="ISubscriberService"/> Services.
+    /// Every message type results in 1 BrokerActor instance.
+    /// </remarks>
+    [StatePersistence(StatePersistence.Persisted)]
 	public abstract class BrokerActor : Actor, IBrokerActor
 	{
 		private string _messageType;

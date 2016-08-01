@@ -27,7 +27,8 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
 		public static async Task RegisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId)
 		{
 			if (actor == null) throw new ArgumentNullException(nameof(actor));
-			if (relayBrokerActorId == null) throw new ArgumentNullException(nameof(relayBrokerActorId));
+            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
+            if (relayBrokerActorId == null) throw new ArgumentNullException(nameof(relayBrokerActorId));
 
 			if (sourceBrokerActorId == null)
 			{
@@ -54,8 +55,9 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
 		/// <returns></returns>
 		public static async Task UnregisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId, bool flushQueue)
 		{
+            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
 			if (actor == null) throw new ArgumentNullException(nameof(actor));
-			if (relayBrokerActorId == null) throw new ArgumentNullException(nameof(relayBrokerActorId));
+            if (relayBrokerActorId == null) throw new ArgumentNullException(nameof(relayBrokerActorId));
 
 			if (sourceBrokerActorId == null)
 			{
@@ -76,8 +78,9 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
 		/// <returns></returns>
 		public static async Task RegisterMessageTypeAsync(this ActorBase actor, Type messageType)
 		{
+            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
 			if (actor == null) throw new ArgumentNullException(nameof(actor));
-			ActorId actorId = new ActorId(messageType.FullName);
+            ActorId actorId = new ActorId(messageType.FullName);
 			IBrokerActor brokerActor = ActorProxy.Create<IBrokerActor>(actorId, actor.ApplicationName, nameof(IBrokerActor));
 			await brokerActor.RegisterSubscriberAsync(ActorReference.Get(actor));
 		}
@@ -88,18 +91,60 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
 		/// <returns></returns>
 		public static async Task UnregisterMessageTypeAsync(this ActorBase actor, Type messageType, bool flushQueue)
 		{
+            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
 			if (actor == null) throw new ArgumentNullException(nameof(actor));
-			ActorId actorId = new ActorId(messageType.FullName);
+            ActorId actorId = new ActorId(messageType.FullName);
 			IBrokerActor brokerActor = ActorProxy.Create<IBrokerActor>(actorId, actor.ApplicationName, nameof(IBrokerActor));
 			await brokerActor.UnregisterSubscriberAsync(ActorReference.Get(actor), flushQueue);
 		}
 
-		/// <summary>
-		/// Deserializes the provided <paramref name="message"/> Payload into an intance of type <typeparam name="TResult"></typeparam>
+        /// <summary>
+		/// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
 		/// </summary>
-		/// <typeparam name="TResult"></typeparam>
 		/// <returns></returns>
-		public static TResult Deserialize<TResult>(this ActorBase actor, MessageWrapper message)
+		public static async Task RegisterMessageTypeWithBrokerServiceAsync(this ActorBase actor, Type messageType, Uri brokerServiceName = null)
+        {
+            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
+            if (actor == null) throw new ArgumentNullException(nameof(actor));
+            if (brokerServiceName == null)
+            {
+                brokerServiceName = await PublisherServices.PublisherServiceExtensions.DiscoverBrokerServiceNameAsync(new Uri(actor.ApplicationName));
+                if (brokerServiceName == null)
+                {
+                    throw new InvalidOperationException("No brokerServiceName was provided or discovered in the current application.");
+                }
+            }
+            var brokerService = await PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
+            await brokerService.RegisterSubscriberAsync(ActorReference.Get(actor), messageType.FullName);
+        }
+
+        /// <summary>
+        /// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
+        /// </summary>
+        /// <returns></returns>
+        public static async Task UnregisterMessageTypeWithBrokerServiceAsync(this ActorBase actor, Type messageType, bool flushQueue, Uri brokerServiceName = null)
+        {
+            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
+            if (actor == null) throw new ArgumentNullException(nameof(actor));
+
+            if (brokerServiceName == null)
+            {
+                brokerServiceName = await PublisherServices.PublisherServiceExtensions.DiscoverBrokerServiceNameAsync(new Uri(actor.ApplicationName));
+                if (brokerServiceName == null)
+                {
+                    throw new InvalidOperationException("No brokerServiceName was provided or discovered in the current application.");
+                }
+            }
+            var brokerService = await PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
+            await brokerService.UnregisterSubscriberAsync(ActorReference.Get(actor), messageType.FullName, flushQueue);
+        }
+
+        /// <summary>
+        /// Deserializes the provided <paramref name="message"/> Payload into an intance of type <typeparam name="TResult"></typeparam>
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <returns></returns>
+        public static TResult Deserialize<TResult>(this ActorBase actor, MessageWrapper message)
 		{
 			var payload = JsonConvert.DeserializeObject<TResult>(message.Payload);
 			return payload;

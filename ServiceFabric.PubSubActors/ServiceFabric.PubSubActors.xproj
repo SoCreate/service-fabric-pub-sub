@@ -4,7 +4,7 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
-  <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.Props" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(VSToolsPath)\dotnet\Microsoft.dotnet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>266d0c63-57ee-4c0d-873f-b3235b062cf4</ProjectGuid>
     <RootNamespace>ServiceFabric.PubSubActors</RootNamespace>
@@ -20,8 +20,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <ProduceOutputsOnBuild>True</ProduceOutputsOnBuild>
   </PropertyGroup>
-  <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(VSToolsPath)\dotnet\Microsoft.dotnet.targets" Condition="'$(VSToolsPath)' != ''" />
   <Target Name="AfterBuild">
-    <Exec Command="dotnet pack" />
+    <Exec Command="dotnet pack --configuration '$(configuration)' -o ..\artifacts\bin\$(MSBuildProjectName)\$(configuration)" />
   </Target>
 </Project>
