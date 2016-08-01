@@ -55,6 +55,7 @@ For large scale messaging with many subscribers you can use a layered approach u
 *note: only message subscriptions are different here, publishing still happens using the default broker*
 
 Or if you like using Services, you can use the BrokerService:
+
 |    publisher  |     broker    |subscriber|
 | ------------- |:-------------:| -----:|
 |[Publishing Actor]||
