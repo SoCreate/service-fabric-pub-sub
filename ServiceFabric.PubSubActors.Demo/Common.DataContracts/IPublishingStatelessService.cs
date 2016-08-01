@@ -9,5 +9,8 @@ namespace Common.DataContracts
 	{
 		[OperationContract]
 		Task<string> PublishMessageOneAsync();
-	}
+
+        [OperationContract]
+        Task<string> PublishMessageTwoAsync();
+    }
 }

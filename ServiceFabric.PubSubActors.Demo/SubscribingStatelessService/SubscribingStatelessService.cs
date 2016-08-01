@@ -56,15 +56,17 @@ namespace SubscribingStatelessService
 			}
 		}
 
-		public Task RegisterAsync()
+		public async Task RegisterAsync()
 		{
-			return this.RegisterMessageTypeAsync(typeof(PublishedMessageOne));
-		}
+			await this.RegisterMessageTypeAsync(typeof(PublishedMessageOne));
+            await this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
+        }
 
-		public Task UnregisterAsync()
+        public async Task UnregisterAsync()
 		{
-			return this.UnregisterMessageTypeAsync(typeof(PublishedMessageOne), true);
-		}
+			await this.UnregisterMessageTypeAsync(typeof(PublishedMessageOne), true);
+            await this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
+        }
 
 		public Task ReceiveMessageAsync(MessageWrapper message)
 		{

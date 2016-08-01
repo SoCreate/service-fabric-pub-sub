@@ -29,9 +29,13 @@ namespace TestClient
 			while (true)
 			{
 				Console.Clear();
-				Console.WriteLine("Hit 1 to send message one, using an Actor.");
-				Console.WriteLine("Hit 2 to send message one, using a Service");
-				Console.WriteLine("Hit escape to exit.");
+				Console.WriteLine("Hit 1 to send a message one to the BrokerActor, using an Actor.");
+				Console.WriteLine("Hit 2 to send a message one to the BrokerActor, using a Service");
+                                                
+                Console.WriteLine("Hit 3 to send a message one to the BrokerService, using an Actor.");
+                Console.WriteLine("Hit 4 to send a message one to the BrokerService, using a Service");
+
+                Console.WriteLine("Hit escape to exit.");
 				var key = Console.ReadKey(true);
 
 				switch (key.Key)
@@ -39,17 +43,30 @@ namespace TestClient
 					case ConsoleKey.D1:
 						{
 							pubActor.PublishMessageOneAsync().GetAwaiter().GetResult();
-							Console.WriteLine("Sent message one from Actor!");
+							Console.WriteLine("Sent message one from Actor Broker Actor!");
 						}
 						break;
 					case ConsoleKey.D2:
 						{
 							pubService.PublishMessageOneAsync().GetAwaiter().GetResult();
-							Console.WriteLine("Sent message one from Service!");
+							Console.WriteLine("Sent message one from Service using Broker Actor!");
 						}
 						break;
 
-					case ConsoleKey.Escape:
+                    case ConsoleKey.D3:
+                        {
+                            pubActor.PublishMessageTwoAsync().GetAwaiter().GetResult();
+                            Console.WriteLine("Sent message two from Actor using Broker Service!");
+                        }
+                        break;
+                    case ConsoleKey.D4:
+                        {
+                            pubService.PublishMessageTwoAsync().GetAwaiter().GetResult();
+                            Console.WriteLine("Sent message two from Service using Broker Service!");
+                        }
+                        break;
+
+                    case ConsoleKey.Escape:
 						return;
 				}
 
@@ -107,15 +124,19 @@ namespace TestClient
 					{
 						subActor = ActorProxy.Create<ISubscribingActor>(actorId, applicationName, nameof(ISubscribingActor));
 
-						if (i%2 == 0)
+						if (i%3 == 0)
 						{
 							subActor.RegisterAsync().GetAwaiter().GetResult();
 						}
-						else
-						{
+						else if (i % 3 == 1)
+                        {
 							subActor.RegisterWithRelayAsync().GetAwaiter().GetResult();
 						}
-					}
+                        else 
+                        {
+                            subActor.RegisterWithBrokerServiceAsync().GetAwaiter().GetResult();
+                        }
+                    }
 					catch
 					{
 						subActor = null;

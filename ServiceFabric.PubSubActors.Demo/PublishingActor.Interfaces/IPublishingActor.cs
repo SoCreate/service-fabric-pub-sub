@@ -10,5 +10,7 @@ namespace PublishingActor.Interfaces
 	public interface IPublishingActor : IActor
 	{
 		Task<string> PublishMessageOneAsync();
-	}
+
+        Task<string> PublishMessageTwoAsync();
+    }
 }

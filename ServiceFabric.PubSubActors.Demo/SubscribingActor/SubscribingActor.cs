@@ -5,6 +5,7 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 using ServiceFabric.PubSubActors.Interfaces;
 using SubscribingActor.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberActors;
+using System;
 
 namespace SubscribingActor
 {
@@ -42,13 +43,24 @@ namespace SubscribingActor
 			return this.UnregisterMessageTypeWithRelayBrokerAsync(typeof(PublishedMessageOne), new ActorId(WellKnownRelayBrokerId), null,  true); 
 		}
 
-		public Task ReceiveMessageAsync(MessageWrapper message)
+	
+
+        public Task RegisterWithBrokerServiceAsync()
+        {
+            return this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
+        }
+
+        public Task UnregisterWithBrokerServiceAsync()
+        {
+            return this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
+        }
+
+        public Task ReceiveMessageAsync(MessageWrapper message)
 		{
 			var payload = this.Deserialize<PublishedMessageOne>(message);
 			ActorEventSource.Current.ActorMessage(this, $"Received message: {payload.Content}");
 			//TODO: handle message
 			return Task.FromResult(true);
 		}
-		
-	}
+    }
 }

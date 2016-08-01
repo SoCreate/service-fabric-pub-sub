@@ -30,15 +30,15 @@ namespace PublishingStatelessService
 		/// </summary>
 		/// <returns>The collection of listeners.</returns>
 		protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
-		{
-			yield return new ServiceInstanceListener(context => new FabricTransportServiceRemotingListener(context, this), "StatelessFabricTransportServiceRemotingListener");
+        {
+            yield return new ServiceInstanceListener(context => new FabricTransportServiceRemotingListener(context, this), "StatelessFabricTransportServiceRemotingListener");
 		}
 
-		/// <summary>
-		/// This is the main entry point for your service instance.
-		/// </summary>
-		/// <param name="cancelServiceInstance">Canceled when Service Fabric terminates this instance.</param>
-		protected override async Task RunAsync(CancellationToken cancelServiceInstance)
+    /// <summary>
+    /// This is the main entry point for your service instance.
+    /// </summary>
+    /// <param name="cancelServiceInstance">Canceled when Service Fabric terminates this instance.</param>
+    protected override async Task RunAsync(CancellationToken cancelServiceInstance)
 		{
 			// TODO: Replace the following sample code with your own logic.
 
@@ -58,10 +58,18 @@ namespace PublishingStatelessService
 		async Task<string> IPublishingStatelessService.PublishMessageOneAsync()
 		{
 			ServiceEventSource.Current.ServiceMessage(this, "Publishing Message");
-			await this.PublishMessageAsync(new PublishedMessageOne { Content = "Hello PubSub World, from Service!" });
-			return "Message published";
+			await this.PublishMessageAsync(new PublishedMessageOne { Content = "Hello PubSub World, from Service, using Broker Actor!!" });
+			return "Message published to broker actor";
 		}
-	}
+
+        async Task<string> IPublishingStatelessService.PublishMessageTwoAsync()
+        {
+            ServiceEventSource.Current.ServiceMessage(this, "Publishing Message");
+            await this.PublishMessageToBrokerServiceAsync(new PublishedMessageOne { Content = "If you see this, something is wrong!" });
+            await this.PublishMessageToBrokerServiceAsync(new PublishedMessageTwo { Content = "Hello PubSub World, from Service, using Broker Service!" });
+            return "Message published to broker service";
+        }
+    }
 
 	
 }

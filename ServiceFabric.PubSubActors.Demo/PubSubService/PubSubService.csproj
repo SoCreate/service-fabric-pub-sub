@@ -4,21 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
-    <ProjectGuid>{DFC5BD11-AFCF-45F1-A2F0-797CE7F017E0}</ProjectGuid>
+    <ProjectGuid>{4FED836F-72EE-4094-9D6D-79FBBFD06C7E}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PubkSubRelayActor</RootNamespace>
-    <AssemblyName>PubkSubRelayActor</AssemblyName>
+    <RootNamespace>PubSubService</RootNamespace>
+    <AssemblyName>PubSubService</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup>
-    <UpdateServiceFabricManifestEnabled>true</UpdateServiceFabricManifestEnabled>
-    <ServicePackagePath>PackageRoot</ServicePackagePath>
-    <ServicePackagePrefix>$(MSBuildProjectName)</ServicePackagePrefix>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,34 +34,36 @@
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <AdditionalFileItemNames>$(AdditionalFileItemNames);None</AdditionalFileItemNames>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.ServiceFabric.Actors, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.Actors.2.1.150\lib\net45\Microsoft.ServiceFabric.Actors.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ServiceFabric.Actors.2.1.163\lib\net45\Microsoft.ServiceFabric.Actors.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Data, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.Data.2.1.150\lib\net45\Microsoft.ServiceFabric.Data.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ServiceFabric.Data.2.1.163\lib\net45\Microsoft.ServiceFabric.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Data.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.Data.2.1.150\lib\net45\Microsoft.ServiceFabric.Data.Interfaces.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ServiceFabric.Data.2.1.163\lib\net45\Microsoft.ServiceFabric.Data.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Internal, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.5.1.150\lib\net45\Microsoft.ServiceFabric.Internal.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ServiceFabric.5.1.163\lib\net45\Microsoft.ServiceFabric.Internal.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Internal.Strings, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.5.1.150\lib\net45\Microsoft.ServiceFabric.Internal.Strings.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ServiceFabric.5.1.163\lib\net45\Microsoft.ServiceFabric.Internal.Strings.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.Services.2.1.150\lib\net45\Microsoft.ServiceFabric.Services.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ServiceFabric.Services.2.1.163\lib\net45\Microsoft.ServiceFabric.Services.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services.Wcf, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.Services.Wcf.2.1.150\lib\net45\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ServiceFabric.Services.Wcf.2.1.163\lib\net45\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -82,13 +79,13 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="ServiceFabricServiceModel, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.Actors.2.1.150\lib\net45\ServiceFabricServiceModel.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ServiceFabric.Actors.2.1.163\lib\net45\ServiceFabricServiceModel.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Fabric, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.5.1.150\lib\net45\System.Fabric.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ServiceFabric.5.1.163\lib\net45\System.Fabric.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
@@ -96,29 +93,30 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PubkSubRelayActor.cs" />
+    <Compile Include="PubSubService.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ActorEventSource.cs" />
+    <Compile Include="ServiceEventSource.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PackageRoot\ServiceManifest.xml" />
     <None Include="PackageRoot\Config\Settings.xml" />
+    <None Include="PackageRoot\ServiceManifest.xml" />
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="readme.md" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PubkSubRelayActor.Interfaces\PubkSubRelayActor.Interfaces.csproj">
-      <Project>{3E870BE2-6DBD-48ED-A6D0-58FDC93A8C2A}</Project>
-      <Name>PubkSubRelayActor.Interfaces</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Microsoft.ServiceFabric.Actors.2.1.150\build\Microsoft.ServiceFabric.Actors.targets" Condition="Exists('..\packages\Microsoft.ServiceFabric.Actors.2.1.150\build\Microsoft.ServiceFabric.Actors.targets')" />
+  <Import Project="..\packages\Microsoft.ServiceFabric.Actors.2.1.163\build\Microsoft.ServiceFabric.Actors.targets" Condition="Exists('..\packages\Microsoft.ServiceFabric.Actors.2.1.163\build\Microsoft.ServiceFabric.Actors.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.ServiceFabric.Actors.2.1.150\build\Microsoft.ServiceFabric.Actors.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ServiceFabric.Actors.2.1.150\build\Microsoft.ServiceFabric.Actors.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.ServiceFabric.Actors.2.1.163\build\Microsoft.ServiceFabric.Actors.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ServiceFabric.Actors.2.1.163\build\Microsoft.ServiceFabric.Actors.targets'))" />
   </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>

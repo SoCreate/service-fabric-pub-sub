@@ -8,4 +8,12 @@ namespace Common.DataContracts
 		[DataMember]
 		public string Content { get; set; }
 	}
+
+
+    [DataContract]
+    public class PublishedMessageTwo
+    {
+        [DataMember]
+        public string Content { get; set; }
+    }
 }
