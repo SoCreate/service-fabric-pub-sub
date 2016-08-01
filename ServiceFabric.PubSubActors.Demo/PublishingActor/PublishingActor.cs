@@ -31,7 +31,6 @@ namespace PublishingActor
             ActorEventSource.Current.ActorMessage(this, "Publishing Message");
 
             await this.PublishMessageToBrokerServiceAsync(new PublishedMessageOne { Content = "If you see this, something is wrong!" });
-
             await this.PublishMessageToBrokerServiceAsync(new PublishedMessageTwo { Content = "Hello PubSub World, from Actor, using Broker Service!" });
             return "Message published to broker service";
         }
