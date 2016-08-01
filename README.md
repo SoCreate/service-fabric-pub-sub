@@ -18,8 +18,8 @@ so minimal inheritance is required. (only for Broker Actors, which need to be ad
 - 4.0.3 updated nuget packages (new SDK)
 
 ## Nuget:
-https://www.nuget.org/packages/ServiceFabric.PubSubActors/4.0.0
-https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces/4.0.0  (for Actor interfaces)
+https://www.nuget.org/packages/ServiceFabric.PubSubActors
+https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces (for Actor interfaces)
 
 ## Introduction
 Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services). 
