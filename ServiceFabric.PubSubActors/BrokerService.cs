@@ -71,7 +71,7 @@ namespace ServiceFabric.PubSubActors
             var actorReference = new ActorReferenceWrapper(actor);
             return RegisterSubscriberPrivateAsync(actorReference, messageTypeName);
         }
-        
+
         /// <summary>
         /// Unregisters an Actor as a subscriber for messages.
         /// </summary>
@@ -123,12 +123,9 @@ namespace ServiceFabric.PubSubActors
             if (message == null) throw new ArgumentNullException(nameof(message));
 
             ServiceEventSourceMessage($"Publishing message of type '{message.MessageType}'");
+            var dictionary = await GetOrAddStateAsync();
             using (var tran = StateManager.CreateTransaction())
-            {
-                var stateResult = await StateManager.TryGetAsync<IReliableDictionary<ReferenceWrapper, BrokerServiceState>>(StateKey);
-                if (!stateResult.HasValue) return;
-
-                var dictionary = stateResult.Value;               
+            {                
                 var enumerable = await dictionary.CreateEnumerableAsync(tran, EnumerationMode.Unordered);
                 var enumerator = enumerable.GetAsyncEnumerator();
                 while (await enumerator.MoveNextAsync(CancellationToken.None))
@@ -158,18 +155,14 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            var dictionary = await StateManager.GetOrAddAsync<IReliableDictionary<ReferenceWrapper, BrokerServiceState>>(StateKey);
+            var dictionary = await GetOrAddStateAsync();
 
             await Task.Delay(this.DueTime);
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 using (var tran = StateManager.CreateTransaction())
-                {
-                    //var result = await StateManager.TryGetAsync<IReliableDictionary<ReferenceWrapper, BrokerServiceState>>(StateKey);
-                    //if (!result.HasValue) return;
-
-                    //var dictionary = result.Value;
+                {                    
                     var enumerable = await dictionary.CreateEnumerableAsync(tran, EnumerationMode.Unordered);
                     var enumerator = enumerable.GetAsyncEnumerator();
                     while (await enumerator.MoveNextAsync(CancellationToken.None))
@@ -187,7 +180,29 @@ namespace ServiceFabric.PubSubActors
             }
         }
 
-       
+        SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+
+        private async Task<IReliableDictionary<ReferenceWrapper, BrokerServiceState>> GetOrAddStateAsync()
+        {
+            IReliableDictionary<ReferenceWrapper, BrokerServiceState> dictionary = null;
+            try
+            {
+                await _semaphore.WaitAsync();
+                dictionary = await StateManager.GetOrAddAsync<IReliableDictionary<ReferenceWrapper, BrokerServiceState>>(StateKey);
+            }
+            catch (Exception ex)
+            {
+                ServiceEventSourceMessage($"Failed to acquire semaphore lock. Error:'{ex}'");
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+
+            return dictionary;
+        }
+
+
 
         /// <summary>
         /// Registers a ReferenceWrapper as a subscriber for messages.
@@ -197,10 +212,10 @@ namespace ServiceFabric.PubSubActors
         {
             ServiceEventSourceMessage($"Registering Subscriber '{reference.Name}' for messages of type {messageTypeName}.");
 
-            var dictionary = await StateManager.GetOrAddAsync<IReliableDictionary<ReferenceWrapper, BrokerServiceState>>(StateKey);
+            var dictionary = await GetOrAddStateAsync(); 
 
             using (var tran = StateManager.CreateTransaction())
-            {               
+            {
                 string messageQueueID = reference.GetHashCode().ToString();
                 string deadLetterQueueID = Guid.NewGuid().ToString("N");
                 var state = await dictionary.GetOrAddAsync(tran, reference, i => new BrokerServiceState
@@ -226,18 +241,19 @@ namespace ServiceFabric.PubSubActors
         private async Task UnregisterSubscriberPrivateAsync(ReferenceWrapper reference, string messageTypeName, bool flushQueue)
         {
             ServiceEventSourceMessage($"Unegistering Subscriber '{reference.Name}' for messages of type {messageTypeName}.");
-            
+
+            var dictionary = await GetOrAddStateAsync();
+
             using (var tran = StateManager.CreateTransaction())
-            {
-                var dictionary = await StateManager.GetOrAddAsync<IReliableDictionary<ReferenceWrapper, BrokerServiceState>>(tran, StateKey);
+            {               
                 var stateResult = await dictionary.TryGetValueAsync(tran, reference);
                 if (!stateResult.HasValue) return;
                 var state = stateResult.Value;
-                
+
                 if (!state.MessageTypeNames.Contains(messageTypeName))
                 {
                     state.MessageTypeNames.Remove(messageTypeName);
-                    
+
                     if (flushQueue)
                     {
                         var queueResult = await StateManager.TryGetAsync<IReliableQueue<MessageWrapper>>(state.SubscriberMessageQueueID);

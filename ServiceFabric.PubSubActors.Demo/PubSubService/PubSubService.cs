@@ -19,8 +19,8 @@ namespace PubSubService
     {
         public PubSubService(StatefulServiceContext context)
             : base(context)
-        { }
-
-        
+        {
+            ServiceEventSourceMessageCallback = message => ServiceEventSource.Current.ServiceMessage(this, message);
+        }        
     }
 }
