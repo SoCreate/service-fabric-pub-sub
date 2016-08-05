@@ -13,12 +13,13 @@ It uses extension methods to
 so minimal inheritance is required. (only for Broker Actors, which need to be added as services)
 
 ##Release notes:
+- 4.2.0 added BrokerService as counterpart of BrokerActor, so you can use your favorite programming model.
 - 4.0.4 moved from dnu to dotnet core project
 - 4.0.3 updated nuget packages (new SDK)
 
 ## Nuget:
-https://www.nuget.org/packages/ServiceFabric.PubSubActors/4.0.0
-https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces/4.0.0  (for Actor interfaces)
+https://www.nuget.org/packages/ServiceFabric.PubSubActors
+https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces (for Actor interfaces)
 
 ## Introduction
 Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services). 
@@ -52,12 +53,26 @@ For large scale messaging with many subscribers you can use a layered approach u
 ||||[Subscribing Services]|
 ||||[Subscribing Actors]|
 *note: only message subscriptions are different here, publishing still happens using the default broker*
+
+Or if you like using Services, you can use the BrokerService:
+
+|    publisher  |     broker    |subscriber|
+| ------------- |:-------------:| -----:|
+|[Publishing Actor]||
+||[BrokerService]|
+|||[Subscribing Actors]|
+|||[Subscribing Services]|
+|[Publishing Service]||
+||[BrokerService]|
+|||[Subscribing Services]|
+|||[Subscribing Actors]|
+
 ## How to use:
 
 ### Create a BrokerActor type
 *Actors of this type will be used to register subscribers to, and every instance will publish one type of message.*
 
-Add a new Stateful Reliable Actor project. Call it 'PubSubActor'.
+Add a new Stateful Reliable Actor project. Call it 'PubSubActor' (optional).
 Add Nuget package 'ServiceFabric.PubSubActors' to the 'PubSubActor' project
 Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to the 'PubSubActor.Interfaces' project.
 Replace the code of PubSubActor with the following code:
@@ -74,7 +89,24 @@ internal class PubSubActor : ServiceFabric.PubSubActors.BrokerActor, Interfaces.
 }
 ```
 
-### Optional, for 'Large Scale Messaging': Add a RelayBrokerActor type
+#### Or, to use the BrokerService:
+Add a new Stateful Reliable Service project. Call it 'PubSubService' (optional).
+Add Nuget package 'ServiceFabric.PubSubActors' to the 'PubSubActor' project
+Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to the project.
+Replace the code of PubSubService with the following code:
+```javascript
+internal sealed class PubSubService : BrokerService
+{
+    public PubSubService(StatefulServiceContext context)
+       : base(context)
+    {
+	//optional: provide a logging callback
+	ServiceEventSourceMessageCallback = message => ServiceEventSource.Current.ServiceMessage(this, message);
+    }
+}
+```
+
+### Optional, for 'Large Scale Messaging': Add a RelayBrokerActor type to your existing BrokerActor (Not in combination with the BrokerService)
 *Actors of this type will be used to relay messges from a BrokerActor, and relay it to registered subscribers, and every instance will publish one type of message.*
 
 Add a new Stateful Reliable Actor project. Call it 'PubkSubRelayActor'.
@@ -89,6 +121,7 @@ Replace the code of PubkSubRelayActor with the following code:
 	{
 		public PubkSubRelayActor()
 		{
+			//optional: provide a logging callback
 			ActorEventSourceMessageCallback = message => ActorEventSource.Current.ActorMessage(this, message);
 		}
 	}
@@ -97,10 +130,16 @@ Replace the code of PubkSubRelayActor with the following code:
 ### Add a shared data contracts library
 *Add a common datacontracts library for shared messages*
 
-Add a new Class Library project, call it 'DataContracts', and add this sample message contract:
+Add a new Class Library project, call it 'DataContracts', and add these sample message contracts:
 ```javascript
 [DataContract]
 public class PublishedMessageOne
+{
+	[DataMember]
+	public string Content { get; set; }
+}
+[DataContract]
+public class PublishedMessageTwo
 {
 	[DataMember]
 	public string Content { get; set; }
@@ -117,7 +156,7 @@ Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to the 'SubscribingAct
 Add a project reference to the shared data contracts library ('DataContracts').
 
 Go to the SubscribingActor.Interfaces project, open the file 'ISubscribingActor' and replace the contents with this code:
-**notice this implements ISubscriberActor from the package 'ServiceFabric.PubSubActors.Interfaces' which adds a Receiv method. The additional methods are to enable this actor to be manipulated from the outside.**
+**notice this implements ISubscriberActor from the package 'ServiceFabric.PubSubActors.Interfaces' which adds a Receive method. The additional methods are to enable this actor to be manipulated from the outside.**
 ```javascript
 public interface ISubscribingActor : ISubscriberActor
 	{
@@ -128,6 +167,9 @@ public interface ISubscribingActor : ISubscriberActor
 		//for relayed messaging:
 		Task RegisterWithRelayAsync();
 		Task UnregisterWithRelayAsync();
+		//for service broker messaging:
+		Task RegisterWithBrokerServiceAsync();
+		Task UnregisterWithBrokerServiceAsync();
 	}
 ```
 
@@ -163,6 +205,16 @@ internal class SubscribingActor : Actor, ISubscribingActor
 		//unregister as subscriber for this type of messages at the relay broker
 		return this.UnregisterMessageTypeWithRelayBrokerAsync(typeof(PublishedMessageOne), new ActorId(WellKnownRelayBrokerId), null,  true); 
 	}
+	
+ 	public Task RegisterWithBrokerServiceAsync()
+        {
+            return this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
+        }
+
+        public Task UnregisterWithBrokerServiceAsync()
+        {
+            return this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
+        }
 
 	public Task ReceiveMessageAsync(MessageWrapper message)
 	{
@@ -219,19 +271,25 @@ internal sealed class SubscribingStatefulService : StatefulService, ISubscriberS
 		yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p), "StatefulSubscriberCommunicationListener);
 	}
 
-	protected override async Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
+	protected override Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
 	{
 		return RegisterAsync();
 	}
 		
-	public Task RegisterAsync()
-	{
-		return this.RegisterMessageTypeAsync(typeof(PublishedMessageOne));
+	public async Task RegisterAsync()
+	{	
+		//register with BrokerActor:	
+	    	await this.RegisterMessageTypeAsync(typeof(PublishedMessageOne));
+	    	//register with BrokerService:
+            	await this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
 	}
 
-	public Task UnregisterAsync()
+	public async Task UnregisterAsync()
 	{
-		return this.UnregisterMessageTypeAsync(typeof(PublishedMessageOne), true);
+		//unregister with BrokerActor:	
+		await this.UnregisterMessageTypeAsync(typeof(PublishedMessageOne), true);
+		//unregister with BrokerService:
+            	await this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
 	}
 
 	//receives published messages:
@@ -310,6 +368,7 @@ public interface IPublishingActor : IActor
 {
 	//enables external callers to trigger a publish action, not required for functionality
 	Task<string> PublishMessageOneAsync();
+	Task<string> PublishMessageTwoAsync();
 }
 ```
 
@@ -320,12 +379,22 @@ using ServiceFabric.PubSubActors.PublisherActors;
 [StatePersistence(StatePersistence.None)]
 internal class PublishingActor : Actor, IPublishingActor
 {
+	//publish to BrokerActor
 	async Task<string> IPublishingActor.PublishMessageOneAsync()
 	{
 		ActorEventSource.Current.ActorMessage(this, "Publishing Message");
 		await this.PublishMessageAsync(new PublishedMessageOne {Content = "Hello PubSub World, from Actor!"});
-		return "Message published";
+		return "Message published to Broker Actor";
 	}
+	
+	//publish to BrokerService
+	async Task<string> IPublishingActor.PublishMessageTwoAsync()
+        {
+            ActorEventSource.Current.ActorMessage(this, "Publishing Message");
+
+            await this.PublishMessageToBrokerServiceAsync(new PublishedMessageTwo { Content = "Hello PubSub World, from Actor, using 	Broker Service!" });
+            return "Message published to broker service";
+        }
 }
 ```
 You can now ask the PublishingActor to publish a message to subscribers:
@@ -355,6 +424,8 @@ public interface IPublishingStatelessService : IService
 	//allows external callers to trigger a publish action, not required for functionality
 	[OperationContract]
 	Task<string> PublishMessageOneAsync();
+	[OperationContract]
+	Task<string> PublishMessageTwoAsync();
 }
 ```
 Open the file 'PublishingStatelessService.cs'. Replace the contents with the code below:
@@ -370,7 +441,14 @@ internal sealed class PublishingStatelessService : StatelessService, IPublishing
 	{
 		ServiceEventSource.Current.ServiceMessage(this, "Publishing Message");
 		await this.PublishMessageAsync(new PublishedMessageOne { Content = "Hello PubSub World, from Service!" });
-		return "Message published";
+		return "Message published tot broker actor";
 	}
+	
+	async Task<string> IPublishingStatelessService.PublishMessageTwoAsync()
+        {
+            ServiceEventSource.Current.ServiceMessage(this, "Publishing Message");
+            await this.PublishMessageToBrokerServiceAsync(new PublishedMessageTwo { Content = "Hello PubSub World, from Service, using Broker Service!" });
+            return "Message published to broker service";
+        }
 }
 ```
