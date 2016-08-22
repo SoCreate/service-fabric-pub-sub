@@ -102,8 +102,7 @@ namespace ServiceFabric.PubSubActors.PublisherActors
         /// <summary>
         /// Resolves the <see cref="ServicePartitionKey"/> to send the message to, based on message type.
         /// </summary>
-        /// <param name="messageTypeName"></param>
-        /// <param name="applicationName"></param>
+        /// <param name="message">The message to publish</param>
         /// <param name="brokerServiceName"></param>
         /// <returns></returns>
         public static async Task<ServicePartitionKey> GetPartitionForMessageAsync(object message, Uri brokerServiceName)
@@ -135,24 +134,24 @@ namespace ServiceFabric.PubSubActors.PublisherActors
         /// Gets the <see cref="IBrokerService"/> instance for the provided <paramref name="message"/>
         /// </summary>
         /// <param name="message"></param>
-        /// <param name="applicationName"></param>
+        /// <param name="brokerServiceName">Uri of BrokerService instance</param>
         /// <returns></returns>
         internal static Task<IBrokerService> GetBrokerServiceForMessageAsync(object message, Uri brokerServiceName)
         {
             return GetBrokerServiceForMessageAsync(message.GetType().FullName, brokerServiceName);
         }
 
-            /// <summary>
-            /// Gets the <see cref="IBrokerService"/> instance for the provided <paramref name="message"/>
-            /// </summary>
-            /// <param name="message"></param>
-            /// <param name="applicationName"></param>
-            /// <returns></returns>
+        /// <summary>
+        /// Gets the <see cref="IBrokerService"/> instance for the provided <paramref name="messageTypeName"/>
+        /// </summary>
+        /// <param name="messageTypeName">Full type name of message object.</param>
+        /// <param name="brokerServiceName">Uri of BrokerService instance</param>
+        /// <returns></returns>
         internal static async Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName, Uri brokerServiceName)
         {
             
             var resolvedPartition = await GetPartitionForMessageAsync(messageTypeName, brokerServiceName);
-            var brokerService = ServiceProxy.Create<IBrokerService>(brokerServiceName, resolvedPartition, listenerName: ServiceFabric.PubSubActors.BrokerService.ListenerName);
+            var brokerService = ServiceProxy.Create<IBrokerService>(brokerServiceName, resolvedPartition, listenerName: BrokerService.ListenerName);
             return brokerService;
         }
 	}

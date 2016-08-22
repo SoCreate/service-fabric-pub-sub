@@ -9,7 +9,7 @@ namespace ServiceFabric.PubSubActors.Interfaces
 	/// Don't forget to mark implementing <see cref="Actor"/> classes with
 	/// the attribute <see cref="ActorServiceAttribute"/> like: [ActorService(Name = nameof(IRelayBrokerActor))]
 	/// </summary>
-	public interface IRelayBrokerActor : ISubscriberActor, IActor
+	public interface IRelayBrokerActor : ISubscriberActor
 	{
 		/// <summary>
 		/// Registers an Actor as a subscriber for messages.

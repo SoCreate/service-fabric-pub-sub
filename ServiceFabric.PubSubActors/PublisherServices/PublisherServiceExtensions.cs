@@ -5,7 +5,6 @@ using Microsoft.ServiceFabric.Actors.Client;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.PublisherActors;
-using Microsoft.ServiceFabric.Services.Remoting.Client;
 
 namespace ServiceFabric.PubSubActors.PublisherServices
 {
@@ -29,7 +28,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
 			}
 
 			var brokerActor = GetBrokerActorForMessage(applicationName, message);
-			var wrapper = ServiceFabric.PubSubActors.PublisherActors.PublisherActorExtensions.CreateMessageWrapper(message);
+			var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
 			await brokerActor.PublishMessageAsync(wrapper);
 		}
 
@@ -51,7 +50,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
 			}
 
 			var brokerActor = GetBrokerActorForMessage(applicationName, message);
-            var wrapper = ServiceFabric.PubSubActors.PublisherActors.PublisherActorExtensions.CreateMessageWrapper(message);
+            var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
             await brokerActor.PublishMessageAsync(wrapper);
 		}
 
@@ -93,7 +92,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
             }
 
 			var brokerService = await PublisherActorExtensions.GetBrokerServiceForMessageAsync(message, brokerServiceName);
-            var wrapper = ServiceFabric.PubSubActors.PublisherActors.PublisherActorExtensions.CreateMessageWrapper(message);
+            var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
 			await brokerService.PublishMessageAsync(wrapper);
 		}
 
@@ -118,7 +117,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
             }
 
             var brokerService = await PublisherActorExtensions.GetBrokerServiceForMessageAsync(message, brokerServiceName);
-            var wrapper = ServiceFabric.PubSubActors.PublisherActors.PublisherActorExtensions.CreateMessageWrapper(message);
+            var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
             await brokerService.PublishMessageAsync(wrapper);
         }
 

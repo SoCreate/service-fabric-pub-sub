@@ -10,6 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using System.Collections.Generic;
+using ServiceFabric.PubSubActors.PublisherActors;
+using ServiceFabric.PubSubActors.SubscriberServices;
 
 namespace ServiceFabric.PubSubActors
 {
@@ -22,6 +24,7 @@ namespace ServiceFabric.PubSubActors
     public abstract class BrokerService : StatefulService, IBrokerService
     {
         private const string StateKey = "__state__";
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
 
         /// <summary>
         /// The name that the <see cref="ServiceReplicaListener"/> instance will get.
@@ -47,13 +50,13 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         protected Action<string> ServiceEventSourceMessageCallback { get; set; }
 
-        public BrokerService(StatefulServiceContext serviceContext)
+        protected BrokerService(StatefulServiceContext serviceContext)
                    : base(serviceContext)
         {
             RegisterBrokerService();
         }
 
-        public BrokerService(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica)
+        protected BrokerService(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica)
             : base(serviceContext, reliableStateManagerReplica)
         {
             RegisterBrokerService();
@@ -63,6 +66,7 @@ namespace ServiceFabric.PubSubActors
         /// Registers an Actor as a subscriber for messages.
         /// </summary>
         /// <param name="actor">Reference to the actor to register.</param>
+        /// <param name="messageTypeName">Full type name of message object.</param>
         public Task RegisterSubscriberAsync(ActorReference actor, string messageTypeName)
         {
             if (actor == null) throw new ArgumentNullException(nameof(actor));
@@ -76,6 +80,7 @@ namespace ServiceFabric.PubSubActors
         /// Unregisters an Actor as a subscriber for messages.
         /// </summary>
         /// <param name="actor">Reference to the actor to unsubscribe.</param>
+        /// <param name="messageTypeName">Full type name of message object.</param>
         /// <param name="flushQueue">Publish any remaining messages.</param>
         public Task UnregisterSubscriberAsync(ActorReference actor, string messageTypeName, bool flushQueue)
         {
@@ -89,6 +94,7 @@ namespace ServiceFabric.PubSubActors
         /// <summary>
         /// Registers a service as a subscriber for messages.
         /// </summary>
+        /// <param name="messageTypeName">Full type name of message object.</param>
         /// <param name="service">Reference to the service to register.</param>
         public Task RegisterServiceSubscriberAsync(ServiceReference service, string messageTypeName)
         {
@@ -102,6 +108,7 @@ namespace ServiceFabric.PubSubActors
         /// <summary>
         /// Unregisters a service as a subscriber for messages.
         /// </summary>
+        /// <param name="messageTypeName">Full type name of message object.</param>
         /// <param name="service">Reference to the actor to unsubscribe.</param>
         /// <param name="flushQueue">Publish any remaining messages.</param>
         public Task UnregisterServiceSubscriberAsync(ServiceReference service, string messageTypeName, bool flushQueue)
@@ -157,7 +164,7 @@ namespace ServiceFabric.PubSubActors
         {
             var dictionary = await GetOrAddStateAsync();
 
-            await Task.Delay(this.DueTime);
+            await Task.Delay(DueTime, cancellationToken);
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -176,11 +183,10 @@ namespace ServiceFabric.PubSubActors
                     }
                 }
 
-                await Task.Delay(Period);
+                await Task.Delay(Period, cancellationToken);
             }
         }
 
-        SemaphoreSlim _semaphore = new SemaphoreSlim(1);
 
         private async Task<IReliableDictionary<ReferenceWrapper, BrokerServiceState>> GetOrAddStateAsync()
         {
@@ -203,11 +209,11 @@ namespace ServiceFabric.PubSubActors
         }
 
 
-
         /// <summary>
         /// Registers a ReferenceWrapper as a subscriber for messages.
         /// </summary>
         /// <param name="reference">Reference to register.</param>
+        /// <param name="messageTypeName"></param>
         private async Task RegisterSubscriberPrivateAsync(ReferenceWrapper reference, string messageTypeName)
         {
             ServiceEventSourceMessage($"Registering Subscriber '{reference.Name}' for messages of type {messageTypeName}.");
@@ -237,6 +243,7 @@ namespace ServiceFabric.PubSubActors
         /// Unregisters a ReferenceWrapper as a subscriber for messages.
         /// </summary>
         /// <param name="reference">Reference to unsubscribe.</param>
+        /// <param name="messageTypeName"></param>
         /// <param name="flushQueue">Publish any remaining messages.</param>
         private async Task UnregisterSubscriberPrivateAsync(ReferenceWrapper reference, string messageTypeName, bool flushQueue)
         {
@@ -271,20 +278,23 @@ namespace ServiceFabric.PubSubActors
         /// When overridden, handles an undeliverable message <paramref name="message"/> for listener <paramref name="reference"/>.
         /// By default, it will be added to the 'dead letter queue'.
         /// </summary>
+        /// <param name="tran">Active StateManager Transaction</param>
         /// <param name="reference"></param>
         /// <param name="message"></param>
         protected virtual async Task HandleUndeliverableMessageAsync(ITransaction tran, ReferenceWrapper reference, MessageWrapper message)
         {
-            ServiceEventSourceMessage($"Adding undeliverable message to Dead Letter Queue (Listener: {reference.Name})");
             var deadLetters = await GetOrAddDeadLetterQueueAsync(tran, reference);
+            var count = await deadLetters.GetCountAsync(tran);
+            ServiceEventSourceMessage($"Adding undeliverable message to Dead Letter Queue (Listener: {reference.Name}, Dead Letter Queue depth:{count})");
             await ValidateQueueDepthAsync(tran, reference, deadLetters);
-            await deadLetters?.EnqueueAsync(tran, message);
+            await deadLetters.EnqueueAsync(tran, message);
         }
 
         /// <summary>
         /// Returns a 'dead letter queue' for the provided Reference, to store undeliverable messages.
         /// Returns null for unregistered references.
         /// </summary>
+        /// <param name="tran">Active StateManager Transaction</param>
         /// <param name="reference"></param>
         /// <returns></returns>
         private async Task<IReliableQueue<MessageWrapper>> GetOrAddDeadLetterQueueAsync(ITransaction tran, ReferenceWrapper reference)
@@ -304,6 +314,7 @@ namespace ServiceFabric.PubSubActors
         /// Ensures the Queue depth is less than the allowed maximum.
         /// </summary>
         /// <param name="reference"></param>
+        /// <param name="tran">Active StateManager Transaction</param>
         /// <param name="deadLetters"></param>
         private async Task ValidateQueueDepthAsync(ITransaction tran, ReferenceWrapper reference, IReliableQueue<MessageWrapper> deadLetters)
         {
@@ -323,24 +334,27 @@ namespace ServiceFabric.PubSubActors
         private async Task ProcessQueueAsync(ReferenceWrapper reference, IReliableQueue<MessageWrapper> queue)
         {
             int messagesProcessed = 0;
+            long depth;
+            using (var tran = StateManager.CreateTransaction())
+            {
+                depth = await queue.GetCountAsync(tran);
+                if (depth == 0) return;
+            }
 
             using (var tran = StateManager.CreateTransaction())
             {
-                long depth = await queue.GetCountAsync(tran);
-
                 ServiceEventSourceMessage($"Processing {depth} queued messages for '{reference.Name}'.");
                 var result = await queue.TryPeekAsync(tran);
 
                 while (result.HasValue)
                 {
                     MessageWrapper message = result.Value;
-                    ServiceEventSourceMessage($"Publishing message to subscriber {reference.Name}");
+                    //ServiceEventSourceMessage($"Publishing message to subscriber {reference.Name}");
                     try
                     {
                         await reference.PublishAsync(message);
-                        ServiceEventSourceMessage($"Published message to subscriber {reference.Name}");
+                        ServiceEventSourceMessage($"Published message {++messagesProcessed} of {depth} to subscriber {reference.Name}");
                         await queue.TryDequeueAsync(tran);
-                        messagesProcessed++;
                     }
                     catch (Exception ex)
                     {
@@ -352,7 +366,10 @@ namespace ServiceFabric.PubSubActors
                 }
                 await tran.CommitAsync();
             }
-            ServiceEventSourceMessage($"Processed {messagesProcessed} queued messages for '{reference.Name}'.");
+            if (messagesProcessed > 0)
+            {
+                ServiceEventSourceMessage($"Processed {messagesProcessed} queued messages for '{reference.Name}'.");
+            }
         }
 
         /// <summary>
@@ -370,7 +387,7 @@ namespace ServiceFabric.PubSubActors
         private void RegisterBrokerService()
         {
             FabricClient fc = new FabricClient();
-            fc.PropertyManager.PutPropertyAsync(new Uri(Context.CodePackageActivationContext.ApplicationName), nameof(BrokerService), this.Context.ServiceName.ToString());
+            fc.PropertyManager.PutPropertyAsync(new Uri(Context.CodePackageActivationContext.ApplicationName), nameof(BrokerService), Context.ServiceName.ToString());
         }
     }
 }

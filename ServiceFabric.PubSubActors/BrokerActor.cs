@@ -6,6 +6,7 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.PublisherActors;
 using ServiceFabric.PubSubActors.State;
+using ServiceFabric.PubSubActors.SubscriberServices;
 
 namespace ServiceFabric.PubSubActors
 {
@@ -67,8 +68,9 @@ namespace ServiceFabric.PubSubActors
 		public async Task UnregisterSubscriberAsync(ActorReference actor, bool flushQueue)
 		{
 			if (actor == null) throw new ArgumentNullException(nameof(actor));
+            ActorEventSourceMessage($"Unregistering Subscriber '{actor.ServiceUri}' for messages of type '{_messageType}'");
 
-			var actorReference = new ActorReferenceWrapper(actor);
+            var actorReference = new ActorReferenceWrapper(actor);
 			Queue<MessageWrapper> queue;
 			var state = await StateManager.GetStateAsync<BrokerActorState>(StateKey);
 			if (flushQueue && state.SubscriberMessages.TryGetValue(actorReference, out queue))
@@ -105,7 +107,9 @@ namespace ServiceFabric.PubSubActors
 		{
 			if (service == null) throw new ArgumentNullException(nameof(service));
 
-			var serviceReference = new ServiceReferenceWrapper(service);
+            ActorEventSourceMessage($"Unregistering Subscriber '{service.ServiceUri}' for messages of type '{_messageType}'");
+
+            var serviceReference = new ServiceReferenceWrapper(service);
 			Queue<MessageWrapper> queue;
 			var state = await StateManager.GetStateAsync<BrokerActorState>(StateKey);
 			if (flushQueue && state.SubscriberMessages.TryGetValue(serviceReference, out queue))
@@ -193,9 +197,10 @@ namespace ServiceFabric.PubSubActors
 		/// <param name="message"></param>
 		protected virtual async Task HandleUndeliverableMessageAsync(ReferenceWrapper reference, MessageWrapper message)
 		{
-			ActorEventSourceMessage($"Adding undeliverable message to Actor Dead Letter Queue (Listener: {reference.Name})");
-			var deadLetters = await GetOrAddActorDeadLetterQueueAsync(reference);
-			ValidateQueueDepth(reference, deadLetters);
+            var deadLetters = await GetOrAddActorDeadLetterQueueAsync(reference);
+            ActorEventSourceMessage($"Adding undeliverable message to Actor Dead Letter Queue (Listener: {reference.Name}, Dead Letter Queue depth:{deadLetters.Count})");
+
+            ValidateQueueDepth(reference, deadLetters);
 			deadLetters.Enqueue(message);
 		}
 
@@ -253,21 +258,16 @@ namespace ServiceFabric.PubSubActors
 		/// <returns></returns>
 		private async Task ProcessQueueAsync(KeyValuePair<ReferenceWrapper, Queue<MessageWrapper>> actorMessageQueue)
 		{
-			ActorEventSourceMessage(
-				$"Processing {actorMessageQueue.Value.Count} queued messages for '{actorMessageQueue.Key.Name}'.");
 			int messagesProcessed = 0;
-
-
+            
 			while (actorMessageQueue.Value.Count > 0)
 			{
 				var message = actorMessageQueue.Value.Peek();
-				ActorEventSourceMessage($"Publishing message to subscribed Actor {actorMessageQueue.Key.Name}");
+				//ActorEventSourceMessage($"Publishing message to subscribed Actor {actorMessageQueue.Key.Name}");
 				try
 				{
 					await actorMessageQueue.Key.PublishAsync(message);
-					ActorEventSourceMessage($"Published message to subscribed Actor {actorMessageQueue.Key.Name}");
-
-					messagesProcessed++;
+					ActorEventSourceMessage($"Published message {++messagesProcessed} of {actorMessageQueue.Value.Count} to subscribed Actor {actorMessageQueue.Key.Name}");
 					actorMessageQueue.Value.Dequeue();
 				}
 				catch (Exception ex)
@@ -276,8 +276,10 @@ namespace ServiceFabric.PubSubActors
 					ActorEventSourceMessage($"Suppressed error while publishing message to subscribed Actor {actorMessageQueue.Key.Name}. Error: {ex}.");
 				}
 			}
-
-			ActorEventSourceMessage($"Processed {messagesProcessed} queued messages for '{actorMessageQueue.Key.Name}'.");
+		    if (messagesProcessed > 0)
+		    {
+		        ActorEventSourceMessage($"Processed {messagesProcessed} queued messages for '{actorMessageQueue.Key.Name}'.");
+		    }
 		}
 
 
