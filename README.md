@@ -13,6 +13,7 @@ It uses extension methods to
 so minimal inheritance is required. (only for Broker Actors, which need to be added as services)
 
 ##Release notes:
+- 4.4.0 improved BrokerService throughput. Added load test demo app.
 - 4.2.0 added BrokerService as counterpart of BrokerActor, so you can use your favorite programming model.
 - 4.0.4 moved from dnu to dotnet core project
 - 4.0.3 updated nuget packages (new SDK)
