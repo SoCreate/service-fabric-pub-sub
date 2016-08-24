@@ -290,7 +290,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		/// <param name="context"></param>
 		/// <param name="info"></param>
 		/// <returns></returns>
-		private static ServiceReference CreateServiceReference(ServiceContext context, ServicePartitionInformation info)
+		public static ServiceReference CreateServiceReference(ServiceContext context, ServicePartitionInformation info)
 		{
 			var serviceReference = new ServiceReference
 			{

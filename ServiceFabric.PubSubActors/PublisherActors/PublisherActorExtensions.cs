@@ -136,7 +136,7 @@ namespace ServiceFabric.PubSubActors.PublisherActors
         /// <param name="message"></param>
         /// <param name="brokerServiceName">Uri of BrokerService instance</param>
         /// <returns></returns>
-        internal static Task<IBrokerService> GetBrokerServiceForMessageAsync(object message, Uri brokerServiceName)
+        public static Task<IBrokerService> GetBrokerServiceForMessageAsync(object message, Uri brokerServiceName)
         {
             return GetBrokerServiceForMessageAsync(message.GetType().FullName, brokerServiceName);
         }
@@ -147,7 +147,7 @@ namespace ServiceFabric.PubSubActors.PublisherActors
         /// <param name="messageTypeName">Full type name of message object.</param>
         /// <param name="brokerServiceName">Uri of BrokerService instance</param>
         /// <returns></returns>
-        internal static async Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName, Uri brokerServiceName)
+        public static async Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName, Uri brokerServiceName)
         {
             
             var resolvedPartition = await GetPartitionForMessageAsync(messageTypeName, brokerServiceName);

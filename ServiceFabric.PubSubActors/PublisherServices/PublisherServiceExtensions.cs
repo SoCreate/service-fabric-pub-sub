@@ -126,7 +126,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
         /// </summary>
         /// <param name="applicationName"></param>
         /// <returns></returns>
-        internal static async Task<Uri> DiscoverBrokerServiceNameAsync(Uri applicationName)
+        public static async Task<Uri> DiscoverBrokerServiceNameAsync(Uri applicationName)
         {
             var fc = new System.Fabric.FabricClient();
             var property = await fc.PropertyManager.GetPropertyAsync(applicationName, nameof(BrokerService));
