@@ -162,8 +162,8 @@ namespace ServiceFabric.PubSubActors
                     {
                         subscriber.QueueSemaphore.Release();
                     }
-                    await tran.CommitAsync();
                 }
+                await tran.CommitAsync();
             }
 
 
