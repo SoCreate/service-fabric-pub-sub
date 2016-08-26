@@ -305,6 +305,8 @@ namespace ServiceFabric.PubSubActors
                     {
                         state.Add(brokerServiceState);
                     }
+
+                    await dictionary.SetAsync(tran, messageTypeName, state);
                     //create subscriber queues
                     await StateManager.GetOrAddAsync<IReliableQueue<MessageWrapper>>(tran, messageQueueID);
                     await StateManager.GetOrAddAsync<IReliableQueue<MessageWrapper>>(tran, deadLetterQueueID);
@@ -352,6 +354,7 @@ namespace ServiceFabric.PubSubActors
                         {
                             state.Remove(subscriber);
                         }
+                        await dictionary.SetAsync(tran, messageTypeName, state);
                     }
 
                     await tran.CommitAsync();
@@ -492,6 +495,17 @@ namespace ServiceFabric.PubSubActors
         /// <returns></returns>
         private async Task InitializeAsync(CancellationToken cancellationToken)
         {
+            //wait until usable;
+            while (Partition.WriteStatus != PartitionAccessStatus.Granted && Partition.WriteStatus != PartitionAccessStatus.NotPrimary)
+            {
+                await Task.Delay(100, cancellationToken);
+            }
+
+            if (Partition.WriteStatus == PartitionAccessStatus.NotPrimary)
+            {
+                throw new Exception("Stopping a broker service InitializeAsync on a secondary replica. Not an issue.");
+            }
+
             var messageSubscriberInfo = await GetOrAddStateAsync();
             using (var tran = StateManager.CreateTransaction())
             {

@@ -11,23 +11,25 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 {
 	internal class SubscriberServicePartitionClient : ServicePartitionClient<WcfCommunicationClient<ISubscriberService>>, ISubscriberService
 	{
+        private static readonly WcfCommunicationClientFactory _factory = new WcfCommunicationClientFactory();
+
 		public static SubscriberServicePartitionClient Create(ServiceReference subscriberServiceReference)
 		{
-			var factory = new WcfCommunicationClientFactory();
+			
 			SubscriberServicePartitionClient client;
 			switch (subscriberServiceReference.PartitionKind)
 			{
 				case ServicePartitionKind.Singleton:
-					client = new SubscriberServicePartitionClient(factory, subscriberServiceReference.ServiceUri);
+					client = new SubscriberServicePartitionClient(_factory, subscriberServiceReference.ServiceUri);
 					break;
 				case ServicePartitionKind.Int64Range:
 					//unsure why it's LowKey here..
 					if (subscriberServiceReference.PartitionID == null)
 						throw new InvalidOperationException("subscriberReference is missing its partition id.");
-					client = new SubscriberServicePartitionClient(factory, subscriberServiceReference.ServiceUri, subscriberServiceReference.PartitionID.Value);
+					client = new SubscriberServicePartitionClient(_factory, subscriberServiceReference.ServiceUri, subscriberServiceReference.PartitionID.Value);
 					break;
 				case ServicePartitionKind.Named:
-					client = new SubscriberServicePartitionClient(factory, subscriberServiceReference.ServiceUri, subscriberServiceReference.PartitionName);
+					client = new SubscriberServicePartitionClient(_factory, subscriberServiceReference.ServiceUri, subscriberServiceReference.PartitionName);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
