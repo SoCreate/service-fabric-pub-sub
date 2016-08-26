@@ -406,6 +406,11 @@ namespace ServiceFabric.PubSubActors
                     $"Dead Letter Queue for Subscriber '{reference.Name}' has {queueDepth} items, which is more than the allowed {MaxDeadLetterCount}. Clearing it.");
                 await deadLetters.ClearAsync();
             }
+            else
+            {
+                ServiceEventSourceMessage(
+                  $"Dead Letter Queue for Subscriber '{reference.Name}' has {queueDepth} items!");
+            }
         }
 
         /// <summary>
@@ -435,17 +440,16 @@ namespace ServiceFabric.PubSubActors
                     return deadLetterQueue;
                 });
                 
-                ServiceEventSourceMessage($"Processing {depth} queued messages for '{subscriber.ReferenceWrapper.Name}'.");
+                ServiceEventSourceMessage($"Processing queu with about {depth} messages for '{subscriber.ReferenceWrapper.Name}'.");
                 var result = await subscriberQueue.TryPeekAsync(tran);
 
                 while (result.HasValue && !cancellationToken.IsCancellationRequested)
                 {
                     MessageWrapper message = result.Value;
-                   
                     try
                     {
                         await subscriber.ReferenceWrapper.PublishAsync(message);
-                        ServiceEventSourceMessage($"Published message {++messagesProcessed} of {depth} to subscriber {subscriber.ReferenceWrapper.Name}");
+                        ServiceEventSourceMessage($"Published message {++messagesProcessed} to subscriber {subscriber.ReferenceWrapper.Name}");
                         await subscriberQueue.TryDequeueAsync(tran);
                     }
                     catch (Exception ex)
