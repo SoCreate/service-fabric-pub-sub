@@ -1,0 +1,630 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.ServiceFabric.Data</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.ServiceFabric.Data.SR">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Data.SR.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Data.SR.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Data.SR.Error_TypeLoadAssembly">
+            <summary>
+              Looks up a localized string similar to Could not load type &apos;{0}&apos; from assembly &apos;{1}&apos;.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Data.ReliableStateManager">
+            <summary>
+            Manages all <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> for a service replica.
+            Each replica in a service has its own state manager and thus its own set of <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.#ctor(System.Fabric.StatefulServiceContext,Microsoft.ServiceFabric.Data.ReliableStateManagerConfiguration)">
+            <summary>
+            Create a new ReliableStateManager
+            </summary>
+            <param name="serviceContext">A <see cref="T:System.Fabric.StatefulServiceContext"/> that describes the service context.</param>
+            <param name="configuration">Configuration parameters.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.GetAsyncEnumerator">
+            <summary>
+            Returns an enumerator that iterates through the collection.
+            </summary>
+            <returns>
+            An <see cref="T:Microsoft.ServiceFabric.Data.IAsyncEnumerator`1"/> object that can be used to iterate through the collection.
+            </returns>
+            <filterpriority>1</filterpriority>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.BackupAsync(System.Func{Microsoft.ServiceFabric.Data.BackupInfo,System.Threading.CancellationToken,System.Threading.Tasks.Task{System.Boolean}})">
+            <summary>
+            Performs a full backup of all reliable state managed by this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>.
+            </summary>
+            <param name="backupCallback">Callback to be called when the backup folder has been created locally and is ready to be moved out of the node.</param>
+            <returns>Task that represents the asynchronous backup operation.</returns>
+            <remarks>
+            A FULL backup will be performed with a one-hour timeout.
+            Boolean returned by the backupCallback indicate whether the service was able to successfully move the backup folder to an external location.
+            If false is returned, BackupAsync throws InvalidOperationException with the relevant message indicating backupCallback returned false.
+            Also, backup will be marked as unsuccessful.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#TryGetAsync``1(System.String)">
+            <summary>
+            Attempts to get an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> of the given type <typeparamref name="T"/> and with the given name.
+            </summary>
+            <typeparam name="T">
+            When specifying the type, you may ask for either a concrete type or an interface type. The retrieved object will
+            be cast to the given type.
+            </typeparam>
+            <param name="name">
+            The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>. This name must be unique in this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>
+            across <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> types, including unrelated types.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not convertible to type <typeparamref name="T"/>.</exception>
+            <returns>Task that represents the asynchronous operation. The task result is a tuple indicating whether the reliable state was found, and if so the instance.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#TryGetAsync``1(System.Uri)">
+            <summary>
+            Attempts to get an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> of the given type <typeparamref name="T"/> and with the given name.
+            </summary>
+            <typeparam name="T">
+            When specifying the type, you may ask for either a concrete type or an interface type. The retrieved object will
+            be cast to the given type.
+            </typeparam>
+            <param name="name">
+            The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>. This name must be unique in this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>
+            across <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> types, including unrelated types.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not convertible to type <typeparamref name="T"/>.</exception>
+            <returns>Task that represents the asynchronous operation. The task result is a tuple indicating whether the reliable state was found, and if so the instance.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#RemoveAsync(System.String)">
+            <summary>
+            Removes the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name from this state manager. The state is
+            permanently removed from persistent storage and all replicas.
+            </summary>
+            <remarks>
+            This is an atomic operation. The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> will be successfully removed along with all state
+            or be left in-tact.
+            </remarks>
+            <param name="name">The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> to remove.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <returns>Task that represents the asynchronous remove operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#RemoveAsync(System.String,System.TimeSpan)">
+            <summary>
+            Removes the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name from this state manager. The state is
+            permanently removed from persistent storage and all replicas.
+            </summary>
+            <remarks>
+            This is an atomic operation. The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> will be successfully removed along with all state
+            or be left in-tact.
+            </remarks>
+            <param name="name">The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> to remove.</param>
+            <param name="timeout">The amount of time to wait for the operation to complete before throwing a TimeoutException. Primarily used to prevent deadlocks. The default is 4 seconds.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist, or <paramref name="timeout"/> is negative.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <returns>Task that represents the asynchronous remove operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#RemoveAsync(Microsoft.ServiceFabric.Data.ITransaction,System.String)">
+            <summary>
+            Removes the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name from this state manager. The state is
+            permanently removed from persistent storage and all replicas when the transaction is committed.
+            </summary>
+            <remarks>
+            This is an atomic operation. The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> will be successfully removed along with all state
+            or be left in-tact. If this method throws an exception, the transaction must be aborted.
+            </remarks>
+            <param name="tx">Transaction to associate this operation with.</param>
+            <param name="name">The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> to remove.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <returns>Task that represents the asynchronous remove operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#RemoveAsync(Microsoft.ServiceFabric.Data.ITransaction,System.String,System.TimeSpan)">
+            <summary>
+            Removes the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name from this state manager. The state is
+            permanently removed from persistent storage and all replicas when the transaction is committed.
+            </summary>
+            <remarks>
+            This is an atomic operation. The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> will be successfully removed along with all state
+            or be left in-tact. If this method throws an exception, the transaction must be aborted.
+            </remarks>
+            <param name="tx">Transaction to associate this operation with.</param>
+            <param name="name">The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> to remove.</param>
+            <param name="timeout">The amount of time to wait for the operation to complete before throwing a TimeoutException. Primarily used to prevent deadlocks. The default is 4 seconds.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist, or <paramref name="timeout"/> is negative.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <returns>Task that represents the asynchronous remove operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#RemoveAsync(System.Uri)">
+            <summary>
+            Removes the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name from this state manager. The state is
+            permanently removed from persistent storage and all replicas.
+            </summary>
+            <remarks>
+            This is an atomic operation. The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> will be successfully removed along with all state
+            or be left in-tact.
+            </remarks>
+            <param name="name">The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> to remove.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <returns>Task that represents the asynchronous remove operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#RemoveAsync(System.Uri,System.TimeSpan)">
+            <summary>
+            Removes the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name from this state manager. The state is
+            permanently removed from persistent storage and all replicas.
+            </summary>
+            <remarks>
+            This is an atomic operation. The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> will be successfully removed along with all state
+            or be left in-tact.
+            </remarks>
+            <param name="name">The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> to remove.</param>
+            <param name="timeout">The amount of time to wait for the operation to complete before throwing a TimeoutException. Primarily used to prevent deadlocks. The default is 4 seconds.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist, or <paramref name="timeout"/> is negative.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <returns>Task that represents the asynchronous remove operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#RemoveAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Uri)">
+            <summary>
+            Removes the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name from this state manager. The state is
+            permanently removed from persistent storage and all replicas when the transaction is committed.
+            </summary>
+            <remarks>
+            This is an atomic operation. The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> will be successfully removed along with all state
+            or be left in-tact. If this method throws an exception, the transaction must be aborted.
+            </remarks>
+            <param name="tx">Transaction to associate this operation with.</param>
+            <param name="name">The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> to remove.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <returns>Task that represents the asynchronous remove operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#RemoveAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Uri,System.TimeSpan)">
+            <summary>
+            Removes the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name from this state manager. The state is
+            permanently removed from persistent storage and all replicas when the transaction is committed.
+            </summary>
+            <remarks>
+            This is an atomic operation. The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> will be successfully removed along with all state
+            or be left in-tact. If this method throws an exception, the transaction must be aborted.
+            </remarks>
+            <param name="tx">Transaction to associate this operation with.</param>
+            <param name="name">The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> to remove.</param>
+            <param name="timeout">The amount of time to wait for the operation to complete before throwing a TimeoutException. Primarily used to prevent deadlocks. The default is 4 seconds.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist, or <paramref name="timeout"/> is negative.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <returns>Task that represents the asynchronous remove operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#GetOrAddAsync``1(System.String)">
+            <summary>
+            Gets an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> of the given type <typeparamref name="T"/> and with the given name if it exists, or creates one
+            and returns it if it doesn't already exist.
+            </summary>
+            <remarks>
+            This is an atomic operation. When an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> needs to be created, it will either complete and return successfully
+            or it will not be created.
+            </remarks>
+            <typeparam name="T">
+            When specifying the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> type, you may ask for either a class type or an interface type.
+            <para>
+            If specifying a class type, the system will attempt to return an instance of that type. 
+            If an instance of that type cannot be instantiated (e.g., abstract class, no suitable constructor), an ArgumentException is thrown.
+            </para>
+            <para>
+            If specifying an interface type, the manager will attempt to resolve the interface to a concrete type.
+            If type mapping is specified by the user, this method will use the user-specified mapping to resolve the type (not yet supported).
+            If type mapping is not specified by the user this method will select the default implementation for the interface given.
+            If the given interface type does not have a default implementation, or a user-specified mapping for the type is not provided or the type
+            is invalid, this method will throw ArgumentException.
+            </para>
+            </typeparam>
+            <param name="name">
+            The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>. This name must be unique in this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>
+            across <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> types, including unrelated types.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#GetOrAddAsync``1(System.String,System.TimeSpan)">
+            <summary>
+            Gets an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> of the given type <typeparamref name="T"/> and with the given name if it exists, or creates one
+            and returns it if it doesn't already exist.
+            </summary>
+            <remarks>
+            This is an atomic operation. When an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> needs to be created, it will either complete and return successfully
+            or it will not be created.
+            </remarks>
+            <typeparam name="T">
+            When specifying the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> type, you may ask for either a class type or an interface type.
+            <para>
+            If specifying a class type, the system will attempt to return an instance of that type. 
+            If an instance of that type cannot be instantiated (e.g., abstract class, no suitable constructor), an ArgumentException is thrown.
+            </para>
+            <para>
+            If specifying an interface type, the manager will attempt to resolve the interface to a concrete type.
+            If type mapping is specified by the user, this method will use the user-specified mapping to resolve the type (not yet supported).
+            If type mapping is not specified by the user this method will select the default implementation for the interface given.
+            If the given interface type does not have a default implementation, or a user-specified mapping for the type is not provided or the type
+            is invalid, this method will throw ArgumentException.
+            </para>
+            </typeparam>
+            <param name="name">
+            The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>. This name must be unique in this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>
+            across <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> types, including unrelated types.
+            </param>
+            <param name="timeout">The amount of time to wait for the operation to complete before throwing a TimeoutException. Primarily used to prevent deadlocks. The default is 4 seconds.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>, or <paramref name="timeout"/> is negative.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#GetOrAddAsync``1(Microsoft.ServiceFabric.Data.ITransaction,System.String)">
+            <summary>
+            Gets an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> of the given type <typeparamref name="T"/> and with the given name if it exists, or creates one
+            and returns it if it doesn't already exist.
+            </summary>
+            <remarks>
+            This is an atomic operation. When an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> needs to be created, it will either complete and return successfully
+            or it will not be created. If this method throws an exception, the transaction must be aborted.
+            </remarks>
+            <typeparam name="T">
+            When specifying the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> type, you may ask for either a class type or an interface type.
+            <para>
+            If specifying a class type, the system will attempt to return an instance of that type. 
+            If an instance of that type cannot be instantiated (e.g., abstract class, no suitable constructor), an ArgumentException is thrown.
+            </para>
+            <para>
+            If specifying an interface type, the manager will attempt to resolve the interface to a concrete type.
+            If type mapping is specified by the user, this method will use the user-specified mapping to resolve the type (not yet supported).
+            If type mapping is not specified by the user this method will select the default implementation for the interface given.
+            If the given interface type does not have a default implementation, or a user-specified mapping for the type is not provided or the type
+            is invalid, this method will throw ArgumentException.
+            </para>
+            </typeparam>
+            <param name="tx">Transaction to associate this operation with.</param>
+            <param name="name">
+            The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>. This name must be unique in this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>
+            across <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> types, including unrelated types.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#GetOrAddAsync``1(Microsoft.ServiceFabric.Data.ITransaction,System.String,System.TimeSpan)">
+            <summary>
+            Gets an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> of the given type <typeparamref name="T"/> and with the given name if it exists, or creates one
+            and returns it if it doesn't already exist.
+            </summary>
+            <remarks>
+            This is an atomic operation. When an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> needs to be created, it will either complete and return successfully
+            or it will not be created. If this method throws an exception, the transaction must be aborted.
+            </remarks>
+            <typeparam name="T">
+            When specifying the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> type, you may ask for either a class type or an interface type.
+            <para>
+            If specifying a class type, the system will attempt to return an instance of that type. 
+            If an instance of that type cannot be instantiated (e.g., abstract class, no suitable constructor), an ArgumentException is thrown.
+            </para>
+            <para>
+            If specifying an interface type, the manager will attempt to resolve the interface to a concrete type.
+            If type mapping is specified by the user, this method will use the user-specified mapping to resolve the type (not yet supported).
+            If type mapping is not specified by the user this method will select the default implementation for the interface given.
+            If the given interface type does not have a default implementation, or a user-specified mapping for the type is not provided or the type
+            is invalid, this method will throw ArgumentException.
+            </para>
+            </typeparam>
+            <param name="tx">Transaction to associate this operation with.</param>
+            <param name="name">
+            The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>. This name must be unique in this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>
+            across <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> types, including unrelated types.
+            </param>
+            <param name="timeout">The amount of time to wait for the operation to complete before throwing a TimeoutException. Primarily used to prevent deadlocks. The default is 4 seconds.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>, or <paramref name="timeout"/> is negative.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#GetOrAddAsync``1(System.Uri)">
+            <summary>
+            Gets an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> of the given type <typeparamref name="T"/> and with the given name if it exists, or creates one
+            and returns it if it doesn't already exist.
+            </summary>
+            <remarks>
+            This is an atomic operation. When an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> needs to be created, it will either complete and return successfully
+            or it will not be created.
+            </remarks>
+            <typeparam name="T">
+            When specifying the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> type, you may ask for either a class type or an interface type.
+            <para>
+            If specifying a class type, the system will attempt to return an instance of that type. 
+            If an instance of that type cannot be instantiated (e.g., abstract class, no suitable constructor), an ArgumentException is thrown.
+            </para>
+            <para>
+            If specifying an interface type, the manager will attempt to resolve the interface to a concrete type.
+            If type mapping is specified by the user, this method will use the user-specified mapping to resolve the type (not yet supported).
+            If type mapping is not specified by the user this method will select the default implementation for the interface given.
+            If the given interface type does not have a default implementation, or a user-specified mapping for the type is not provided or the type
+            is invalid, this method will throw ArgumentException.
+            </para>
+            </typeparam>
+            <param name="name">
+            The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>. This name must be unique in this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>
+            across <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> types, including unrelated types.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#GetOrAddAsync``1(System.Uri,System.TimeSpan)">
+            <summary>
+            Gets an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> of the given type <typeparamref name="T"/> and with the given name if it exists, or creates one
+            and returns it if it doesn't already exist.
+            </summary>
+            <remarks>
+            This is an atomic operation. When an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> needs to be created, it will either complete and return successfully
+            or it will not be created.
+            </remarks>
+            <typeparam name="T">
+            When specifying the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> type, you may ask for either a class type or an interface type.
+            <para>
+            If specifying a class type, the system will attempt to return an instance of that type. 
+            If an instance of that type cannot be instantiated (e.g., abstract class, no suitable constructor), an ArgumentException is thrown.
+            </para>
+            <para>
+            If specifying an interface type, the manager will attempt to resolve the interface to a concrete type.
+            If type mapping is specified by the user, this method will use the user-specified mapping to resolve the type (not yet supported).
+            If type mapping is not specified by the user this method will select the default implementation for the interface given.
+            If the given interface type does not have a default implementation, or a user-specified mapping for the type is not provided or the type
+            is invalid, this method will throw ArgumentException.
+            </para>
+            </typeparam>
+            <param name="name">
+            The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>. This name must be unique in this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>
+            across <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> types, including unrelated types.
+            </param>
+            <param name="timeout">The amount of time to wait for the operation to complete before throwing a TimeoutException. Primarily used to prevent deadlocks. The default is 4 seconds.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>, or <paramref name="timeout"/> is negative.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#GetOrAddAsync``1(Microsoft.ServiceFabric.Data.ITransaction,System.Uri)">
+            <summary>
+            Gets an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> of the given type <typeparamref name="T"/> and with the given name if it exists, or creates one
+            and returns it if it doesn't already exist.
+            </summary>
+            <remarks>
+            This is an atomic operation. When an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> needs to be created, it will either complete and return successfully
+            or it will not be created. If this method throws an exception, the transaction must be aborted.
+            </remarks>
+            <typeparam name="T">
+            When specifying the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> type, you may ask for either a class type or an interface type.
+            <para>
+            If specifying a class type, the system will attempt to return an instance of that type. 
+            If an instance of that type cannot be instantiated (e.g., abstract class, no suitable constructor), an ArgumentException is thrown.
+            </para>
+            <para>
+            If specifying an interface type, the manager will attempt to resolve the interface to a concrete type.
+            If type mapping is specified by the user, this method will use the user-specified mapping to resolve the type (not yet supported).
+            If type mapping is not specified by the user this method will select the default implementation for the interface given.
+            If the given interface type does not have a default implementation, or a user-specified mapping for the type is not provided or the type
+            is invalid, this method will throw ArgumentException.
+            </para>
+            </typeparam>
+            <param name="tx">Transaction to associate this operation with.</param>
+            <param name="name">
+            The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>. This name must be unique in this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>
+            across <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> types, including unrelated types.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#GetOrAddAsync``1(Microsoft.ServiceFabric.Data.ITransaction,System.Uri,System.TimeSpan)">
+            <summary>
+            Gets an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> of the given type <typeparamref name="T"/> and with the given name if it exists, or creates one
+            and returns it if it doesn't already exist.
+            </summary>
+            <remarks>
+            This is an atomic operation. When an <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> needs to be created, it will either complete and return successfully
+            or it will not be created. If this method throws an exception, the transaction must be aborted.
+            </remarks>
+            <typeparam name="T">
+            When specifying the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> type, you may ask for either a class type or an interface type.
+            <para>
+            If specifying a class type, the system will attempt to return an instance of that type. 
+            If an instance of that type cannot be instantiated (e.g., abstract class, no suitable constructor), an ArgumentException is thrown.
+            </para>
+            <para>
+            If specifying an interface type, the manager will attempt to resolve the interface to a concrete type.
+            If type mapping is specified by the user, this method will use the user-specified mapping to resolve the type (not yet supported).
+            If type mapping is not specified by the user this method will select the default implementation for the interface given.
+            If the given interface type does not have a default implementation, or a user-specified mapping for the type is not provided or the type
+            is invalid, this method will throw ArgumentException.
+            </para>
+            </typeparam>
+            <param name="tx">Transaction to associate this operation with.</param>
+            <param name="name">
+            The name of the <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>. This name must be unique in this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>
+            across <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> types, including unrelated types.
+            </param>
+            <param name="timeout">The amount of time to wait for the operation to complete before throwing a TimeoutException. Primarily used to prevent deadlocks. The default is 4 seconds.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>, or <paramref name="timeout"/> is negative.</exception>
+            <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#CreateTransaction">
+            <summary>
+            Create and start a new transaction that can be used to group operations to be performed atomically.
+            </summary>
+            <remarks>
+            Operations are added to the transaction by passing the <see cref="T:Microsoft.ServiceFabric.Data.ITransaction"/> object in to reliable state methods.
+            </remarks>
+            <returns>A new transaction.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IReliableStateManager#TryAddStateSerializer``1(Microsoft.ServiceFabric.Data.IStateSerializer{``0})">
+            <summary>
+            Adds a state serializer.
+            Adds it for all reliable collection instances.
+            </summary>
+            <typeparam name="T">Type that will be serialized and de-serialized.</typeparam>
+            <param name="stateSerializer">
+            The state serializer to be added.
+            </param>
+            <returns>
+            True if the serializer was added.
+            False if a serailizer is already registered.
+            </returns>
+            <remarks>
+            This method can only be called in InitializeStateSerializers.
+            Instance specific state serializers always take precedence.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.RestoreAsync(System.String)">
+            <summary>
+            Restore a backup taken by <see cref="M:Microsoft.ServiceFabric.Data.IStateProviderReplica.BackupAsync(System.Func{Microsoft.ServiceFabric.Data.BackupInfo,System.Threading.CancellationToken,System.Threading.Tasks.Task{System.Boolean}})"/> or 
+            <see cref="M:Microsoft.ServiceFabric.Data.IStateProviderReplica.BackupAsync(Microsoft.ServiceFabric.Data.BackupOption,System.TimeSpan,System.Threading.CancellationToken,System.Func{Microsoft.ServiceFabric.Data.BackupInfo,System.Threading.CancellationToken,System.Threading.Tasks.Task{System.Boolean}})"/>.
+            </summary>
+            <param name="backupFolderPath">
+            The directory where the replica is to be restored from.
+            This parameter cannot be null, empty or contain just whitespace. 
+            UNC paths may also be provided.
+            </param>
+            <remarks>
+            A safe backup will be performed, meaning the restore will only be completed if the data to restore is ahead of state of the current replica.
+            </remarks>
+            <returns>Task that represents the asynchronous restore operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.RestoreAsync(System.String,Microsoft.ServiceFabric.Data.RestorePolicy,System.Threading.CancellationToken)">
+            <summary>
+            Restore a backup taken by <see cref="M:Microsoft.ServiceFabric.Data.IStateProviderReplica.BackupAsync(System.Func{Microsoft.ServiceFabric.Data.BackupInfo,System.Threading.CancellationToken,System.Threading.Tasks.Task{System.Boolean}})"/> or 
+            <see cref="M:Microsoft.ServiceFabric.Data.IStateProviderReplica.BackupAsync(Microsoft.ServiceFabric.Data.BackupOption,System.TimeSpan,System.Threading.CancellationToken,System.Func{Microsoft.ServiceFabric.Data.BackupInfo,System.Threading.CancellationToken,System.Threading.Tasks.Task{System.Boolean}})"/>.
+            </summary>
+            <param name="restorePolicy">The restore policy.</param>
+            <param name="backupFolderPath">
+            The directory where the replica is to be restored from.
+            This parameter cannot be null, empty or contain just whitespace. 
+            UNC paths may also be provided.
+            </param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>Task that represents the asynchronous restore operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.BackupAsync(Microsoft.ServiceFabric.Data.BackupOption,System.TimeSpan,System.Threading.CancellationToken,System.Func{Microsoft.ServiceFabric.Data.BackupInfo,System.Threading.CancellationToken,System.Threading.Tasks.Task{System.Boolean}})">
+            <summary>
+            Performs a backup of all reliable state managed by this <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>.
+            </summary>
+            <param name="option">The type of backup to perform.</param>
+            <param name="timeout">The timeout for this operation.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <param name="backupCallback">Callback to be called when the backup folder has been created locally and is ready to be moved out of the node.</param>
+            <returns>Task that represents the asynchronous backup operation.</returns>
+            <remarks>
+            Boolean returned by the backupCallback indicate whether the service was able to successfully move the backup folder to an external location.
+            If false is returned, BackupAsync throws InvalidOperationException with the relevant message indicating backupCallback returned false.
+            Also, backup will be marked as unsuccessful.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IStateProviderReplica#Initialize(System.Fabric.StatefulServiceInitializationParameters)">
+            <summary>
+            Initialize the state provider replica using the service initialization information.
+            </summary>
+            <remarks>
+            No complex processing should be done during Initialize. Expensive or long-running initialization should be done in OpenAsync.
+            </remarks>
+            <param name="initializationParameters">Service initialization information such as service name, partition id, replica id, and code package information.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IStateProviderReplica#OpenAsync(System.Fabric.ReplicaOpenMode,System.Fabric.IStatefulServicePartition,System.Threading.CancellationToken)">
+            <summary>
+            Open the state provider replica for use.
+            </summary>
+            <remarks>
+            Extended state provider initialization tasks can be started at this time.
+            </remarks>
+            <param name="openMode">Indicates whether this is a new or existing replica.</param>
+            <param name="partition">The partition this replica belongs to.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>
+            Task that represents the asynchronous open operation. The result contains the replicator
+            responsible for replicating state between other state provider replicas in the partition.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IStateProviderReplica#ChangeRoleAsync(System.Fabric.ReplicaRole,System.Threading.CancellationToken)">
+            <summary>
+            Notify the state provider replica that its role is changing, for example to Primary or Secondary.
+            </summary>
+            <param name="newRole">The new replica role, such as primary or secondary.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>Task that represents the asynchronous change role operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IStateProviderReplica#CloseAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gracefully close the state provider replica.
+            </summary>
+            <remarks>
+            This generally occurs when the replica's code is being upgrade, the replica is being moved
+            due to load balancing, or a transient fault is detected.
+            </remarks>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>Task that represents the asynchronous close operation.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IStateProviderReplica#Abort">
+            <summary>
+            Forcefully abort the state provider replica.
+            </summary>
+            <remarks>
+            This generally occurs when a permanent fault is detected on the node, or when
+            Service Fabric cannot reliably manage the replica's lifecycle due to internal failures.
+            </remarks>
+        </member>
+        <member name="E:Microsoft.ServiceFabric.Data.ReliableStateManager.TransactionChanged">
+            <summary>
+            Occurs when a transaction's state changes.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ServiceFabric.Data.ReliableStateManager.StateManagerChanged">
+            <summary>
+            Occurs when State Manager's state changes.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Data.ReliableStateManager.OnDataLossAsync">
+            <summary>
+            Set this property to receive notification when this <see cref="T:Microsoft.ServiceFabric.Data.IStateProviderReplica"/> suspects data loss.
+            </summary>
+            <remarks>
+            The passed delegate may monitor the given cancellation token for cancellation requests, and should
+            return a task with result TRUE if state was restored from backup, and FALSE otherwise.
+            </remarks>
+        </member>
+    </members>
+</doc>
