@@ -19,12 +19,12 @@ It uses extension methods to
 ## Nuget:
 https://www.nuget.org/packages/ServiceFabric.PubSubActors
 https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces (for Actor interfaces)
-https://www.nuget.org/packages/ServiceFabric.PubSubActors.PackagedBrokerService (add BrokerService to existing Service Fabric Application)
+https://www.nuget.org/packages/ServiceFabric.PubSubActors.PackagedBrokerService (PREVIEW) (add BrokerService to existing Service Fabric Application)
 
 ## Getting started
 (This is the short version.)
 
-1. Add Nuget package 'ServiceFabric.PubSubActors.PackagedBrokerService' to your existing Service Fabric application. 
+1. Add Nuget package 'ServiceFabric.PubSubActors.PackagedBrokerService' (PREVIEW) to your existing Service Fabric application. 
 2. Add Nuget package 'ServiceFabric.PubSubActors' to your Actor or Service project.
 3. Publish a message
 
