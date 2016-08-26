@@ -70,12 +70,12 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ServiceFabric.PubSubActors, Version=4.4.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\ServiceFabric.PubSubActors.4.4.0\lib\net451\ServiceFabric.PubSubActors.dll</HintPath>
+    <Reference Include="ServiceFabric.PubSubActors, Version=4.4.13.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\ServiceFabric.PubSubActors.4.4.13\lib\net451\ServiceFabric.PubSubActors.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ServiceFabric.PubSubActors.Interfaces, Version=4.4.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\ServiceFabric.PubSubActors.Interfaces.4.4.0\lib\net451\ServiceFabric.PubSubActors.Interfaces.dll</HintPath>
+    <Reference Include="ServiceFabric.PubSubActors.Interfaces, Version=4.4.13.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\ServiceFabric.PubSubActors.Interfaces.4.4.13\lib\net451\ServiceFabric.PubSubActors.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ServiceFabricServiceModel, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
@@ -98,11 +98,19 @@
     <Compile Include="ServiceEventSource.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PackageRoot\Config\Settings.xml" />
+    <None Include="PackageRoot\Config\Settings.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="PackageRoot\ServiceManifest.xml" />
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="readme.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.DataContracts\Common.DataContracts.csproj">
+      <Project>{8C343E4D-CF8C-40B5-B880-862D1CF4E360}</Project>
+      <Name>Common.DataContracts</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.ServiceFabric.Actors.2.1.163\build\Microsoft.ServiceFabric.Actors.targets" Condition="Exists('..\packages\Microsoft.ServiceFabric.Actors.2.1.163\build\Microsoft.ServiceFabric.Actors.targets')" />

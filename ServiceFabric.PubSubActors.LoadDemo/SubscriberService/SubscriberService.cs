@@ -4,9 +4,11 @@ using System.Fabric;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.DataContracts;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Newtonsoft.Json;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberServices;
 
@@ -17,7 +19,8 @@ namespace SubscriberService
     /// </summary>
     internal sealed class SubscriberService : StatelessService, ISubscriberService
     {
-        private int _messagesReceived; 
+        private Dictionary<string, HashSet<Guid>> _messagesReceived;
+        private readonly object _lockMe = new object();
 
         public SubscriberService(StatelessServiceContext context)
             : base(context)
@@ -60,17 +63,43 @@ namespace SubscriberService
                 ServiceEventSource.Current.ServiceMessage(this, $"Subscribing to Message Type {messageTypeName}.");
             }
 
+            _messagesReceived = new Dictionary<string, HashSet<Guid>>();
+            for (int i = 0; i < messageTypeCount; i++)
+            {
+                string messageTypeName = $"DataContract{i}";
+                _messagesReceived[messageTypeName] = new HashSet<Guid>();
+            }
+
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+                }
+                catch (OperationCanceledException ex)
+                {
+                   
+                }
             }
+
+            ServiceEventSource.Current.ServiceMessage(this, $"Instance {Context.InstanceId} stopping. Total counts:{string.Join(", ", _messagesReceived.Select(m => $"Message Type '{m.Key}' - {m.Value.Count}"))}.");
+
         }
 
         public Task ReceiveMessageAsync(MessageWrapper message)
         {
-            int count = Interlocked.Increment(ref _messagesReceived);
-            ServiceEventSource.Current.ServiceMessage(this, $"Received Message Type {message.MessageType}. Total count:{count}.");
+            
+            DataContract dc = JsonConvert.DeserializeObject<DataContract>(message.Payload);
+            var set = _messagesReceived[message.MessageType];
 
+            lock (_lockMe)
+            {
+                if (!set.Add(dc.Id))
+                {
+                    ServiceEventSource.Current.ServiceMessage(this, $"Received duplicate Message ID {dc.Id}.");
+                }
+                ServiceEventSource.Current.ServiceMessage(this, $"Instance {Context.InstanceId} Received Message Type {message.MessageType}. Total count:{set.Count}.");
+            }
             return Task.FromResult(true);
         }
 

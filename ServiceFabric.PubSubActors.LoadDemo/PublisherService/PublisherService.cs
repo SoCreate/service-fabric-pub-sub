@@ -95,7 +95,6 @@ namespace PublisherService
                 {
                     await this.PublishMessageToBrokerServiceAsync(message);
                 }
-                
             }
 
             //await Task.WhenAll(tasks);

@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Section Name="MessageSettings">
-    <Parameter Name="Amount" Value="10000" />
-    <Parameter Name="MessageTypeCount" Value="2" />
-    <Parameter Name="InitialDelaySec" Value="20" />
+    <Parameter Name="Amount" Value="500" />
+    <Parameter Name="MessageTypeCount" Value="10" />
+    <Parameter Name="InitialDelaySec" Value="60" />
 
   </Section>
 </Settings>

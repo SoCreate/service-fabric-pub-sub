@@ -1,4 +1,5 @@
-﻿using System.Fabric;
+﻿using System;
+using System.Fabric;
 
 namespace BrokerService
 {
@@ -11,6 +12,9 @@ namespace BrokerService
             : base(context)
         {
             ServiceEventSourceMessageCallback = (message) => ServiceEventSource.Current.ServiceMessage(this, message);
+
+            Period = TimeSpan.FromMilliseconds(200);
+            DueTime = TimeSpan.FromSeconds(10);
         }
     }
 }
