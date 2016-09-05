@@ -10,113 +10,127 @@ namespace ServiceFabric.PubSubActors.PublisherServices
 {
     public static class PublisherServiceExtensions
     {
-		/// <summary>
-		/// Publish a message.
-		/// </summary>
-		/// <param name="service"></param>
-		/// <param name="message"></param>
-		/// <param name="applicationName">The name of the SF application that hosts the <see cref="BrokerActor"/>. If not provided, ServiceInitializationParameters.CodePackageActivationContext.ApplicationName will be used.</param>
-		/// <returns></returns>
-		public static async Task PublishMessageAsync(this StatelessService service, object message, string applicationName = null)
-		{
-			if (service == null) throw new ArgumentNullException(nameof(service));
-			if (message == null) throw new ArgumentNullException(nameof(message));
+        /// <summary>
+        /// Publish a message.
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="message"></param>
+        /// <param name="applicationName">The name of the SF application that hosts the <see cref="BrokerActor"/>. If not provided, ServiceInitializationParameters.CodePackageActivationContext.ApplicationName will be used.</param>
+        /// <returns></returns>
+        public static async Task PublishMessageAsync(this StatelessService service, object message,
+            string applicationName = null)
+        {
+            if (service == null) throw new ArgumentNullException(nameof(service));
+            if (message == null) throw new ArgumentNullException(nameof(message));
 
-			if (string.IsNullOrWhiteSpace(applicationName))
-			{
-				applicationName = service.Context.CodePackageActivationContext.ApplicationName;
-			}
+            if (string.IsNullOrWhiteSpace(applicationName))
+            {
+                applicationName = service.Context.CodePackageActivationContext.ApplicationName;
+            }
 
-			var brokerActor = GetBrokerActorForMessage(applicationName, message);
-			var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
-			await brokerActor.PublishMessageAsync(wrapper);
-		}
-
-		/// <summary>
-		/// Publish a message.
-		/// </summary>
-		/// <param name="service"></param>
-		/// <param name="message"></param>
-		/// <param name="applicationName">The name of the SF application that hosts the <see cref="BrokerActor"/>. If not provided, ServiceInitializationParameters.CodePackageActivationContext.ApplicationName will be used.</param>
-		/// <returns></returns>
-		public static async Task PublishMessageAsync(this StatefulServiceBase service, object message, string applicationName = null)
-		{
-			if (service == null) throw new ArgumentNullException(nameof(service));
-			if (message == null) throw new ArgumentNullException(nameof(message));
-
-			if (string.IsNullOrWhiteSpace(applicationName))
-			{
-				applicationName = service.Context.CodePackageActivationContext.ApplicationName;
-			}
-
-			var brokerActor = GetBrokerActorForMessage(applicationName, message);
+            var brokerActor = GetBrokerActorForMessage(applicationName, message);
             var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
             await brokerActor.PublishMessageAsync(wrapper);
-		}
+        }
 
-		/// <summary>
-		/// Gets the <see cref="BrokerActor"/> instance for the provided <paramref name="message"/>
-		/// </summary>
-		/// <param name="applicationName"></param>
-		/// <param name="message"></param>
-		/// <returns></returns>
-		private static IBrokerActor GetBrokerActorForMessage(string applicationName, object message)
-		{
-			ActorId actorId = new ActorId(message.GetType().FullName);
-			IBrokerActor brokerActor = ActorProxy.Create<IBrokerActor>(actorId, applicationName, nameof(IBrokerActor));
-			return brokerActor;
-		}
+        /// <summary>
+        /// Publish a message.
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="message"></param>
+        /// <param name="applicationName">The name of the SF application that hosts the <see cref="BrokerActor"/>. If not provided, ServiceInitializationParameters.CodePackageActivationContext.ApplicationName will be used.</param>
+        /// <returns></returns>
+        public static async Task PublishMessageAsync(this StatefulServiceBase service, object message,
+            string applicationName = null)
+        {
+            if (service == null) throw new ArgumentNullException(nameof(service));
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
+            if (string.IsNullOrWhiteSpace(applicationName))
+            {
+                applicationName = service.Context.CodePackageActivationContext.ApplicationName;
+            }
+
+            var brokerActor = GetBrokerActorForMessage(applicationName, message);
+            var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
+            await brokerActor.PublishMessageAsync(wrapper);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="BrokerActor"/> instance for the provided <paramref name="message"/>
+        /// </summary>
+        /// <param name="applicationName"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private static IBrokerActor GetBrokerActorForMessage(string applicationName, object message)
+        {
+            ActorId actorId = new ActorId(message.GetType().FullName);
+            IBrokerActor brokerActor = ActorProxy.Create<IBrokerActor>(actorId, applicationName, nameof(IBrokerActor));
+            return brokerActor;
+        }
 
 
-///////broker service code
+        ///////broker service code
 
 
         /// <summary>
-		/// Publish a message.
-		/// </summary>
-		/// <param name="service"></param>
-		/// <param name="message"></param>
-		/// <param name="brokerServiceName">The name of a SF Service of type <see cref="BrokerService"/>.</param>
+        /// Publish a message.
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="message"></param>
+        /// <param name="brokerServiceName">The name of a SF Service of type <see cref="BrokerService"/>.</param>
         /// <returns></returns>
-		public static async Task PublishMessageToBrokerServiceAsync(this StatelessService service, object message, Uri brokerServiceName = null)
-		{
-			if (service == null) throw new ArgumentNullException(nameof(service));
-			if (message == null) throw new ArgumentNullException(nameof(message));
+        public static async Task PublishMessageToBrokerServiceAsync(this StatelessService service, object message,
+            Uri brokerServiceName = null)
+        {
+            if (service == null) throw new ArgumentNullException(nameof(service));
+            if (message == null) throw new ArgumentNullException(nameof(message));
             if (brokerServiceName == null)
             {
-                brokerServiceName = await DiscoverBrokerServiceNameAsync(new Uri(service.Context.CodePackageActivationContext.ApplicationName));
+                brokerServiceName =
+                    await
+                        DiscoverBrokerServiceNameAsync(
+                            new Uri(service.Context.CodePackageActivationContext.ApplicationName));
                 if (brokerServiceName == null)
                 {
-                    throw new InvalidOperationException("No brokerServiceName was provided or discovered in the current application.");
+                    throw new InvalidOperationException(
+                        "No brokerServiceName was provided or discovered in the current application.");
                 }
             }
 
-			var brokerService = await PublisherActorExtensions.GetBrokerServiceForMessageAsync(message, brokerServiceName);
+            var brokerService =
+                await PublisherActorExtensions.GetBrokerServiceForMessageAsync(message, brokerServiceName);
             var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
-			await brokerService.PublishMessageAsync(wrapper);
-		}
+            await brokerService.PublishMessageAsync(wrapper);
+        }
 
-		/// <summary>
-		/// Publish a message.
-		/// </summary>
-		/// <param name="service"></param>
-		/// <param name="message"></param>
-		/// <param name="brokerServiceName">The name of a SF Service of type <see cref="BrokerService"/>.</param>
+        /// <summary>
+        /// Publish a message.
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="message"></param>
+        /// <param name="brokerServiceName">The name of a SF Service of type <see cref="BrokerService"/>.</param>
         /// <returns></returns>
-		public static async Task PublishMessageToBrokerServiceAsync(this StatefulServiceBase service, object message, Uri brokerServiceName = null)
-		{
-			if (service == null) throw new ArgumentNullException(nameof(service));
-			if (message == null) throw new ArgumentNullException(nameof(message));
+        public static async Task PublishMessageToBrokerServiceAsync(this StatefulServiceBase service, object message,
+            Uri brokerServiceName = null)
+        {
+            if (service == null) throw new ArgumentNullException(nameof(service));
+            if (message == null) throw new ArgumentNullException(nameof(message));
             if (brokerServiceName == null)
             {
-                brokerServiceName = await DiscoverBrokerServiceNameAsync(new Uri(service.Context.CodePackageActivationContext.ApplicationName));
+                brokerServiceName =
+                    await
+                        DiscoverBrokerServiceNameAsync(
+                            new Uri(service.Context.CodePackageActivationContext.ApplicationName));
                 if (brokerServiceName == null)
                 {
-                    throw new InvalidOperationException("No brokerServiceName was provided or discovered in the current application.");
+                    throw new InvalidOperationException(
+                        "No brokerServiceName was provided or discovered in the current application.");
                 }
             }
 
-            var brokerService = await PublisherActorExtensions.GetBrokerServiceForMessageAsync(message, brokerServiceName);
+            var brokerService =
+                await PublisherActorExtensions.GetBrokerServiceForMessageAsync(message, brokerServiceName);
             var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
             await brokerService.PublishMessageAsync(wrapper);
         }
@@ -128,14 +142,17 @@ namespace ServiceFabric.PubSubActors.PublisherServices
         /// <returns></returns>
         public static async Task<Uri> DiscoverBrokerServiceNameAsync(Uri applicationName)
         {
-            var fc = new System.Fabric.FabricClient();
-            var property = await fc.PropertyManager.GetPropertyAsync(applicationName, nameof(BrokerService));
-            if (property != null)
+            try
             {
+                var fc = new System.Fabric.FabricClient();
+                var property = await fc.PropertyManager.GetPropertyAsync(applicationName, nameof(BrokerService));
+                if (property == null) return null;
                 string value = property.GetValue<string>();
                 return new Uri(value);
             }
-
+            catch
+            {
+            }
             return null;
         }
     }

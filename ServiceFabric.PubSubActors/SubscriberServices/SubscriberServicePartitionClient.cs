@@ -23,7 +23,6 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 					client = new SubscriberServicePartitionClient(_factory, subscriberServiceReference.ServiceUri);
 					break;
 				case ServicePartitionKind.Int64Range:
-					//unsure why it's LowKey here..
 					if (subscriberServiceReference.PartitionID == null)
 						throw new InvalidOperationException("subscriberReference is missing its partition id.");
 					client = new SubscriberServicePartitionClient(_factory, subscriberServiceReference.ServiceUri, subscriberServiceReference.PartitionID.Value);

@@ -60,16 +60,22 @@ namespace ServiceFabric.PubSubActors
 
         private int _publishCounter;
 
-        protected BrokerService(StatefulServiceContext serviceContext)
+        protected BrokerService(StatefulServiceContext serviceContext, bool enableAutoDiscovery = true)
                    : base(serviceContext)
         {
-            RegisterBrokerService();
+            if (enableAutoDiscovery)
+            {
+                RegisterBrokerService();
+            }
         }
 
-        protected BrokerService(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica)
+        protected BrokerService(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica, bool enableAutoDiscovery = true)
             : base(serviceContext, reliableStateManagerReplica)
         {
-            RegisterBrokerService();
+            if (enableAutoDiscovery)
+            {
+                RegisterBrokerService();
+            }
         }
 
         /// <summary>
@@ -484,11 +490,11 @@ namespace ServiceFabric.PubSubActors
         }
 
         /// <summary>
-        /// Registers this instance as the BrokerService for this Application.
+        /// Registers this instance as the (one and only) BrokerService for this Application. This makes it discoverable to other services without them knowing this service's name.
         /// </summary>
         private void RegisterBrokerService()
         {
-            FabricClient fc = new FabricClient();
+            var fc = new FabricClient();
             fc.PropertyManager.PutPropertyAsync(new Uri(Context.CodePackageActivationContext.ApplicationName), nameof(BrokerService), Context.ServiceName.ToString());
         }
 
