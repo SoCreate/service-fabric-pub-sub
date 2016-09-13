@@ -9,10 +9,8 @@ It uses extension methods to
 - StatelessService
 - StatefulService
 
-
-so minimal inheritance is required. (only for Broker Actors, which need to be added as services)
-
 ##Release notes:
+- 4.4.13 fixed memory leak
 - 4.4.0 improved BrokerService throughput. Added load test demo app.
 - 4.2.0 added BrokerService as counterpart of BrokerActor, so you can use your favorite programming model.
 - 4.0.4 moved from dnu to dotnet core project
@@ -21,6 +19,39 @@ so minimal inheritance is required. (only for Broker Actors, which need to be ad
 ## Nuget:
 https://www.nuget.org/packages/ServiceFabric.PubSubActors
 https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces (for Actor interfaces)
+https://www.nuget.org/packages/ServiceFabric.PubSubActors.PackagedBrokerService (PREVIEW) (add BrokerService to existing Service Fabric Application)
+
+## Getting started
+(This is the short version.)
+
+1. Add Nuget package 'ServiceFabric.PubSubActors.PackagedBrokerService' (PREVIEW) to your existing Service Fabric application. 
+2. Add Nuget package 'ServiceFabric.PubSubActors' to your Actor or Service project.
+3. Publish a message
+
+	3.1. From an Actor:  
+	``` javascript
+	using ServiceFabric.PubSubActors.PublisherActors;
+	[..]
+	this.PublishMessageToBrokerServiceAsync(..);  	//use any JSON serializable object as a message
+	```
+
+	3.2. From a Service:  
+	``` javascript
+	using ServiceFabric.PubSubActors.PublisherServices;
+	[..]
+	this.PublishMessageToBrokerServiceAsync(..);	//use any JSON serializable object as a message
+	```
+
+4. Subscribe to messages
+
+	4.1. From an Actor: implement ISubscriberActor (like described below)
+	
+	4.2. From a Service : implement ISubscriberService and add the 'SubscriberCommunicationListener' (like described below)
+
+That's it. Actors and Services can be both subscribers and publishers.
+
+#
+Now the long version:
 
 ## Introduction
 Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services). 
@@ -70,7 +101,7 @@ Or if you like using Services, you can use the BrokerService:
 
 ## How to use:
 
-### Create a BrokerActor type
+### Create a Custom BrokerActor type
 *Actors of this type will be used to register subscribers to, and every instance will publish one type of message.*
 
 Add a new Stateful Reliable Actor project. Call it 'PubSubActor' (optional).
@@ -90,7 +121,7 @@ internal class PubSubActor : ServiceFabric.PubSubActors.BrokerActor, Interfaces.
 }
 ```
 
-#### Or, to use the BrokerService:
+#### Or, to use a Custom BrokerService:
 Add a new Stateful Reliable Service project. Call it 'PubSubService' (optional).
 Add Nuget package 'ServiceFabric.PubSubActors' to the 'PubSubActor' project
 Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to the project.
@@ -107,7 +138,7 @@ internal sealed class PubSubService : BrokerService
 }
 ```
 
-### Optional, for 'Large Scale Messaging': Add a RelayBrokerActor type to your existing BrokerActor (Not in combination with the BrokerService)
+### Optional, for 'Large Scale Messaging' using Broker Actors: Add a RelayBrokerActor type to your existing BrokerActor (Not in combination with the BrokerService)
 *Actors of this type will be used to relay messges from a BrokerActor, and relay it to registered subscribers, and every instance will publish one type of message.*
 
 Add a new Stateful Reliable Actor project. Call it 'PubkSubRelayActor'.
