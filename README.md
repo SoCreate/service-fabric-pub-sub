@@ -10,7 +10,9 @@ It uses extension methods to
 - StatefulService
 
 ##Release notes:
-- 4.4.13 fixed memory leak
+
+- 4.5.0 updated nuget packages (new SDK), moving from extension methods to injectable helpers for test support.
+- 4.4.13 fixed memory leak.
 - 4.4.0 improved BrokerService throughput. Added load test demo app.
 - 4.2.0 added BrokerService as counterpart of BrokerActor, so you can use your favorite programming model.
 - 4.0.4 moved from dnu to dotnet core project
@@ -54,10 +56,25 @@ That's it. Actors and Services can be both subscribers and publishers.
 Now the long version:
 
 ## Introduction
+
 Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services). 
-This is done using an intermediate, called BrokerActor.
+This is done using an intermediate, which is the BrokerActor or BrokerService.
 Add this package to all Reliable Actor & Service projects that participate in the pub/sub messaging.
 Add the package 'ServiceFabric.PubSubActors.Interfaces' to all (*ReliableActor).Interfaces projects.
+
+
+|    publisher  |     broker    |subscriber|
+| ------------- |:-------------:| -----:|
+|[Publishing Actor]||
+||[BrokerService]|
+|||[Subscribing Actors]|
+|||[Subscribing Services]|
+|[Publishing Service]||
+||[BrokerService]|
+|||[Subscribing Services]|
+|||[Subscribing Actors]|
+
+Or if you like using Actors, you can use the BrokerActor:
 
 |    publisher  |     broker    |subscriber|
 | ------------- |:-------------:| -----:|
@@ -85,19 +102,6 @@ For large scale messaging with many subscribers you can use a layered approach u
 ||||[Subscribing Services]|
 ||||[Subscribing Actors]|
 *note: only message subscriptions are different here, publishing still happens using the default broker*
-
-Or if you like using Services, you can use the BrokerService:
-
-|    publisher  |     broker    |subscriber|
-| ------------- |:-------------:| -----:|
-|[Publishing Actor]||
-||[BrokerService]|
-|||[Subscribing Actors]|
-|||[Subscribing Services]|
-|[Publishing Service]||
-||[BrokerService]|
-|||[Subscribing Services]|
-|||[Subscribing Actors]|
 
 ## How to use:
 
