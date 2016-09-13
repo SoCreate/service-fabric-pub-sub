@@ -21,7 +21,7 @@ namespace ServiceFabric.PubSubActors.State
 		/// Gets the wrapped <see cref="Microsoft.ServiceFabric.Actors.ActorReference"/>
 		/// </summary>
 		[DataMember]
-		public ActorReference ActorReference { get; set; }
+		public ActorReference ActorReference { get; private set; }
 
 		/// <summary>
 		/// Creates a new instance, for Serializer use only.

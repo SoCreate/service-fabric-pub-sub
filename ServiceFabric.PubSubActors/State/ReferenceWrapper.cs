@@ -29,5 +29,15 @@ namespace ServiceFabric.PubSubActors.State
             if (other == null) return -1;
             return other.GetHashCode().CompareTo(GetHashCode());
         }
+
+	    public string GetQueueName()
+	    {
+	        return GetHashCode().ToString();
+	    }
+
+        public string GetDeadLetterQueueName()
+        {
+            return $"DeadLetters_{GetQueueName()}";
+        }
     }
 }

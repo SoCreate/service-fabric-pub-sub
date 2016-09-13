@@ -80,6 +80,7 @@ namespace ServiceFabric.PubSubActors.PublisherActors
         /// <param name="message"></param>
         /// <param name="brokerServiceName">The name of the SF Service of type <see cref="BrokerService"/>.</param>
         /// <returns></returns>
+		[Obsolete("Use ServiceFabric.PubSubActors.Helpers.PublisherActorHelper for testability")]
         public static async Task PublishMessageToBrokerServiceAsync(this ActorBase actor, object message, Uri brokerServiceName = null)
         {
             if (actor == null) throw new ArgumentNullException(nameof(actor));

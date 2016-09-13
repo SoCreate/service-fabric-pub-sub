@@ -80,6 +80,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
         /// <param name="message"></param>
         /// <param name="brokerServiceName">The name of a SF Service of type <see cref="BrokerService"/>.</param>
         /// <returns></returns>
+		[Obsolete("Use ServiceFabric.PubSubActors.Helpers.PublisherServiceHelper for testability")]
         public static async Task PublishMessageToBrokerServiceAsync(this StatelessService service, object message,
             Uri brokerServiceName = null)
         {
@@ -111,6 +112,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
         /// <param name="message"></param>
         /// <param name="brokerServiceName">The name of a SF Service of type <see cref="BrokerService"/>.</param>
         /// <returns></returns>
+		[Obsolete("Use ServiceFabric.PubSubActors.Helpers.PublisherServiceHelper for testability")]
         public static async Task PublishMessageToBrokerServiceAsync(this StatefulServiceBase service, object message,
             Uri brokerServiceName = null)
         {
@@ -140,6 +142,8 @@ namespace ServiceFabric.PubSubActors.PublisherServices
         /// </summary>
         /// <param name="applicationName"></param>
         /// <returns></returns>
+		[Obsolete("Use ServiceFabric.PubSubActors.Helpers.BrokerServiceLocator for testability")]
+
         public static async Task<Uri> DiscoverBrokerServiceNameAsync(Uri applicationName)
         {
             try

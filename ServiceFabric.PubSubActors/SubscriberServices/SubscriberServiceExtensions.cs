@@ -173,9 +173,10 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 		}
 
         /// <summary>
-        /// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
+        /// Registers this Service as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
         /// </summary>
         /// <returns></returns>
+		[Obsolete("Use ServiceFabric.PubSubActors.Helpers.SubscriberServiceHelper for testability")]
         public static async Task RegisterMessageTypeWithBrokerServiceAsync(this StatelessService service, Type messageType, Uri brokerServiceName = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
@@ -194,9 +195,10 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         }
 
         /// <summary>
-        /// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
+        /// Unregisters this Service as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
         /// </summary>
         /// <returns></returns>
+		[Obsolete("Use ServiceFabric.PubSubActors.Helpers.SubscriberServiceHelper for testability")]
         public static async Task UnregisterMessageTypeWithBrokerServiceAsync(this StatelessService service, Type messageType, bool flushQueue, Uri brokerServiceName = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
@@ -218,6 +220,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
         /// </summary>
         /// <returns></returns>
+		[Obsolete("Use ServiceFabric.PubSubActors.Helpers.SubscriberServiceHelper for testability")]
         public static async Task RegisterMessageTypeWithBrokerServiceAsync(this StatefulService service, Type messageType, Uri brokerServiceName = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
@@ -239,6 +242,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
         /// </summary>
         /// <returns></returns>
+		[Obsolete("Use ServiceFabric.PubSubActors.Helpers.SubscriberServiceHelper for testability")]
         public static async Task UnregisterMessageTypeWithBrokerServiceAsync(this StatefulService service, Type messageType, bool flushQueue, Uri brokerServiceName = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));

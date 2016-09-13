@@ -23,7 +23,21 @@ namespace ServiceFabric.PubSubActors
 		private IActorTimer _timer;
 		private const string StateKey = "__state__";
 
-		/// <summary>
+        /// <summary>
+        /// Initializes a new instance of <see cref="BrokerActor" />
+        /// </summary>
+        /// <param name="actorService">
+        /// The <see cref="Microsoft.ServiceFabric.Actors.Runtime.ActorService" /> that will host this actor instance.
+        /// </param>
+        /// <param name="actorId">
+        /// The <see cref="Microsoft.ServiceFabric.Actors.ActorId" /> for this actor instance.
+        /// </param>
+        protected BrokerActor(ActorService actorService, ActorId actorId) 
+            : base(actorService, actorId)
+	    {
+	    }
+
+	    /// <summary>
 		/// Indicates the maximum size of the Dead Letter Queue for each registered <see cref="ActorReference"/>. (Default: 100)
 		/// </summary>
 		protected int MaxDeadLetterCount { get; set; } = 100;
