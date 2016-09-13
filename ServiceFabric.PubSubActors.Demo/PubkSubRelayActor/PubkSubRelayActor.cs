@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Actors.Runtime;
+﻿using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Runtime;
 using PubkSubRelayActor.Interfaces;
 using ServiceFabric.PubSubActors;
 using ServiceFabric.PubSubActors.Interfaces;
@@ -12,7 +13,8 @@ namespace PubkSubRelayActor
 	[ActorService(Name = nameof(IRelayBrokerActor))]
 	internal class PubkSubRelayActor : RelayBrokerActor, IPubkSubRelayActor
 	{
-		public PubkSubRelayActor()
+		public PubkSubRelayActor(ActorService actorService, ActorId actorId) 
+            : base(actorService, actorId)
 		{
 			ActorEventSourceMessageCallback = message => ActorEventSource.Current.ActorMessage(this, message);
 		}

@@ -6,6 +6,7 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.DataContracts;
+using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberServices;
 
@@ -16,9 +17,12 @@ namespace SubscribingStatelessService
 	/// </summary>
 	internal sealed class SubscribingStatelessService : StatelessService, ISubscriberService
 	{
+	    private readonly ISubscriberServiceHelper _subscriberServiceHelper;
+
 		public SubscribingStatelessService(StatelessServiceContext serviceContext) : base(serviceContext)
 		{
-		}
+            _subscriberServiceHelper = new SubscriberServiceHelper(new BrokerServiceLocator());
+        }
 
 		protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
 		{
@@ -59,16 +63,18 @@ namespace SubscribingStatelessService
 		public async Task RegisterAsync()
 		{
 			await this.RegisterMessageTypeAsync(typeof(PublishedMessageOne));
-            await this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
-        }
+            //await this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
+		    await _subscriberServiceHelper.RegisterMessageTypeAsync(this, typeof(PublishedMessageTwo));
+		}
 
         public async Task UnregisterAsync()
 		{
 			await this.UnregisterMessageTypeAsync(typeof(PublishedMessageOne), true);
-            await this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
+            //await this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
+            await _subscriberServiceHelper.UnregisterMessageTypeAsync(this, typeof(PublishedMessageTwo), true);
         }
 
-		public Task ReceiveMessageAsync(MessageWrapper message)
+        public Task ReceiveMessageAsync(MessageWrapper message)
 		{
 			var payload = this.Deserialize<PublishedMessageOne>(message);
 			ServiceEventSource.Current.ServiceMessage(this, $"Received message: {payload.Content}");

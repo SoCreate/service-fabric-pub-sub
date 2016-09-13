@@ -6,6 +6,7 @@ using ServiceFabric.PubSubActors.Interfaces;
 using SubscribingActor.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberActors;
 using System;
+using ServiceFabric.PubSubActors.Helpers;
 
 namespace SubscribingActor
 {
@@ -19,8 +20,15 @@ namespace SubscribingActor
 	internal class SubscribingActor : Actor, ISubscribingActor
 	{
 		private const string WellKnownRelayBrokerId = "WellKnownRelayBroker";
+        private readonly ISubscriberActorHelper _subscriberActorHelper;
 
-		public Task RegisterAsync()
+        public SubscribingActor(ActorService actorService, ActorId actorId) 
+            : base(actorService, actorId)
+	    {
+            _subscriberActorHelper = new SubscriberActorHelper(new BrokerServiceLocator());
+        }
+
+        public Task RegisterAsync()
 		{
 			return this.RegisterMessageTypeAsync(typeof(PublishedMessageOne)); //register as subscriber for this type of messages
 		}
@@ -47,12 +55,15 @@ namespace SubscribingActor
 
         public Task RegisterWithBrokerServiceAsync()
         {
-            return this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
+            //return this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
+            return _subscriberActorHelper.RegisterMessageTypeAsync(this, typeof(PublishedMessageTwo));
+
         }
 
         public Task UnregisterWithBrokerServiceAsync()
         {
-            return this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
+            //return this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
+            return _subscriberActorHelper.UnregisterMessageTypeAsync(this, typeof(PublishedMessageTwo), true);
         }
 
         public Task ReceiveMessageAsync(MessageWrapper message)

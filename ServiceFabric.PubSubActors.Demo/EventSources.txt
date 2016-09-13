@@ -1,0 +1,9 @@
+MyCompany-MyServiceFabricApp-PublishingActor
+MyCompany-MyServiceFabricApp-SubscribingActor
+MyCompany-MyServiceFabricApp-PubSubActor
+MyCompany-MyServiceFabricApp-SubscribingStatelessService
+MyCompany-MyServiceFabricApp-SubscribingStatefulService
+MyCompany-MyServiceFabricApp-PublishingStatelessService
+Xpirit-MyServiceFabricApp-PubkSubRelayActor
+MyCompany-MyServiceFabricApp-SubscribingToRelayStatefulService
+MyCompany-MyServiceFabricApp-PubSubService

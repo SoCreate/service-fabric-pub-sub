@@ -11,7 +11,8 @@ namespace PubSubActor
 	[ActorService(Name = nameof(IBrokerActor))]
 	internal class PubSubActor : ServiceFabric.PubSubActors.BrokerActor, IPubSubActor
 	{
-		public PubSubActor() 
+		public PubSubActor(ActorService actorService, ActorId actorId) 
+            :base(actorService, actorId)
 		{
 			ActorEventSourceMessageCallback = message => ActorEventSource.Current.ActorMessage(this, message);
 		}

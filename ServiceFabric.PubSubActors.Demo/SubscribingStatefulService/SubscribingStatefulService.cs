@@ -7,6 +7,7 @@ using Common.DataContracts;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberServices;
 
@@ -17,15 +18,20 @@ namespace SubscribingStatefulService
 	/// </summary>
 	internal sealed class SubscribingStatefulService : StatefulService, ISubscriberService
 	{
-		public SubscribingStatefulService(StatefulServiceContext serviceContext) : base(serviceContext)
-		{
-		}
+        private readonly ISubscriberServiceHelper _subscriberServiceHelper;
 
-		public SubscribingStatefulService(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica) : base(serviceContext, reliableStateManagerReplica)
-		{
-		}
 
-		protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
+        public SubscribingStatefulService(StatefulServiceContext serviceContext) : base(serviceContext)
+		{
+            _subscriberServiceHelper = new SubscriberServiceHelper(new BrokerServiceLocator());
+        }
+
+        public SubscribingStatefulService(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica) : base(serviceContext, reliableStateManagerReplica)
+		{
+            _subscriberServiceHelper = new SubscriberServiceHelper(new BrokerServiceLocator());
+        }
+
+        protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
 		{
 			yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p), "StatefulSubscriberCommunicationListener");
 		}
@@ -64,17 +70,18 @@ namespace SubscribingStatefulService
 		public async Task RegisterAsync()
 		{
 			await this.RegisterMessageTypeAsync(typeof(PublishedMessageOne));
-            await this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
-
+            //await this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
+            await _subscriberServiceHelper.RegisterMessageTypeAsync(this, typeof(PublishedMessageTwo));
         }
 
         public async Task UnregisterAsync()
 		{
 			await this.UnregisterMessageTypeAsync(typeof(PublishedMessageOne), true);
-            await this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
+            //await this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
+            await _subscriberServiceHelper.UnregisterMessageTypeAsync(this, typeof(PublishedMessageTwo), true);
         }
 
-		public Task ReceiveMessageAsync(MessageWrapper message)
+        public Task ReceiveMessageAsync(MessageWrapper message)
 		{
 			var payload = this.Deserialize<PublishedMessageOne>(message);
 			ServiceEventSource.Current.ServiceMessage(this, $"Received message: {payload.Content}");

@@ -13,6 +13,7 @@ using Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using ServiceFabric.PubSubActors.PublisherServices;
 using System.Fabric;
+using ServiceFabric.PubSubActors.Helpers;
 
 namespace PublishingStatelessService
 {
@@ -21,8 +22,11 @@ namespace PublishingStatelessService
 	/// </summary>
 	internal sealed class PublishingStatelessService : StatelessService, IPublishingStatelessService
 	{
+	    private readonly IPublisherServiceHelper _publisherServiceHelper;
+
 		public PublishingStatelessService(StatelessServiceContext serviceContext) : base(serviceContext)
 		{
+            _publisherServiceHelper = new PublisherServiceHelper(new BrokerServiceLocator());
 		}
 
 		/// <summary>
@@ -65,8 +69,9 @@ namespace PublishingStatelessService
         async Task<string> IPublishingStatelessService.PublishMessageTwoAsync()
         {
             ServiceEventSource.Current.ServiceMessage(this, "Publishing Message");
-            await this.PublishMessageToBrokerServiceAsync(new PublishedMessageOne { Content = "If you see this, something is wrong!" });
-            await this.PublishMessageToBrokerServiceAsync(new PublishedMessageTwo { Content = "Hello PubSub World, from Service, using Broker Service!" });
+
+            await _publisherServiceHelper.PublishMessageAsync(this, new PublishedMessageTwo { Content = "Hello PubSub World, from Service, using Broker Service!" });
+
             return "Message published to broker service";
         }
     }

@@ -22,7 +22,7 @@ namespace PubkSubRelayActor
 				// For more information, see http://aka.ms/servicefabricactorsplatform
 
 				ActorRuntime.RegisterActorAsync<PubkSubRelayActor>(
-				   (context, actorType) => new ActorService(context, actorType, () => new PubkSubRelayActor())).GetAwaiter().GetResult();
+				   (context, actorType) => new ActorService(context, actorType, (svc, id) => new PubkSubRelayActor(svc, id))).GetAwaiter().GetResult();
 
 				Thread.Sleep(Timeout.Infinite);
 			}
