@@ -14,7 +14,7 @@ namespace BrokerService
             ServiceEventSourceMessageCallback = (message) => ServiceEventSource.Current.ServiceMessage(this, message);
 
             Period = TimeSpan.FromMilliseconds(200);
-            DueTime = TimeSpan.FromSeconds(10);
+            DueTime = TimeSpan.FromSeconds(5);
         }
     }
 }

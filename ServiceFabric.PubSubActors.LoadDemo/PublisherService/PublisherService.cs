@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Fabric;
 using System.Linq;
 using System.Threading;
@@ -8,6 +9,7 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System.Reflection;
 using System.Reflection.Emit;
+using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.PublisherServices;
 
 namespace PublisherService
@@ -23,6 +25,8 @@ namespace PublisherService
             : base(context)
         { }
 
+       
+
         /// <summary>
         /// Publish the configured amount of messages.
         /// </summary>
@@ -35,7 +39,7 @@ namespace PublisherService
             {
                 ServiceEventSource.Current.ServiceMessage(this, $"Sleeping for {delay} seconds.");
 
-                await Task.Delay(TimeSpan.FromSeconds(delay));
+                await Task.Delay(TimeSpan.FromSeconds(delay), cancellationToken);
             }
 
 
@@ -69,7 +73,6 @@ namespace PublisherService
                 ServiceEventSource.Current.ServiceMessage(this, $"Created Message Type {messageTypeName} ({i} of {messageTypeCount}.");
 
             }
-            //asmBuild.Save("Dynamic.dll");
 
             Dictionary<Type, List<object>> messagesPerType = new Dictionary<Type, List<object>>();
 
@@ -86,19 +89,28 @@ namespace PublisherService
                 }
             }
 
-            //var tasks = new List<Task>(ammount);
-
-            for (int i = 0; i < messageTypeCount; i++)
+            var allMessages = messagesPerType.Values.SelectMany(l => l).ToArray();
+            var options = new ParallelOptions
             {
-                var messages = messagesPerType[types[i]];
-                foreach (var message in messages)
-                {
-                    await this.PublishMessageToBrokerServiceAsync(message);
-                }
-            }
+                MaxDegreeOfParallelism = -1
+            };
 
-            //await Task.WhenAll(tasks);
-            ServiceEventSource.Current.ServiceMessage(this, $"Published {ammount} instances of Message Types {string.Join(", ", types.Select(t => t.FullName))}.");
+            
+            var helper = new PublisherServiceHelper();
+            var brokerSvcLocator = new BrokerServiceLocator();
+            var brokerSvcLocation = await brokerSvcLocator.LocateAsync();
+
+            //sending starts here:
+
+            Stopwatch sw = Stopwatch.StartNew();
+            Parallel.For(0, allMessages.Length, options, i =>
+            {
+                var message = allMessages[i];
+                helper.PublishMessageAsync(this, message, brokerSvcLocation).ConfigureAwait(false).GetAwaiter().GetResult();
+            });
+            sw.Stop();
+
+            ServiceEventSource.Current.ServiceMessage(this, $"In {sw.ElapsedMilliseconds}ms - Published {ammount} instances of Message Types {string.Join(", ", types.Select(t => t.FullName))}.");
 
             while (!cancellationToken.IsCancellationRequested)
             {
