@@ -9,7 +9,7 @@
     <ProjectGuid>8e319be1-af0a-4683-997f-7577e369850a</ProjectGuid>
     <RootNamespace>ServiceFabric.PubSubActors.Interfaces</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
-    <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
+    <OutputPath Condition="'$(OutputPath)'=='' ">..\artifacts\bin\$(MSBuildProjectName)</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
@@ -22,6 +22,7 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\dotnet\Microsoft.dotnet.targets" Condition="'$(VSToolsPath)' != ''" />
   <Target Name="AfterBuild">
+    <Exec Command="dotnet restore"/>
     <Exec Command="dotnet pack --configuration '$(configuration)' -o ..\artifacts\bin\$(MSBuildProjectName)\$(configuration)" />
   </Target>
 </Project>
