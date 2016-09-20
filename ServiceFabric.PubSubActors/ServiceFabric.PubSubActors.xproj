@@ -22,6 +22,7 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\dotnet\Microsoft.dotnet.targets" Condition="'$(VSToolsPath)' != ''" />
   <Target Name="AfterBuild">
+    <Exec Command="dotnet restore"/>
     <Exec Command="dotnet pack --configuration '$(configuration)' -o ..\artifacts\bin\$(MSBuildProjectName)\$(configuration)" />
   </Target>
 </Project>
