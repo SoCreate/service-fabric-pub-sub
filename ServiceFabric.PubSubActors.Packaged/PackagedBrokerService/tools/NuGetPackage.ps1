@@ -326,8 +326,8 @@ Else {
 
 Write-Log "Package created" -ForegroundColor Green
 Write-Log "Packages: "
-Get-ChildItem *.nupkg -Path $artifacts 
-
+Get-ChildItem *.nupkg -Path $artifacts | Out-File packages.txt
+Get-Content packages.txt
 
 # Check if package should be published
 #if ($Publish -and $global:ExitCode -eq 0) {
