@@ -314,14 +314,16 @@ Write-Log "Creating package in $($artifacts)..." -ForegroundColor Green
 
 # Create symbols package if any .pdb files are located in the lib folder
 If ((Get-ChildItem *.pdb -Path .\bin -Recurse).Count -gt 0) {
-	$packageTask = Create-Process .\tools\NuGet.exe ("pack Package.nuspec -Symbol -Verbosity Detailed -OutputDirectory $artifacts -Prop Configuration=$Configuration")
+	$packageTask = Create-Process .\tools\NuGet.exe ("pack Package.nuspec -Symbol -Verbosity detailed -OutputDirectory $artifacts -Prop Configuration=$Configuration")
 	Run-Process-Wait-For-Message -process $packageTask -message "Successfully created package"
 	$global:ExitCode = $packageTask.ExitCode
+	Write-Log "Exit Code after packaging with symbols: $global:ExitCode"
 }
 Else {
-	$packageTask = Create-Process .\tools\NuGet.exe ("pack Package.nuspec -Verbosity Detailed -OutputDirectory $artifacts -Prop Configuration=$Configuration")
+	$packageTask = Create-Process .\tools\NuGet.exe ("pack Package.nuspec -Verbosity detailed -OutputDirectory $artifacts -Prop Configuration=$Configuration")
 	Run-Process-Wait-For-Message -process $packageTask -message "Successfully created package"
 	$global:ExitCode = $packageTask.ExitCode
+	Write-Log "Exit Code after packaging: $global:ExitCode"
 }
 
 Write-Log "Package created" -ForegroundColor Green
