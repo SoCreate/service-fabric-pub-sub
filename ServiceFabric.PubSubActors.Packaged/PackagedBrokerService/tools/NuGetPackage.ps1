@@ -287,24 +287,24 @@ Write-Log " "
 Write-Log "NuGet Packager 2.0.3" -ForegroundColor Yellow
 
 # Make sure the nuget executable is writable
-#Set-ItemProperty tools\NuGet.exe -Name IsReadOnly -Value $false
+Set-ItemProperty tools\NuGet.exe -Name IsReadOnly -Value $false
 
-## Make sure the nupkg files are writeable and create backup
-#if (Test-Path *.nupkg) {
-#	Set-ItemProperty *.nupkg -Name IsReadOnly -Value $false
+# Make sure the nupkg files are writeable and create backup
+if (Test-Path *.nupkg) {
+	Set-ItemProperty *.nupkg -Name IsReadOnly -Value $false
 
-#	Write-Log " "
-#	Write-Log "Creating backup..." -ForegroundColor Green
+	Write-Log " "
+	Write-Log "Creating backup..." -ForegroundColor Green
 
-#	Get-ChildItem *.nupkg | ForEach-Object { 
-#		Move-Item $_.Name ($_.Name + ".bak") -Force
-#		Write-Log ("Renamed " + $_.Name + " to " + $_.Name + ".bak")
-#	}
-#}
+	Get-ChildItem *.nupkg | ForEach-Object { 
+		Move-Item $_.Name ($_.Name + ".bak") -Force
+		Write-Log ("Renamed " + $_.Name + " to " + $_.Name + ".bak")
+	}
+}
 
-#Write-Log " "
-#Write-Log "Updating NuGet..." -ForegroundColor Green
-#Write-Log (Invoke-Command {.\tools\NuGet.exe update -Self} -ErrorAction Stop)
+Write-Log " "
+Write-Log "Updating NuGet..." -ForegroundColor Green
+Write-Log (Invoke-Command {.\tools\NuGet.exe update -Self} -ErrorAction Stop)
 
 $artifacts = Resolve-Path "..\..\artifacts"
 New-Item $artifacts -type directory -force
@@ -312,18 +312,15 @@ New-Item $artifacts -type directory -force
 Write-Log " "
 Write-Log "Creating package in $($artifacts)..." -ForegroundColor Green
 
-Write-Log "Using nuspec file:"
-Get-Content Package.nuspec
-
 # Create symbols package if any .pdb files are located in the lib folder
 If ((Get-ChildItem *.pdb -Path .\bin -Recurse).Count -gt 0) {
-	$packageTask = Create-Process NuGet ("pack Package.nuspec -Symbol -Verbosity detailed -OutputDirectory $artifacts -Prop Configuration=$Configuration")
+	$packageTask = Create-Process .\tools\NuGet.exe ("pack Package.nuspec -Symbol -Verbosity detailed -OutputDirectory $artifacts -Prop Configuration=$Configuration")
 	Run-Process-Wait-For-Message -process $packageTask -message "Successfully created package"
 	$global:ExitCode = $packageTask.ExitCode
 	Write-Log "Exit Code after packaging with symbols: $global:ExitCode"
 }
 Else {
-	$packageTask = Create-Process NuGet ("pack Package.nuspec -Verbosity detailed -OutputDirectory $artifacts -Prop Configuration=$Configuration")
+	$packageTask = Create-Process .\tools\NuGet.exe ("pack Package.nuspec -Verbosity detailed -OutputDirectory $artifacts -Prop Configuration=$Configuration")
 	Run-Process-Wait-For-Message -process $packageTask -message "Successfully created package"
 	$global:ExitCode = $packageTask.ExitCode
 	Write-Log "Exit Code after packaging: $global:ExitCode"
