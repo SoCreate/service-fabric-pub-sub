@@ -306,11 +306,11 @@ Write-Log " "
 Write-Log "Updating NuGet..." -ForegroundColor Green
 Write-Log (Invoke-Command {.\tools\NuGet.exe update -Self} -ErrorAction Stop)
 
-Write-Log " "
-Write-Log "Creating package..." -ForegroundColor Green
-
-$artifacts = "..\..\artifacts"
+$artifacts = Resolve-Path "..\..\artifacts"
 New-Item $artifacts -type directory -force
+
+Write-Log " "
+Write-Log "Creating package in $($artifacts)..." -ForegroundColor Green
 
 # Create symbols package if any .pdb files are located in the lib folder
 If ((Get-ChildItem *.pdb -Path .\bin -Recurse).Count -gt 0) {
@@ -325,6 +325,9 @@ Else {
 }
 
 Write-Log "Package created" -ForegroundColor Green
+Write-Log "Packages: "
+Get-ChildItem *.nupkg -Path $artifacts 
+
 
 # Check if package should be published
 #if ($Publish -and $global:ExitCode -eq 0) {
