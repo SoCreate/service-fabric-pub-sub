@@ -14,6 +14,16 @@ function getProjectDirectory($project)
 	return $fileInfo.DirectoryName
 }
 
+function cleanServieParameters($parmsElm, $prefix){
+    if ($parmsElm){     
+        for ($i=$parmsElm.ChildNodes.Count-1; $i-ge 0;$i--){
+            if ($parmsElm.ChildNodes[$i].Name.StartsWith($prefix)){
+                $parmsElm.RemoveChild($parmsElm.ChildNodes[$i]);
+            }
+        }
+    }
+}
+
 function cleanAppManifest($appXml, $srvXml) {
     $importElements = $appXml.ApplicationManifest.ServiceManifestImport | where {$_.ServiceManifestRef.ServiceManifestName -eq $srvXml.ServiceManifest.Name}
     Foreach($importElement in $importElements){
@@ -39,6 +49,14 @@ function cleanAppManifest($appXml, $srvXml) {
         $elm = $appXml.ApplicationManifest.GetElementsByTagName("DefaultServices")
     	$appXml.ApplicationManifest.RemoveChild($elm[0])
 	}
+
+    $srvName = $srvXml.ServiceManifest.Name.Substring(0, $srvXml.ServiceManifest.Name.Length-3)
+    cleanServieParameters $appXml.ApplicationManifest.Parameters ($srvName+"_")
+    $parmCount = $appXml.ApplicationManifest.Parameters.ChildNodes.Count
+    if ($parmCount -eq 0){
+        $pElm = $appXml.ApplicationManifest.GetElementsByTagName("Parameters")
+        $appXml.ApplicationManifest.RemoveChild($pElm[0])
+    }
 }
 
 $srcFolder = Get-Item $installPath\*Pkg | Where-Object {$_.Mode -match 'd'}

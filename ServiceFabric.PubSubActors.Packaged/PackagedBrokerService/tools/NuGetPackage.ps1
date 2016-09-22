@@ -309,24 +309,26 @@ Write-Log (Invoke-Command {.\tools\NuGet.exe update -Self} -ErrorAction Stop)
 Write-Log " "
 Write-Log "Creating package..." -ForegroundColor Green
 
+New-Item .\artifacts -type directory -force
+
 # Create symbols package if any .pdb files are located in the lib folder
-If ((Get-ChildItem *.pdb -Path .\bin\x64\Release -Recurse).Count -gt 0) {
-	$packageTask = Create-Process .\tools\NuGet.exe ("pack Package.nuspec -Symbol -Verbosity Detailed -Prop Configuration=$Configuration -o ..\..\artifacts\bin\ServiceFabric.PubSubActors\Release")
+If ((Get-ChildItem *.pdb -Path .\bin -Recurse).Count -gt 0) {
+	$packageTask = Create-Process .\tools\NuGet.exe ("pack Package.nuspec -Symbol -Verbosity Detailed -OutputDirectory artifacts -Prop Configuration=$Configuration")
+	Run-Process-Wait-For-Message -process $packageTask -message "Successfully created package"
+	$global:ExitCode = $packageTask.ExitCode
+}
+Else {
+	$packageTask = Create-Process .\tools\NuGet.exe ("pack Package.nuspec -Verbosity Detailed -OutputDirectory artifacts -Prop Configuration=$Configuration")
 	Run-Process-Wait-For-Message -process $packageTask -message "Successfully created package"
 	$global:ExitCode = $packageTask.ExitCode
 }
 
-$packageTask = Create-Process .\tools\NuGet.exe ("pack Package.nuspec -Verbosity Detailed -Prop Configuration=$Configuration -o ..\..\artifacts\bin\ServiceFabric.PubSubActors\Release -Exclude **\*.pdb")
-Run-Process-Wait-For-Message -process $packageTask -message "Successfully created package"
-$global:ExitCode = $packageTask.ExitCode
-
-
 Write-Log "Package created" -ForegroundColor Green
 
 # Check if package should be published
-if ($Publish -and $global:ExitCode -eq 0) {
-	Publish
-}
+#if ($Publish -and $global:ExitCode -eq 0) {
+#	Publish
+#}
 
 Write-Log " "
 Write-Log "Exit Code: $global:ExitCode" -ForegroundColor Gray

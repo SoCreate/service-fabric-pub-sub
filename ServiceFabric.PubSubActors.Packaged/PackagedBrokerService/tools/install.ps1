@@ -14,32 +14,21 @@ function getProjectDirectory($project)
 	return $fileInfo.DirectoryName
 }
 
-function addFiles($root, $parent, $folder, $destFolder, $project)
+function addFiles($project, $srcFolder, $destFolder)
 {
-    $files = Get-ChildItem $folder
-    Foreach($file in $files)
-    {
-        if ($file.Mode -match 'd') {
-            $name = $file.Name
-            addFiles $root "$parent\$name" (New-Object System.IO.DirectoryInfo $file.FullName) $destFolder $project
-        }
-        else {
-            $srcFile = ([System.IO.Path]::Combine([System.IO.Path]::Combine($root, $parent),$file.Name))
-            $destFile = ([System.IO.Path]::Combine([System.IO.Path]::Combine($destFolder, $parent),$file.Name))
-			$destPath = [System.IO.Path]::Combine($destFolder, $parent)
-			New-Item -Path $destPath -ItemType Directory -Force
-			Copy-Item $srcFile $destFile -Force
-			$project.ProjectItems.AddFromFile($destFile)
-        }
-    }
+    $project.ProjectItems.Item("ApplicationPackageRoot").ProjectItems.AddFromDirectory($srcFolder)
 }
-
 function appendAttribute($xml, $element, [string]$name, [string]$value) {
     $attribute = $xml.CreateAttribute($name)
     $attribute.Value = $value
     $element.Attributes.Append($attribute)
 }
-
+function addParameter($appXml, $parms, $parmName, $parmValue){
+	$parm = $appXml.CreateElement("Parameter", $nsm.DefaultNamespace)
+	appendAttribute $appXml $parm "Name" $parmName 
+    appendAttribute $appXml $parm "DefaultValue" $parmValue
+	$parms.AppendChild($parm)
+}
 function updateAppManifest($appXml, $srvXml, $appOverridesXml) {
     $nsm = New-Object System.Xml.XmlNamespaceManager($appXml.NameTable)
     $nsm.AddNamespace("xsd", "http://www.w3.org/2001/XMLSchema")
@@ -60,15 +49,22 @@ function updateAppManifest($appXml, $srvXml, $appOverridesXml) {
         $dftSrvElement = $appXml.ApplicationManifest.AppendChild($dftSrvElement)
     }
 
+	$parmElement = $appXml.ApplicationManifest.Parameters
+	if (!$parmElement){
+		$parmElement = $appXml.CreateElement("Parameters", $nsm.DefaultNamespace)
+	}
+
     $srvElement = $appXml.CreateElement("Service", $nsm.DefaultNamespace)
-    appendAttribute $appXml $srvElement "Name" $srvXml.ServiceManifest.Name.Substring(0, $srvXml.ServiceManifest.Name.Length-3)
+	$srvName = $srvXml.ServiceManifest.Name.Substring(0, $srvXml.ServiceManifest.Name.Length-3)
+    appendAttribute $appXml $srvElement "Name" $srvName
 
     Foreach($srvType in $srvXml.ServiceManifest.ServiceTypes.ChildNodes) {
         if ($srvType.Name -eq "StatelessServiceType") {
             $stElement = $appXml.CreateElement("StatelessService", $nsm.DefaultNamespace)
             appendAttribute $appXml $stElement "ServiceTypeName" $srvType.ServiceTypeName
-            appendAttribute $appXml $stElement "InstanceCount" "-1"
+            appendAttribute $appXml $stElement "InstanceCount" ("["+$srvName+"_InstanceCount]")
             $partElement = $appXml.CreateElement("SingletonPartition", $nsm.DefaultNamespace)
+			addParameter $appXml $parmElement ($srvName+"_InstanceCount") "-1"
             $stElement.AppendChild($partElement)
             $srvElement.AppendChild($stElement)
         }
@@ -78,10 +74,13 @@ function updateAppManifest($appXml, $srvXml, $appOverridesXml) {
 			if (!$elm.Name) {
 				$stElement = $appXml.CreateElement("StatefulService", $nsm.DefaultNamespace)
 				appendAttribute $appXml $stElement "ServiceTypeName" $srvType.ServiceTypeName
-				appendAttribute $appXml $stElement "TargetReplicaSetSize" "3"
-				appendAttribute $appXml $stElement "MinReplicaSetSize" "3"
+				appendAttribute $appXml $stElement "TargetReplicaSetSize" ("["+$srvName+"_TargetReplicaSetSize]")
+				addParameter $appXml $parmElement ($srvName+"_TargetReplicaSetSize") "3"
+				appendAttribute $appXml $stElement "MinReplicaSetSize" ("["+$srvName+"_MinReplicaSetSize]")
+				addParameter $appXml $parmElement ($srvName+"_MinReplicaSetSize") "3"
 				$partElement = $appXml.CreateElement("UniformInt64Partition", $nsm.DefaultNamespace)
-				appendAttribute $appXml $partElement "PartitionCount" "1"
+				appendAttribute $appXml $partElement "PartitionCount" ("["+$srvName+"_PartitionCount]")
+				addParameter $appXml $parmElement ($srvName+"_PartitionCount") "1"
 				appendAttribute $appXml $partElement "LowKey" "-9223372036854775808"
 				appendAttribute $appXml $partElement "HighKey" "9223372036854775807"
 				$stElement.AppendChild($partElement)
@@ -101,8 +100,8 @@ function updateAppManifest($appXml, $srvXml, $appOverridesXml) {
         }
     }
 
-	if ($appXml.Parameters) {
-        $appXml.ApplicationManifest.InsertAfter($appXml.Parameters, $importElement)
+	if ($appXml.ApplicationManifest.Parameters) {
+        $appXml.ApplicationManifest.InsertAfter($importElement, $appXml.ApplicationManifest.Parameters)
     } else {
         $appXml.ApplicationManifest.PrependChild($importElement)
     }
@@ -112,26 +111,47 @@ function updateAppManifest($appXml, $srvXml, $appOverridesXml) {
 	}
 }
 
-$srcFolder = Get-Item $installPath\*Pkg | Where-Object {$_.Mode -match 'd'}
-$destFolder = getProjectDirectory($project)
-$destFolder = "$destFolder\ApplicationPackageRoot"
-
-addFiles $installPath $srcFolder.Name $srcFolder $destFolder $project
-
-$appMainfest = "$destFolder\ApplicationManifest.xml"
-$srvManifest = "$srcFolder\ServiceManifest.xml"
-$appManifestOverrides = "$srcFolder\ApplicationManifest.overrides.xml"
-
-$appXml = [xml](Get-Content $appMainfest)
-$srvXml = [xml](Get-Content $srvManifest)
-if ([System.IO.File]::Exists($appManifestOverrides)) {
-	$appOverridesXml = [xml](Get-Content $appManifestOverrides)
-} else {
-	$appOverridesXml = $null
+function updateNuspec($nugetXml, $id, $version){
+    $count= $nugetXml.package.metadata.GetElementsByTagName("dependencies").Count
+    if ($count -eq 0){
+        $dependencies = $nugetXml.CreateElement("dependencies")
+        $nugetXml.package.metadata.AppendChild($dependencies)        
+    } else {
+        $dependencies = $nugetXml.package.metadata.GetElementsByTagName("dependencies")[0]
+    }
+    $dependency = $nugetXml.CreateElement("dependency")
+    appendAttribute $nugetXml $dependency "id" $id
+    appendAttribute $nugetXml $dependency "version" $version
+    $dependencies.AppendChild($dependency)
 }
 
-updateAppManifest $appXml $srvXml $appOverridesXml
+$srcFolder = Get-Item $installPath\*Pkg | Where-Object {$_.Mode -match 'd'}
+$destFolder = getProjectDirectory($project)
 
-$appXml.Save($appMainfest)
+if ([System.IO.Directory]::Exists("$destFolder\ApplicationPackageRoot")) {
+	$destFolder = "$destFolder\ApplicationPackageRoot"
+	addFiles $project $srcFolder ($destFolder+"\"+$srcFolder.Name)
 
+	$appMainfest = "$destFolder\ApplicationManifest.xml"
+	$srvManifest = "$srcFolder\ServiceManifest.xml"
+	$appManifestOverrides = "$srcFolder\ApplicationManifest.overrides.xml"
 
+	$appXml = [xml](Get-Content $appMainfest)
+	$srvXml = [xml](Get-Content $srvManifest)
+	if ([System.IO.File]::Exists($appManifestOverrides)) {
+		$appOverridesXml = [xml](Get-Content $appManifestOverrides)
+	} else {
+		$appOverridesXml = $null
+	}
+
+	updateAppManifest $appXml $srvXml $appOverridesXml
+
+	$appXml.Save($appMainfest)
+} elseif ([System.IO.File]::Exists("$destFolder\Package.nuspec")) {
+    $nugetXml = [xml](Get-Content "$destFolder\Package.nuspec")
+	updateNuspec $nugetXml $package.Id $package.Version
+    $nugetXml.Save("$destFolder\Package.nuspec")
+} else {
+	Write-Error "SFNuGet can't be installed for this project type."
+	exit 1
+}
