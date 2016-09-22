@@ -306,6 +306,8 @@ Write-Log " "
 Write-Log "Updating NuGet..." -ForegroundColor Green
 Write-Log (Invoke-Command {.\tools\NuGet.exe update -Self} -ErrorAction Stop)
 
+New-Item "content" -type directory -force
+
 $artifacts = Resolve-Path "..\..\artifacts"
 New-Item $artifacts -type directory -force
 
