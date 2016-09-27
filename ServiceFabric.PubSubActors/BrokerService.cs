@@ -165,7 +165,7 @@ namespace ServiceFabric.PubSubActors
                 {
                     var queueResult = await StateManager.TryGetAsync<IReliableQueue<MessageWrapper>>(subscriber.QueueName);
                     if (!queueResult.HasValue) continue;
-                   
+
                     await queueResult.Value.EnqueueAsync(tx, message);
                 }
                 ServiceEventSourceMessage($"Published message '{message.MessageType}' to {subscribers.Length} subscribers.");
@@ -196,22 +196,22 @@ namespace ServiceFabric.PubSubActors
                     {
                         var subscriber = element.Value;
                         string queueName = element.Key;
+
                         //process messages for 3s, then allow other transactions to enqueue messages 
-                        using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3)))
-                        {
-                            using (var linked = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken))
-                            {
-                                tasks.Add(ProcessQueues(linked.Token, subscriber, queueName));
-                            }
-                        }
+                        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                        var linked = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken);
+                        tasks.Add(ProcessQueues(linked.Token, subscriber, queueName));
                     }
                     await Task.WhenAll(tasks);
+                }
+                catch (TaskCanceledException)
+                {//swallow and move on..
                 }
                 catch (OperationCanceledException)
                 {//swallow and move on..
                 }
                 catch (ObjectDisposedException)
-                { //swallow and move on..
+                {//swallow and move on..
                 }
                 catch (Exception ex)
                 {
@@ -222,7 +222,7 @@ namespace ServiceFabric.PubSubActors
             }
             // ReSharper disable once FunctionNeverReturns
         }
-        
+
         /// <inheritdoc />
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
@@ -340,20 +340,20 @@ namespace ServiceFabric.PubSubActors
 
             await TimeoutRetryHelper.ExecuteInTransaction(StateManager, async (tx, token, state) =>
             {
-                var queueName = reference.GetHashCode().ToString();
-                var deadLetterQueueName = $"DeadLetters_{reference.GetHashCode()}";
+                var queueName = CreateQueueName(reference, messageTypeName);
+                var deadLetterQueueName = CreateDeadLetterQueueName(reference, messageTypeName);
 
                 Func<string, BrokerServiceState> addValueFactory = key =>
                 {
                     var newState = new BrokerServiceState(messageTypeName);
-                    var subscriber = new Reference(reference);
+                    var subscriber = new Reference(reference, queueName, deadLetterQueueName);
                     newState = BrokerServiceState.AddSubscriber(newState, subscriber);
                     return newState;
                 };
 
                 Func<string, BrokerServiceState, BrokerServiceState> updateValueFactory = (key, current) =>
                 {
-                    var subscriber = new Reference(reference);
+                    var subscriber = new Reference(reference, queueName, deadLetterQueueName);
                     var newState = BrokerServiceState.AddSubscriber(current, subscriber);
                     return newState;
                 };
@@ -379,7 +379,8 @@ namespace ServiceFabric.PubSubActors
             await WaitForInitializeAsync(CancellationToken.None);
 
             var myDictionary = await TimeoutRetryHelper.Execute((token, state) => StateManager.GetOrAddAsync<IReliableDictionary<string, BrokerServiceState>>(messageTypeName));
-
+            var queueName = CreateQueueName(reference, messageTypeName);
+            var deadLetterQueueName = CreateDeadLetterQueueName(reference, messageTypeName);
 
             await TimeoutRetryHelper.ExecuteInTransaction(StateManager, async (tx, token, state) =>
             {
@@ -391,12 +392,30 @@ namespace ServiceFabric.PubSubActors
                 }
 
 
-                await StateManager.RemoveAsync(tx, reference.GetQueueName());
-                await StateManager.RemoveAsync(tx, reference.GetDeadLetterQueueName());
+                await StateManager.RemoveAsync(tx, queueName);
+                await StateManager.RemoveAsync(tx, deadLetterQueueName);
 
                 ServiceEventSourceMessage($"Unregistered subscriber: {reference.Name}");
-                _queues.TryRemove(reference.GetQueueName(), out reference);
+                _queues.TryRemove(queueName, out reference);
             });
+        }
+
+        /// <summary>
+        /// Creates a queuename to use for this reference. (message specific)
+        /// </summary>
+        /// <returns></returns>
+        private static string CreateDeadLetterQueueName(ReferenceWrapper reference, string messageTypeName)
+        {
+            return $"{messageTypeName}_{reference.GetDeadLetterQueueName()}";
+        }
+
+        /// <summary>
+        /// Creates a deadletter queuename to use for this reference. (not message specific)
+        /// </summary>
+        /// <returns></returns>
+        private static string CreateQueueName(ReferenceWrapper reference, string messageTypeName)
+        {
+            return $"{messageTypeName}_{reference.GetQueueName()}";
         }
     }
 }

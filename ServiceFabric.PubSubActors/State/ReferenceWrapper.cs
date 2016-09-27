@@ -30,11 +30,18 @@ namespace ServiceFabric.PubSubActors.State
             return other.GetHashCode().CompareTo(GetHashCode());
         }
 
+        /// <summary>
+        /// Creates a queuename to use for this reference. (not message specific)
+        /// </summary>
+        /// <returns></returns>
 	    public string GetQueueName()
 	    {
 	        return GetHashCode().ToString();
 	    }
-
+        /// <summary>
+        /// Creates a deadletter queuename to use for this reference. (not message specific)
+        /// </summary>
+        /// <returns></returns>
         public string GetDeadLetterQueueName()
         {
             return $"DeadLetters_{GetQueueName()}";

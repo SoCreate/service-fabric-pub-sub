@@ -40,6 +40,10 @@ namespace ServiceFabric.PubSubActors.State
         {
             if (current == null) throw new ArgumentNullException(nameof(current));
             if (subscriber == null) throw new ArgumentNullException(nameof(subscriber));
+            if (current.Subscribers.Any(s => s.ServiceOrActorReference.Equals(subscriber.ServiceOrActorReference)))
+            {
+                return current;
+            }
 
             var clone = new BrokerServiceState(current.MessageTypeName, ((ImmutableList<Reference>)current.Subscribers).Add(subscriber));
             return clone;
@@ -70,7 +74,9 @@ namespace ServiceFabric.PubSubActors.State
             if (subscriber == null) throw new ArgumentNullException(nameof(subscriber));
 
             if (current.Subscribers.All(s => s.ServiceOrActorReference != subscriber))
+            {
                 return current;
+            }
 
             var clone = new BrokerServiceState(current.MessageTypeName, ((ImmutableList<Reference>)current.Subscribers).RemoveAll(s => s.ServiceOrActorReference == subscriber));
             return clone;
@@ -80,8 +86,6 @@ namespace ServiceFabric.PubSubActors.State
     [DataContract]
     internal class Reference
     {
-        //private SemaphoreSlim _queueSemaphore = new SemaphoreSlim(1);
-
         [DataMember]
         public ReferenceWrapper ServiceOrActorReference { get; private set; }
 
@@ -95,34 +99,5 @@ namespace ServiceFabric.PubSubActors.State
             QueueName = queueName;
             DeadLetterQueueName = deadLetterQueueName;
         }
-
-        public Reference(ReferenceWrapper serviceOrActorReference)
-        {
-            ServiceOrActorReference = serviceOrActorReference;
-            QueueName = serviceOrActorReference.GetQueueName();
-            DeadLetterQueueName = serviceOrActorReference.GetDeadLetterQueueName();
-        }
-
-        //[IgnoreDataMember]
-        //public SemaphoreSlim QueueSemaphore => _queueSemaphore;
-
-        //[OnDeserialized]
-        //public void OnDeserialized(StreamingContext context)
-        //{
-        //    _queueSemaphore = new SemaphoreSlim(1);
-        //}
-
-        //public override bool Equals(object obj)
-        //{
-        //    var rfrnc = obj as Reference;
-        //    if (rfrnc == null) return false;
-        //    return Equals(ServiceOrActorReference, rfrnc.ServiceOrActorReference);
-        //}
-
-        //public override int GetHashCode()
-        //{
-        //    // ReSharper disable once NonReadonlyMemberInGetHashCode
-        //    return ServiceOrActorReference?.GetHashCode() ?? -1;
-        //}
     }
 }
