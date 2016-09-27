@@ -42,7 +42,9 @@ namespace SubscriberService
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             //Pub-sub listener:
-            yield return new ServiceInstanceListener(p => new SubscriberCommunicationListener(this, p), "StatelessSubscriberCommunicationListener");
+            yield return
+                new ServiceInstanceListener(p => new SubscriberCommunicationListener(this, p),
+                    "StatelessSubscriberCommunicationListener");
         }
 
 
@@ -71,11 +73,9 @@ namespace SubscriberService
             for (int i = 0; i < _messageTypeCount; i++)
             {
                 string messageTypeName = $"DataContract{i}";
-                var brokerService = await ServiceFabric.PubSubActors.PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageTypeName, brokerServiceName);
-                var serviceReference = SubscriberServiceExtensions.CreateServiceReference(Context, Partition.PartitionInfo);
-                await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageTypeName);
-
-                ServiceEventSource.Current.ServiceMessage(this, $"Subscribing to {amount} instances of Message Type {messageTypeName}.");
+                await SubscribeAsync(messageTypeName);
+                ServiceEventSource.Current.ServiceMessage(this,
+                    $"Subscribing to {amount} instances of Message Type {messageTypeName}.");
             }
 
             Reset();
@@ -88,13 +88,16 @@ namespace SubscriberService
                 }
                 catch (OperationCanceledException)
                 {
-                   
+
                 }
             }
 
-            ServiceEventSource.Current.ServiceMessage(this, $"Instance {Context.InstanceId} stopping. Total counts:{string.Join(", ", _messagesReceived.Select(m => $"Message Type '{m.Key}' - {m.Value.Count}"))}.");
+            ServiceEventSource.Current.ServiceMessage(this,
+                $"Instance {Context.InstanceId} stopping. Total counts:{string.Join(", ", _messagesReceived.Select(m => $"Message Type '{m.Key}' - {m.Value.Count}"))}.");
 
         }
+
+
 
         private void Reset()
         {
@@ -110,12 +113,11 @@ namespace SubscriberService
 
         private Stopwatch _stopwatch;
 
-        public Task ReceiveMessageAsync(MessageWrapper message)
+        public async Task ReceiveMessageAsync(MessageWrapper message)
         {
-            
             DataContract dc = JsonConvert.DeserializeObject<DataContract>(message.Payload);
             var set = _messagesReceived[message.MessageType];
-
+            int localMessagesReceived = 0;
             lock (_lockMe)
             {
                 if (_stopwatch == null)
@@ -126,18 +128,28 @@ namespace SubscriberService
                 {
                     ServiceEventSource.Current.ServiceMessage(this, $"Received duplicate Message ID {dc.Id}.");
                 }
-                ServiceEventSource.Current.ServiceMessage(this, $"Instance {Context.InstanceId} Received Message Type {message.MessageType}. Total count:{set.Count}.");
-                _messagesReceivedCount++;
+                ServiceEventSource.Current.ServiceMessage(this,
+                    $"Instance {Context.InstanceId} Received Message Type {message.MessageType}. Total count:{set.Count}.");
+                localMessagesReceived = _messagesReceivedCount++;
 
                 if (_messagesReceivedCount == _messagesExpectedCount)
                 {
                     _stopwatch.Stop();
 
-                    ServiceEventSource.Current.ServiceMessage(this, $"In {_stopwatch.ElapsedMilliseconds}ms - Received all {_messagesExpectedCount} expected messages.");
+                    ServiceEventSource.Current.ServiceMessage(this,
+                        $"In {_stopwatch.ElapsedMilliseconds}ms - Received all {_messagesExpectedCount} expected messages.");
                     Reset();
                 }
             }
-            return Task.FromResult(true);
+            //if (localMessagesReceived == 1)
+            //try
+            //{
+            //    await UnsubscribeAsync(message.MessageType);
+            //    int a = 23;
+            //}
+            //catch (Exception)
+            //{
+            //}
         }
 
         private static string GetConfigurationValue(ServiceContext context, string sectionName, string parameterName)
@@ -146,6 +158,28 @@ namespace SubscriberService
             var section = (configSection?.Settings.Sections.Contains(sectionName) ?? false) ? configSection?.Settings.Sections[sectionName] : null;
             string endPointType = (section?.Parameters.Contains(parameterName) ?? false) ? section.Parameters[parameterName].Value : null;
             return endPointType;
+        }
+
+        private async Task SubscribeAsync(string messageTypeName)
+        {
+            var brokerServiceName = await _brokerServiceLocator.LocateAsync();
+
+            var brokerService = await ServiceFabric.PubSubActors.PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageTypeName, brokerServiceName);
+            var serviceReference = SubscriberServiceExtensions.CreateServiceReference(Context, Partition.PartitionInfo);
+            await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageTypeName);
+
+            ServiceEventSource.Current.ServiceMessage(this, $"Subscribing to Message Type {messageTypeName}.");
+        }
+
+        private async Task UnsubscribeAsync(string messageTypeName)
+        {
+            var brokerServiceName = await _brokerServiceLocator.LocateAsync();
+
+            var brokerService = await ServiceFabric.PubSubActors.PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageTypeName, brokerServiceName);
+            var serviceReference = SubscriberServiceExtensions.CreateServiceReference(Context, Partition.PartitionInfo);
+            await brokerService.UnregisterServiceSubscriberAsync(serviceReference, messageTypeName, false);
+
+            ServiceEventSource.Current.ServiceMessage(this, $"Unsubscribing from Message Type {messageTypeName}.");
         }
     }
 }

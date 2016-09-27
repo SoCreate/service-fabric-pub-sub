@@ -1,0 +1,3 @@
+MyCompany-ServiceFabric.PubSubActors.LoadDemo-BrokerService
+MyCompany-ServiceFabric.PubSubActors.LoadDemo-PublisherService
+MyCompany-ServiceFabric.PubSubActors.LoadDemo-SubscriberService
