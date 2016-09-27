@@ -336,9 +336,9 @@ Get-Content packages.txt
 Write-Log "Logs: "
 Get-Content NuGet.log
 # Check if package should be published
-#if ($Publish -and $global:ExitCode -eq 0) {
-#	Publish
-#}
+if ($Publish -and $global:ExitCode -eq 0) {
+	Publish
+}
 
 Write-Log " "
 Write-Log "Exit Code: $global:ExitCode" -ForegroundColor Gray
