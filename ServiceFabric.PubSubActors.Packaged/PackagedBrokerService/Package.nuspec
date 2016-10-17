@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>ServiceFabric.PubSubActors.PackagedBrokerService</id>
-    <version>4.5.4-preview</version>
+    <version>4.6.0</version>
     <title>ServiceFabric.PubSubActors.PackagedBrokerService</title>
     <authors>Loek Duys</authors>
     <owners>Loek Duys</owners>
