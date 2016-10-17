@@ -11,6 +11,7 @@ It uses extension methods to
 
 ##Release notes:
 
+- 4.6.0 upgraded to new SDK and packages (2.3.301) 
 - 4.5.4 fixed unregister issue found by schernets
 - 4.5.0 updated nuget packages (new SDK), moving from extension methods to injectable helpers for test support.
 - 4.4.13 fixed memory leak.
