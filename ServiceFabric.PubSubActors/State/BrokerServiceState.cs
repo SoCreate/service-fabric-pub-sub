@@ -73,12 +73,12 @@ namespace ServiceFabric.PubSubActors.State
             if (current == null) throw new ArgumentNullException(nameof(current));
             if (subscriber == null) throw new ArgumentNullException(nameof(subscriber));
 
-            if (current.Subscribers.All(s => s.ServiceOrActorReference != subscriber))
+            if (current.Subscribers.All(s => !s.ServiceOrActorReference.Equals(subscriber)))
             {
                 return current;
             }
 
-            var clone = new BrokerServiceState(current.MessageTypeName, ((ImmutableList<Reference>)current.Subscribers).RemoveAll(s => s.ServiceOrActorReference == subscriber));
+            var clone = new BrokerServiceState(current.MessageTypeName, ((ImmutableList<Reference>)current.Subscribers).RemoveAll(s => s.ServiceOrActorReference.Equals(subscriber)));
             return clone;
         }
     }
