@@ -76,6 +76,11 @@
             </list>
             </remarks>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfExceptionHandler.#ctor">
+            <summary>
+            Initializes a new instance of WcfExceptionHandler class.
+            </summary>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfExceptionHandler.Microsoft#ServiceFabric#Services#Communication#Client#IExceptionHandler#TryHandleException(Microsoft.ServiceFabric.Services.Communication.Client.ExceptionInformation,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingResult@)">
             <summary>
             Method that examines the exception and determines how that exception can be handled. 
@@ -345,9 +350,56 @@
                 the service host can be customized by accessing it via this property.
             </remarks>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Remoting.Wcf.IServiceRemotingCallbackContract">
+            <summary>
+             Defines the interface that must be implemented for providing callback mechanism
+             from the wcf remoting listener to the client.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Wcf.IServiceRemotingCallbackContract.RequestResponseAsync(Microsoft.ServiceFabric.Services.Remoting.ServiceRemotingMessageHeaders,System.Byte[])">
+            <summary>
+             Sends a message to the client and gets the response.
+            </summary>
+            <param name="messageHeaders">Message Headers contains the information needed to deserialize request and to dispatch message to the client.</param>
+            <param name="requestBody"> Message Body contains a request in a serialized form.</param>
+            <returns>Response Body is a serialized response recived by the service</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Wcf.IServiceRemotingCallbackContract.SendOneWay(Microsoft.ServiceFabric.Services.Remoting.ServiceRemotingMessageHeaders,System.Byte[])">
+            <summary>
+            Sends a one way message to the client.
+            </summary>
+            <param name="messageHeaders">Message Headers contains the information needed to deserialize request and to dispatch message to the client.</param>
+            <param name="requestBody"> Message Body contains a request in a serialized form.</param>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Remoting.Wcf.IServiceRemotingContract">
+            <summary>
+               Interface that defines the contract for WCF service remoting.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Wcf.IServiceRemotingContract.RequestResponseAsync(Microsoft.ServiceFabric.Services.Remoting.ServiceRemotingMessageHeaders,System.Byte[])">
+            <summary>
+               Sends a message to the client and gets the response.
+            </summary>
+            <param name="messageHeaders">Message Headers contains the information needed to deserialize request and to dispatch message to the service.</param>
+            <param name="requestBody"> Message Body contains a request in a serialized form.</param>
+            <returns>Response Body is a serialized response recived by the client</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Wcf.IServiceRemotingContract.OneWayMessage(Microsoft.ServiceFabric.Services.Remoting.ServiceRemotingMessageHeaders,System.Byte[])">
+            <summary>
+               Sends a one way message to the client.
+            </summary>
+            <param name="messageHeaders">Message Headers contains the information needed to deserialize request and to dispatch message to the service.</param>
+            <param name="requestBody"> Message Body contains a serialized message</param>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Remoting.Wcf.WcfServiceRemotingProviderAttribute">
             <summary>
                 Sets WCF as the default service remoting transport provider in the assembly.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Wcf.WcfServiceRemotingProviderAttribute.#ctor">
+            <summary>
+            Constructs a <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Wcf.WcfServiceRemotingProviderAttribute"/> which can be used
+            to set WCF transport as the default service remoting transport provider in the assembly.
             </summary>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Remoting.Wcf.WcfServiceRemotingProviderAttribute.CreateServiceRemotingListener(System.Fabric.ServiceContext,Microsoft.ServiceFabric.Services.Remoting.IService)">

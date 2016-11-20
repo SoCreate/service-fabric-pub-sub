@@ -10,8 +10,8 @@
          
          The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
     <Service Name="PackagedBrokerService">
-      <StatefulService ServiceTypeName="PackagedBrokerServiceType" TargetReplicaSetSize="3" MinReplicaSetSize="3">
-        <UniformInt64Partition PartitionCount="1" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      <StatefulService ServiceTypeName="PackagedBrokerServiceType" TargetReplicaSetSize="[PackagedBrokerService_TargetReplicaSetSize]" MinReplicaSetSize="[PackagedBrokerService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[PackagedBrokerService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>
     </Service>
   </DefaultServices>

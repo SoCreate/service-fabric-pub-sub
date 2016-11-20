@@ -4,237 +4,6 @@
         <name>Microsoft.ServiceFabric.Services</name>
     </assembly>
     <members>
-        <member name="T:Microsoft.ServiceFabric.Services.SR">
-            <summary>
-              A strongly-typed resource class, for looking up localized strings, etc.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ResourceManager">
-            <summary>
-              Returns the cached ResourceManager instance used by this class.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.Culture">
-            <summary>
-              Overrides the current thread's CurrentUICulture property for all
-              resource lookups using this strongly typed resource class.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.Error_ConnectionDenied">
-            <summary>
-              Looks up a localized string similar to Client is Not authorized to connect.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorClientCallbackChannelNotFound">
-            <summary>
-              Looks up a localized string similar to CallBack Channel Not Found for this ClientId  : &apos;{0}&apos;.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorCommunicationTargetSelectorEndpointNotFound">
-            <summary>
-              Looks up a localized string similar to No endpoint found for the service &apos;{0}&apos; partition &apos;{1}&apos; that matches the specified TargetReplicaSelector : &apos;{2}&apos;.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorCommunicationTargetSelectorInvalidStateful">
-            <summary>
-              Looks up a localized string similar to The value &apos;{0}&apos; of targetReplicaSelector argument is not a valid for a stateful service.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorCommunicationTargetSelectorInvalidStateless">
-            <summary>
-              Looks up a localized string similar to The value &apos;{0}&apos; of targetReplicaSelector argument is not valid for a stateless service.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorConfigFileNotFound">
-            <summary>
-              Looks up a localized string similar to Config File was Not Found in this path {0}.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorConfigPackageNotFound">
-            <summary>
-              Looks up a localized string similar to ConfigPackageName {0} was not found..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorEndpointAlreadyExists">
-            <summary>
-              Looks up a localized string similar to Endpoint with Name &apos;{0}&apos; already exists..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorHeaderAlreadyExists">
-            <summary>
-              Looks up a localized string similar to Header with name &apos;{0}&apos; already exists.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorInterfaceNotImplemented">
-            <summary>
-              Looks up a localized string similar to Interface id &apos;{0}&apos; is not implemented by object &apos;{1}&apos;.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorInvalidAddress">
-            <summary>
-              Looks up a localized string similar to Client is trying to connect to invalid address {0}..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorInvalidPartitionEndpointAddress">
-            <summary>
-              Looks up a localized string similar to The EndpointAddress &apos;{0}&apos; for partition &apos;{1}&apos; is not in a format understood by the client.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorMethodNotImplemented">
-            <summary>
-              Looks up a localized string similar to The object of type &apos;{0}&apos; does support the method &apos;{1}&apos;.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorNoServiceInterfaceFound">
-            <summary>
-              Looks up a localized string similar to The service type &apos;{0}&apos; does not implement any service interfaces. A service interface is the one that derives from &apos;{1}&apos; type..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorNotAService">
-            <summary>
-              Looks up a localized string similar to The type &apos;{0}&apos; is not a Service. A service type must derive from either &apos;{1}&apos; or &apos;{2}&apos;..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorNotAServiceInterface_DerivationCheck1">
-            <summary>
-              Looks up a localized string similar to The type &apos;{0}&apos; is not an service interface as it does not derive from the interface &apos;{1}&apos;..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorNotAServiceInterface_DerivationCheck2">
-            <summary>
-              Looks up a localized string similar to The type &apos;{0}&apos; is not an service interface as it derive from a non service interface &apos;{1}&apos;. All service interfaces must derive from &apos;{2}&apos;..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorNotAServiceInterface_InterfaceCheck">
-            <summary>
-              Looks up a localized string similar to The type &apos;{0}&apos; is not a service interface as it is not an interface. .
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorPartitionNamedEndpointNotFound">
-            <summary>
-              Looks up a localized string similar to NamedEndpoint &apos;{0}&apos; not found in the address &apos;{1}&apos; for partition &apos;{2}&apos;.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorParttionInstanceInvalidAddress">
-            <summary>
-              Looks up a localized string similar to The primary or stateless instance for the partition &apos;{0}&apos; has invalid address, this means that right address from the replica/instance is not registered in the system..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedInterfaceIsGeneric">
-            <summary>
-              Looks up a localized string similar to The  {0} interface &apos;{1}&apos; is using generics. Generic interfaces cannot be remoted..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodCancellationTokenOutOfOrder">
-            <summary>
-              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; has &apos;{4}&apos; parameter &apos;{3}&apos;, and it is not the last parameter. If a method of the {0} interface has parameter of type &apos;{4}&apos; it must be the last parameter..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodDoesNotReturnTask">
-            <summary>
-              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; does not return Task or Task&lt;&gt;. The {0} interface methods must be async and must return either Task or Task&lt;&gt;..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodDoesNotReturnVoid">
-            <summary>
-              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; returns &apos;{3}&apos;. The {0} interface methods must have a return of type &apos;{4}&apos;..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodHasGenerics">
-            <summary>
-              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; is using generics. The {0} interface methods cannot use generics..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodHasOutRefOptionalParameter">
-            <summary>
-              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; has out/ref/optional parameter &apos;{3}&apos;. The {0} interface methods must not have out, ref or optional parameters..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodHasVaArgParameter">
-            <summary>
-              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; has variable length parameter &apos;{3}&apos;. The {0} interface methods must not have variable length parameters..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodHasVaArgs">
-            <summary>
-              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; is using a variable argument list. The {0} interface methods cannot have a variable argument list..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodsIsOverloaded">
-            <summary>
-              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; is overloaded. The {0} interface methods cannot be overloaded..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorSectionNameNotFound">
-            <summary>
-              Looks up a localized string similar to SectionName {0} was Not Found in the Settings File.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorServiceDoesNotExist">
-            <summary>
-              Looks up a localized string similar to Service &apos;{0}&apos; doesnot exist.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorServiceMethodDispatcher_InterfaceNotFound">
-            <summary>
-              Looks up a localized string similar to Interface id {0} is not implemented by object {1}.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorServiceTooBusy">
-            <summary>
-              Looks up a localized string similar to This can happen if message is dropped when service is busy or its long running operation and taking more time than configured Operation Timeout..
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatefulRunAsyncCancellation">
-            <summary>
-              Looks up a localized string similar to RunAsync has been cancelled for a stateful service replica.  The cancellation will be considered &apos;slow&apos; if RunAsync does not halt execution within {6} milliseconds.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Replica Id: {5}.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatefulRunAsyncCompletion">
-            <summary>
-              Looks up a localized string similar to RunAsync has successfully completed for a stateful service replica.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Replica Id: {5}, WasCancelled: {6}.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatefulRunAsyncFailure">
-            <summary>
-              Looks up a localized string similar to RunAsync has failed for a stateful service replica.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Replica Id: {5}, WasCancelled: {6}, Exception: {7}.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatefulRunAsyncInvocation">
-            <summary>
-              Looks up a localized string similar to RunAsync has been invoked for a stateful service replica.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Replica Id: {5}.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatefulRunAsyncSlowCancellation">
-            <summary>
-              Looks up a localized string similar to RunAsync was slow to respect the cancellation token and halt execution for a stateful service replica.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Replica Id: {5}, Time to Cancel: {6} milliseconds, Slow Cancellation Timeout: {7} milliseconds.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatelessRunAsyncCancellation">
-            <summary>
-              Looks up a localized string similar to RunAsync has been cancelled for a stateless service instance.  The cancellation will be considered &apos;slow&apos; if RunAsync does not halt execution within {6} milliseconds.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Instance Id: {5}.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatelessRunAsyncCompletion">
-            <summary>
-              Looks up a localized string similar to RunAsync has successfully completed for a stateless service instance.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Instance Id: {5}, WasCancelled: {6}.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatelessRunAsyncFailure">
-            <summary>
-              Looks up a localized string similar to RunAsync has failed for a stateless service instance.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Instance Id: {5}, WasCancelled: {6}, Exception: {7}.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatelessRunAsyncInvocation">
-            <summary>
-              Looks up a localized string similar to RunAsync has been invoked for a stateless service instance.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Instance Id: {5}.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatelessRunAsyncSlowCancellation">
-            <summary>
-              Looks up a localized string similar to RunAsync was slow to respect the cancellation token and halt execution for a stateless service instance.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Instance Id: {5}, Time to Cancel: {6} milliseconds, Slow Cancellation Timeout: {7} milliseconds.
-            </summary>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientCache`1">
             <summary>
             This is the cache used by CommunicationClientFactory base class to store the communication channel's
@@ -541,6 +310,11 @@
                 </para>
             </remarks>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.ServiceRemotingProviderAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the ServiceRemotingProviderAttribute class.
+            </summary>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Services.Remoting.ServiceRemotingProviderAttribute.CreateServiceRemotingListener(System.Fabric.ServiceContext,Microsoft.ServiceFabric.Services.Remoting.IService)">
             <summary>
             Creates a service remoting listener for remoting the service interface.
@@ -656,6 +430,40 @@
             Defines the interface for Service partition resolver.
             </summary>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver.ResolveAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Resolves a partition of the specified service with specified back-off/retry settings on retry-able errors.
+            </summary>
+            <param name="serviceUri">Uri of the service to resolve</param>
+            <param name="partitionKey">Key that identifies the partition to resolve</param>
+            <param name="resolveTimeoutPerTry">The time out per resolve try.</param>
+            <param name="maxRetryBackoffInterval">
+            The interval to back-off before retrying the resolution after a failure due to retry-able exception.
+            </param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result from
+            the Task is the <see cref="T:System.Fabric.ResolvedServicePartition"/> object, that contains the information
+            about the resolved service partition including the service endpoints.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver.ResolveAsync(System.Fabric.ResolvedServicePartition,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Re-resolves a previously resolved partition of the specified service with specified back-off/retry settings 
+            on retry-able errors. 
+            </summary>
+            <param name="previousRsp">Previous resolved service partition</param>
+            <param name="resolveTimeoutPerTry">The time out per resolve try.</param>
+            <param name="maxRetryBackoffInterval">
+            The interval to back-off before retrying the resolution after a failure due to retry-able exception.
+            </param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result from
+            the Task is the <see cref="T:System.Fabric.ResolvedServicePartition"/> object, that contains the information
+            about the resolved service partition including the service endpoints.
+            </returns>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey">
             <summary>
             Defines a key to address a service partition.
@@ -769,7 +577,7 @@
         <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,System.Threading.CancellationToken)">
             <summary>
             Resolves a partition of the specified service by invoking FabricClient's
-            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method with back-off/retry on retriable errors.
+            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method with back-off/retry on retry-able errors.
             </summary>
             <param name="serviceUri">Uri of the service to resolve</param>
             <param name="partitionKey">Key that identifies the partition to resolve</param>
@@ -783,13 +591,13 @@
         <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
             <summary>
             Resolves a partition of the specified service by invoking FabricClient's
-            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method with back-off/retry on retriable errors.
+            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method with back-off/retry on retry-able errors.
             </summary>
             <param name="serviceUri">Uri of the service to resolve</param>
             <param name="partitionKey">Key that identifies the partition to resolve</param>
             <param name="resolveTimeoutPerTry">The timeout passed to FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method </param>
             <param name="maxRetryBackoffInterval">
-            The interval to back-off before retrying when FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method fails with a retriable exception.
+            The interval to back-off before retrying when FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method fails with a retry-able exception.
             </param>
             <param name="cancellationToken">Cancellation token</param>
             <returns>
@@ -801,7 +609,7 @@
         <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Fabric.ResolvedServicePartition,System.Threading.CancellationToken)">
             <summary>
             Resolves a partition of the specified service by invoking FabricClient's
-            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method with back-off/retry on retriable errors. This takes in 
+            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method with back-off/retry on retry-able errors. This takes in 
             the resolved service partition that was got via an earlier invocation of the ResolveAsync() method. 
             This api-overload is used in cases where the client knows that the resolved service partition that it has is no longer valid.
             </summary>
@@ -816,14 +624,14 @@
         <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Fabric.ResolvedServicePartition,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
             <summary>
             Resolves a partition of the specified service by invoking FabricClient's
-            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method with back-off/retry on retriable errors. This takes in 
+            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method with back-off/retry on retry-able errors. This takes in 
             the resolved service partition that was got via an earlier invocation of the ResolveAsync() method. 
             This api-overload is used in cases where the client knows that the resolved service partition that it has is no longer valid.
             </summary>
             <param name="previousRsp">Previous resolved service partition</param>
             <param name="resolveTimeoutPerTry">The timeout passed to FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method </param>
             <param name="maxRetryBackoffInterval">
-            The interval to back-off before retrying when FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method fails with a retriable exception.
+            The interval to back-off before retrying when FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method fails with a retry-able exception.
             </param>
             <param name="cancellationToken">Cancellation token</param>
             <returns>
@@ -1053,6 +861,7 @@
             </summary>
             <param name="servicePartitionResolver">Optional ServicePartitionResolver</param>
             <param name="exceptionHandlers">Optional Custom exception handlers for the exceptions on the Client to Service communication channel</param>
+            <param name="traceId">Identifier to use in diagnostics traces from this component </param>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.GetClientAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector,System.String,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
             <summary>
@@ -1144,8 +953,7 @@
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.TraceId">
             <summary>
-            Gets the trace identifier that is used to identify an instance of the CommunicationClientFactory. This is
-            used as a correlation identifier for tracing/logging.
+            Gets the diagnostics trace identifier for this component.
             </summary>
             <value>Trace identifier</value>
         </member>
@@ -1594,6 +1402,11 @@
             Settings that configures the  FabricTransport Listener.
              </summary>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.FabricTransport.Runtime.FabricTransportListenerSettings.#ctor">
+            <summary>
+            Creates a new instance of FabricTransportListenerSettings and initializes properties with default Values.
+            </summary>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Services.Communication.FabricTransport.Runtime.FabricTransportListenerSettings.LoadFrom(System.String,System.String)">
             <summary>
             Loads the FabricTransport settings from a section specified in the service settings configuration file - settings.xml 
@@ -1847,6 +1660,11 @@
             Identifier for the remote method invocation
             </summary>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Remoting.Builder.CodeBuilderAttribute">
+            <summary>
+            This attribute allows configuration of dyanamic code generation process for service remoting.
+            </summary>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.CodeBuilderAttribute.#ctor">
             <summary>
             Initializes a new instance of the ActorCodeBuilderAttribute class.
@@ -1862,6 +1680,12 @@
             <summary>
             Defines the interface implemented by generated code to create proxy objects.
             </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.IProxyActivator.CreateInstance">
+            <summary>
+            Create the instance of the generated proxy type.
+            </summary>
+            <returns>An instance of the generated proxy as <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Builder.ProxyBase"/></returns>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase">
             <summary>
@@ -1897,6 +1721,7 @@
             <param name="methodId">Id of the method.</param>
             <param name="remotedObject">The remoted object instance.</param>
             <param name="requestBody">Request body</param>
+            <param name="cancellationToken">Cancellation token</param>
             <returns>
             A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. 
             The result of the task is the return value from the method.
@@ -1945,6 +1770,7 @@
             <param name="interfaceId">Id of the remote interface.</param>
             <param name="methodId">Id of the remote method to be invokved.</param>
             <param name="requestMsgBodyValue">Request body.</param>
+            <param name="cancellationToken">Cancellation token</param>
             <returns>A task that represents the asynchronous operation async call to remote object.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.ProxyBase.ContinueWithResult``1(System.Int32,System.Int32,System.Threading.Tasks.Task{System.Object})">
@@ -1973,6 +1799,11 @@
             <param name="methodId">Method Id for the actor method.</param>
             <param name="responseBody">Response body.</param>
             <returns>Return value of method call as <see cref="T:System.Object"/>.</returns>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Remoting.Builder.ServiceMethodDispatcherBase">
+            <summary>
+            Internal use.
+            </summary>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy">
             <summary>
@@ -2099,6 +1930,13 @@
             </param>
             <returns>The proxy that implement the interface that is being remoted. The returned object also implement <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> interface.</returns>
             </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Client.ServiceProxyFactory.CreateServiceRemotingClientFactory(Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient)">
+            <summary>
+            Creates service remoting client factory. TODO: Figure out if having this method as protected is really needed.
+            </summary>
+            <param name="callbackClient">Callback from the remoting listener to the client.</param>
+            <returns>Created service remoting client factory as <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClientFactory"/></returns>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Remoting.Client.ServiceRemotingPartitionClient">
             <summary>
@@ -2519,6 +2357,35 @@
             </summary>
             <value>true if class implementing service interface is abstract, otherwise false.</value>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Runtime.ServiceRuntime">
+            <summary>
+            Static class that provides methods to resister reliable services with Service Fabric runtime.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Runtime.ServiceRuntime.RegisterServiceAsync(System.String,System.Func{System.Fabric.StatelessServiceContext,Microsoft.ServiceFabric.Services.Runtime.StatelessService},System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Registers a reliable stateless service with Service Fabric runtime.
+            </summary>
+            <param name="serviceTypeName">ServiceTypeName as provied in service manifest.</param>
+            <param name="serviceFactory">A factory method to create stateless service objects.</param>
+            <param name="timeout">Timeout for the register operation.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>
+            A task that represents the asynchronous register operation.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Runtime.ServiceRuntime.RegisterServiceAsync(System.String,System.Func{System.Fabric.StatefulServiceContext,Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase},System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Registers a reliable stateful service with Service Fabric runtime.
+            </summary>
+            <param name="serviceTypeName">ServiceTypeName as provied in service manifest.</param>
+            <param name="serviceFactory">A factory method to create stateful service objects.</param>
+            <param name="timeout">Timeout for the register operation.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>
+            A task that represents the asynchronous register operation.
+            </returns>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Runtime.StatefulService">
             <summary>
             Represents base class for Microsoft Service Fabric based stateful reliable service
@@ -2832,6 +2699,242 @@
             1) When replica is being closed.
             2) When replica is being aborted.
             
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Services.SR">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.Error_ConnectionDenied">
+            <summary>
+              Looks up a localized string similar to Client is Not authorized to connect.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.Error_InvalidOperation">
+            <summary>
+              Looks up a localized string similar to Invalid Client for remoting..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorClientCallbackChannelNotFound">
+            <summary>
+              Looks up a localized string similar to CallBack Channel Not Found for this ClientId  : &apos;{0}&apos;.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorCommunicationTargetSelectorEndpointNotFound">
+            <summary>
+              Looks up a localized string similar to No endpoint found for the service &apos;{0}&apos; partition &apos;{1}&apos; that matches the specified TargetReplicaSelector : &apos;{2}&apos;.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorCommunicationTargetSelectorInvalidStateful">
+            <summary>
+              Looks up a localized string similar to The value &apos;{0}&apos; of targetReplicaSelector argument is not a valid for a stateful service.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorCommunicationTargetSelectorInvalidStateless">
+            <summary>
+              Looks up a localized string similar to The value &apos;{0}&apos; of targetReplicaSelector argument is not valid for a stateless service.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorConfigFileNotFound">
+            <summary>
+              Looks up a localized string similar to Config File was Not Found in this path {0}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorConfigPackageNotFound">
+            <summary>
+              Looks up a localized string similar to ConfigPackageName {0} was not found..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorEndpointAlreadyExists">
+            <summary>
+              Looks up a localized string similar to Endpoint with Name &apos;{0}&apos; already exists..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorHeaderAlreadyExists">
+            <summary>
+              Looks up a localized string similar to Header with name &apos;{0}&apos; already exists.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorInterfaceNotImplemented">
+            <summary>
+              Looks up a localized string similar to Interface id &apos;{0}&apos; is not implemented by object &apos;{1}&apos;.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorInvalidAddress">
+            <summary>
+              Looks up a localized string similar to Client is trying to connect to invalid address {0}..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorInvalidPartitionEndpointAddress">
+            <summary>
+              Looks up a localized string similar to The EndpointAddress &apos;{0}&apos; for partition &apos;{1}&apos; is not in a format understood by the client.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorMethodNotImplemented">
+            <summary>
+              Looks up a localized string similar to The object of type &apos;{0}&apos; does support the method &apos;{1}&apos;.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorNoServiceInterfaceFound">
+            <summary>
+              Looks up a localized string similar to The service type &apos;{0}&apos; does not implement any service interfaces. A service interface is the one that derives from &apos;{1}&apos; type..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorNotAService">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; is not a Service. A service type must derive from either &apos;{1}&apos; or &apos;{2}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorNotAServiceInterface_DerivationCheck1">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; is not an service interface as it does not derive from the interface &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorNotAServiceInterface_DerivationCheck2">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; is not an service interface as it derive from a non service interface &apos;{1}&apos;. All service interfaces must derive from &apos;{2}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorNotAServiceInterface_InterfaceCheck">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; is not a service interface as it is not an interface. .
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorPartitionNamedEndpointNotFound">
+            <summary>
+              Looks up a localized string similar to NamedEndpoint &apos;{0}&apos; not found in the address &apos;{1}&apos; for partition &apos;{2}&apos;.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorParttionInstanceInvalidAddress">
+            <summary>
+              Looks up a localized string similar to The primary or stateless instance for the partition &apos;{0}&apos; has invalid address, this means that right address from the replica/instance is not registered in the system..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedInterfaceIsGeneric">
+            <summary>
+              Looks up a localized string similar to The  {0} interface &apos;{1}&apos; is using generics. Generic interfaces cannot be remoted..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodCancellationTokenOutOfOrder">
+            <summary>
+              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; has &apos;{4}&apos; parameter &apos;{3}&apos;, and it is not the last parameter. If a method of the {0} interface has parameter of type &apos;{4}&apos; it must be the last parameter..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodDoesNotReturnTask">
+            <summary>
+              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; does not return Task or Task&lt;&gt;. The {0} interface methods must be async and must return either Task or Task&lt;&gt;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodDoesNotReturnVoid">
+            <summary>
+              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; returns &apos;{3}&apos;. The {0} interface methods must have a return of type &apos;{4}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodHasGenerics">
+            <summary>
+              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; is using generics. The {0} interface methods cannot use generics..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodHasOutRefOptionalParameter">
+            <summary>
+              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; has out/ref/optional parameter &apos;{3}&apos;. The {0} interface methods must not have out, ref or optional parameters..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodHasVaArgParameter">
+            <summary>
+              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; has variable length parameter &apos;{3}&apos;. The {0} interface methods must not have variable length parameters..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodHasVaArgs">
+            <summary>
+              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; is using a variable argument list. The {0} interface methods cannot have a variable argument list..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorRemotedMethodsIsOverloaded">
+            <summary>
+              Looks up a localized string similar to Method &apos;{1}&apos; of {0} interface &apos;{2}&apos; is overloaded. The {0} interface methods cannot be overloaded..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorSectionNameNotFound">
+            <summary>
+              Looks up a localized string similar to SectionName {0} was Not Found in the Settings File.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorServiceDoesNotExist">
+            <summary>
+              Looks up a localized string similar to Service &apos;{0}&apos; doesnot exist.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorServiceMethodDispatcher_InterfaceNotFound">
+            <summary>
+              Looks up a localized string similar to Interface id {0} is not implemented by object {1}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorServiceTooBusy">
+            <summary>
+              Looks up a localized string similar to This can happen if message is dropped when service is busy or its long running operation and taking more time than configured Operation Timeout..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatefulRunAsyncCancellation">
+            <summary>
+              Looks up a localized string similar to RunAsync has been cancelled for a stateful service replica.  The cancellation will be considered &apos;slow&apos; if RunAsync does not halt execution within {6} milliseconds.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Replica Id: {5}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatefulRunAsyncCompletion">
+            <summary>
+              Looks up a localized string similar to RunAsync has successfully completed for a stateful service replica.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Replica Id: {5}, WasCancelled: {6}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatefulRunAsyncFailure">
+            <summary>
+              Looks up a localized string similar to RunAsync has failed for a stateful service replica.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Replica Id: {5}, WasCancelled: {6}, Exception: {7}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatefulRunAsyncInvocation">
+            <summary>
+              Looks up a localized string similar to RunAsync has been invoked for a stateful service replica.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Replica Id: {5}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatefulRunAsyncSlowCancellation">
+            <summary>
+              Looks up a localized string similar to RunAsync was slow to respect the cancellation token and halt execution for a stateful service replica.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Replica Id: {5}, Time to Cancel: {6} milliseconds, Slow Cancellation Timeout: {7} milliseconds.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatelessRunAsyncCancellation">
+            <summary>
+              Looks up a localized string similar to RunAsync has been cancelled for a stateless service instance.  The cancellation will be considered &apos;slow&apos; if RunAsync does not halt execution within {6} milliseconds.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Instance Id: {5}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatelessRunAsyncCompletion">
+            <summary>
+              Looks up a localized string similar to RunAsync has successfully completed for a stateless service instance.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Instance Id: {5}, WasCancelled: {6}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatelessRunAsyncFailure">
+            <summary>
+              Looks up a localized string similar to RunAsync has failed for a stateless service instance.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Instance Id: {5}, WasCancelled: {6}, Exception: {7}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatelessRunAsyncInvocation">
+            <summary>
+              Looks up a localized string similar to RunAsync has been invoked for a stateless service instance.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Instance Id: {5}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.event_StatelessRunAsyncSlowCancellation">
+            <summary>
+              Looks up a localized string similar to RunAsync was slow to respect the cancellation token and halt execution for a stateless service instance.  Application Type Name: {0}, Application Name: {1}, Service Type Name: {2}, Service Name: {3}, Partition Id: {4}, Instance Id: {5}, Time to Cancel: {6} milliseconds, Slow Cancellation Timeout: {7} milliseconds.
             </summary>
         </member>
     </members>

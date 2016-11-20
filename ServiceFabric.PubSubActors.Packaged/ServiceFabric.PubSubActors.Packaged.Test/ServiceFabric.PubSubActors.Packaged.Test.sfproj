@@ -24,7 +24,6 @@
     <None Include="Scripts\Deploy-FabricApplication.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\en-us\Microsoft.ServiceFabric.Internal.Strings.resources.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Actors.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Actors.xml" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Data.dll" />
@@ -44,7 +43,10 @@
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\ServiceFabric.PubSubActors.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\ServiceFabric.PubSubActors.Interfaces.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\ServiceFabricServiceModel.dll" />
+    <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Collections.Immutable.dll" />
+    <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Collections.Immutable.xml" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Fabric.dll" />
+    <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Fabric.Strings.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Fabric.xml" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Config\Settings.xml" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\ServiceManifest.xml" />

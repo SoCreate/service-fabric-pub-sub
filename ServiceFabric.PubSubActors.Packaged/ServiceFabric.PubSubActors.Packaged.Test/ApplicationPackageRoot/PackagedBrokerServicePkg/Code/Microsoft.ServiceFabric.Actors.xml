@@ -982,14 +982,14 @@
             an object array as argument gets used and it is not very efficient. 
             </summary>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteEvent(System.Int32,System.String,System.String,System.Int32,System.Boolean,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteEvent(System.Int32,System.String,System.String,System.Int32,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
             <summary>
             Implement WriteEvent overload to match our activation/deactivation events. If this overload is
             not implemented, the standard WriteEvent overload method in the base class that accepts an
             object array as argument gets used and it is not very efficient. 
             </summary>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteEvent(System.Int32,System.Int64,System.String,System.String,System.Int32,System.Boolean,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteEvent(System.Int32,System.Int64,System.String,System.String,System.Int32,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
             <summary>
             Implement WriteEvent overload to match our actor metric events. If this overload is not 
             implemented, the standard WriteEvent overload method in the base class that accepts an
@@ -1044,7 +1044,13 @@
             </summary>
             <remarks>A method that may return a partial set of results via a 
             <see cref="T:Microsoft.ServiceFabric.Actors.Query.PagedResult`1"/> object also returns a continuation token
-            int he object, which can be used in a subsequent call to return the next set of available results.</remarks>
+            in the object, which can be used in a subsequent call to return the next set of available results.</remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Query.ContinuationToken.#ctor(System.Object)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Query.ContinuationToken"/> class.
+            </summary>
+            <param name="marker">Marker used to retrieve the next set of available results.</param>
         </member>
         <member name="P:Microsoft.ServiceFabric.Actors.Query.ContinuationToken.Marker">
             <summary>
@@ -1196,6 +1202,12 @@
                 generate actor proxy to talk to the actor over remoted actor interface.
             </returns>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Remoting.Builder.ActorMethodDispatcherBase">
+            <summary>
+            The class is used by actor remoting code generator to generate a type that dispatches requests to actor 
+            object by invoking right method on it.
+            </summary>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingProviderAttribute">
             <summary>
                 Sets fabric TCP transport as the default remoting provider for the actors.
@@ -1300,6 +1312,31 @@
             </param>
             <param name="listenerSettings"></param>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Remoting.Runtime.ActorServiceRemotingDispatcher">
+            <summary>
+            Provides an implementation of <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Runtime.IServiceRemotingMessageHandler"/> that can dispatch
+            messages to an actor service and to the actors hosted in the service.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Remoting.Runtime.ActorServiceRemotingDispatcher.#ctor(Microsoft.ServiceFabric.Actors.Runtime.ActorService)">
+            <summary>
+            Instantiates the ActorServiceRemotingDispatcher that can dispatch messages to an actor service and 
+            to the actors hosted in the service..
+            </summary>
+            <param name="actorService">An actor service instance.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Remoting.Runtime.ActorServiceRemotingDispatcher.RequestResponseAsync(Microsoft.ServiceFabric.Services.Remoting.Runtime.IServiceRemotingRequestContext,Microsoft.ServiceFabric.Services.Remoting.ServiceRemotingMessageHeaders,System.Byte[])">
+            <summary>
+            Dispatches the messages received from the client to the actor service methods or the actor methods.
+            </summary>
+            <param name="requestContext">Request context that allows getting the callback channel if required.</param>
+            <param name="messageHeaders">Service remoting message headers</param>
+            <param name="requestBodyBytes">serialized request body of the remoting message.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. 
+            The result of the Task is the serialized response body.
+            </returns>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType">
             <summary>
             Represents the call-type associated with the method invoked by actor runtime.
@@ -1344,10 +1381,70 @@
             An <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType"/> representing the call type.
             </value>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorReminderState">
+            <summary>
+            Represents internal state of Actor Reminder
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder">
+            <summary>
+            Encapsulates Reminder set on an Actor
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.Name">
+            <summary>
+            Name of Reminder set on Actor. The name is unique per actor.
+            </summary>
+            <value>Name of Reminder set on Actor.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.DueTime">
+            <summary>
+            Time when Reminder is first due.
+            </summary>
+            <value>Due time as <see cref="T:System.TimeSpan"/> when the reminder is first due.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.Period">
+            <summary>
+            Periodic time when Reminder will be invoked.
+            </summary>
+            <value>Time period as <see cref="T:System.TimeSpan"/> when Reminder will be invoked.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.State">
+            <summary>
+            State to be passed into reminder invocation.
+            </summary>
+            <value>State to be passed into reminder invocation.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminderState.RemainingDueTime">
+            <summary>
+            Time when Reminder is next due.
+            </summary>
+            <value>Due time as <see cref="T:System.TimeSpan"/> when the reminder is next due.</value>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException">
             <summary>
-            Exception indicates that Actor recieved Duplicate Message
+            This exception indicates that an Actor received the duplicate message while waiting for to acquire 
+            the turn based concurrency lock.
             </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException"/> class with a specified error message.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException"/> class with a specified error message and
+            a reference to the inner exception that is the cause of this exception.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception.</param>
+            <param name="inner">The exception that is the cause of the current exception, or a null reference if no inner exception is specified.</param>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Remoting.Client.ActorRemotingExceptionHandler">
             <summary>
@@ -1632,10 +1729,16 @@
             A <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorService"/> that represents the stateful service replica hosting the actor.
             </value>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.Actor.#ctor">
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.Actor.#ctor(Microsoft.ServiceFabric.Actors.Runtime.ActorService,Microsoft.ServiceFabric.Actors.ActorId)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>
             </summary>
+            <param name="actorService">
+            The <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorService"/> that will host this actor instance.
+            </param>
+            <param name="actorId">
+            The <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> for this actor instance.
+            </param>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.Actor.SaveStateAsync">
             <summary>
@@ -1741,35 +1844,6 @@
             actorServiceFactory delegate is called by Reliable Actors runtime to create new actor service.
             </remarks>
         </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder">
-            <summary>
-            Encapsulates Reminder set on an Actor
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.Name">
-            <summary>
-            Name of Reminder set on Actor. The name is unique per actor.
-            </summary>
-            <value>Name of Reminder set on Actor.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.DueTime">
-            <summary>
-            Time when Reminder is first due.
-            </summary>
-            <value>Due time as <see cref="T:System.TimeSpan"/> when the reminder is first due.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.Period">
-            <summary>
-            Periodic time when Reminder will be invoked.
-            </summary>
-            <value>Time period as <see cref="T:System.TimeSpan"/> when Reminder will be invoked.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.State">
-            <summary>
-            State to be passed into reminder invocation.
-            </summary>
-            <value>State to be passed into reminder invocation.</value>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorReminderCollection">
             <summary>
             Actor reminder collection.
@@ -1780,17 +1854,6 @@
             Captures ActorReminderState for Actors
             </summary>
         </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorReminderState">
-            <summary>
-            Represents internal state of Actor Reminder
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminderState.TotalElapsed">
-            <summary>
-            Total time elapsed since Reminder last fired
-            </summary>
-            <value>Total time elapsed as <see cref="T:System.TimeSpan"/> since Reminder last fired.</value>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorService">
             <summary>
             Represents the base class for Microsoft Service Fabric based reliable actors service.
@@ -1800,13 +1863,14 @@
             any service level behavior for your actors.
             </remarks>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorService.#ctor(System.Fabric.StatefulServiceContext,Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation,System.Func{Microsoft.ServiceFabric.Actors.Runtime.ActorBase},Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider,Microsoft.ServiceFabric.Actors.Runtime.ActorServiceSettings)">
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorService.#ctor(System.Fabric.StatefulServiceContext,Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation,System.Func{Microsoft.ServiceFabric.Actors.Runtime.ActorService,Microsoft.ServiceFabric.Actors.ActorId,Microsoft.ServiceFabric.Actors.Runtime.ActorBase},System.Func{Microsoft.ServiceFabric.Actors.Runtime.ActorBase,Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider,Microsoft.ServiceFabric.Actors.Runtime.IActorStateManager},Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider,Microsoft.ServiceFabric.Actors.Runtime.ActorServiceSettings)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorService"/> class.
             </summary>
             <param name="context">Service context the actor service is operating under.</param>
             <param name="actorTypeInfo">Type information of the actor.</param>
             <param name="actorFactory">A factory method to create actor objects.</param>
+            <param name="stateManagerFactory">A factory method to create <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateManager"/></param>
             <param name="stateProvider">State provider to store the state for actor objects.</param>
             <param name="settings">/// Settings to configures behavior of Actor Service.</param>
         </member>
@@ -1882,6 +1946,14 @@
             <value>
             <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider"/>
             representing the state provider for the actor service.
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorService.Settings">
+            <summary>
+            Gets settings for the actor service. 
+            </summary>
+            <value>
+            Settings for the actor service.
             </value>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute">
@@ -2190,6 +2262,16 @@
             clearing the cache and will not be included in next save operation.
             </remarks>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.IActorStateManager.SaveStateAsync(System.Threading.CancellationToken)">
+            <summary>
+            Saves all the cached state changes (add/update/remove) that were made since last call to
+            <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.IActorStateManager.SaveStateAsync(System.Threading.CancellationToken)"/> by actor runtime or by user explicitly.
+            </summary>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>
+            A task that represents the asynchronous save operation.
+            </returns>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorTimer">
             <summary>
             Represents Timer set on an Actor
@@ -2240,6 +2322,13 @@
             </summary>
             <param name="actorType">Type implementing actor.</param>
             <returns>true, if <see cref="P:System.Type.BaseType"/> of actorType is <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions.IsRemindableActor(System.Type)">
+            <summary>
+            Checks if an actor type implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/> interface.
+            </summary>
+            <param name="actorType">Type implementing actor.</param>
+            <returns>true, if <paramref name="actorType"/> implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/> interface.</returns>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation">
             <summary>
@@ -2312,6 +2401,12 @@
             </summary>
             <value>true if class implementing actor is abstract, otherwise false.</value>
         </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.IsRemindable">
+            <summary>
+            Gets if the actor class implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/>.
+            </summary>
+            <value>true if actor class implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/>, otherwise false.</value>
+        </member>
         <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.StatePersistence">
             <summary>
             Get the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.StatePersistence"/> enum representing type of state persistence for the actor.
@@ -2349,7 +2444,19 @@
             <param name="actorId">ID of the actor that is activated.</param>
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <exception cref="T:System.OperationCanceledException">The operation was canceled.</exception>
-            <returns> A task that represents the asynchronous Actor activation notification processing.</returns>
+            <returns>A task that represents the asynchronous Actor activation notification processing.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider.ReminderCallbackCompletedAsync(Microsoft.ServiceFabric.Actors.ActorId,Microsoft.ServiceFabric.Actors.Runtime.IActorReminder,System.Threading.CancellationToken)">
+            <summary>
+            This method is invoked when a reminder fires and finishes executing its callback 
+            <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.IRemindable.ReceiveReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)"/> successfully.
+            </summary>
+            <param name="actorId">ID of the actor which own reminder</param>
+            <param name="reminder">Actor reminder that completed successfully.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>
+            A task that represents the asynchronous reminder callback completed notification processing.
+            </returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider.LoadStateAsync``1(Microsoft.ServiceFabric.Actors.ActorId,System.String,System.Threading.CancellationToken)">
             <summary>
@@ -2507,6 +2614,12 @@
             will be activated.
             to specify that the state need not be saved upon completion of the reminder</para>.</remarks>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider">
+            <summary>
+            Provides an implementation of <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider"/> which 
+            uses <see cref="T:System.Fabric.KeyValueStoreReplica"/> to store and persist the actor state.
+            </summary>
+        </member>
         <member name="F:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.isBackupInProgress">
             <summary>
             Ensures single backup in progress at ActorStateProvider level.
@@ -2550,6 +2663,18 @@
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <exception cref="T:System.OperationCanceledException">The operation was canceled.</exception>
             <returns> A task that represents the asynchronous Actor activation notification processing.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.Microsoft#ServiceFabric#Actors#Runtime#IActorStateProvider#ReminderCallbackCompletedAsync(Microsoft.ServiceFabric.Actors.ActorId,Microsoft.ServiceFabric.Actors.Runtime.IActorReminder,System.Threading.CancellationToken)">
+            <summary>
+            This method is invoked when a reminder fires and finishes executing its callback 
+            <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.IRemindable.ReceiveReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)"/> successfully.
+            </summary>
+            <param name="actorId">ID of the actor which own reminder</param>
+            <param name="reminder">Actor reminder that completed successfully.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>
+            A task that represents the asynchronous reminder callback completed notification processing.
+            </returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.Microsoft#ServiceFabric#Actors#Runtime#IActorStateProvider#LoadStateAsync``1(Microsoft.ServiceFabric.Actors.ActorId,System.String,System.Threading.CancellationToken)">
             <summary>
@@ -2794,6 +2919,9 @@
             <summary>
             Function called during suspected data-loss.
             </summary>
+            <value>
+            A function representing data-loss callback function.
+            </value>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorConcurrencyLock">
             <summary>
@@ -3068,6 +3196,11 @@
             it to this class.
             </summary>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider">
+            <summary>
+            Provides an implementation of <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider"/> where actor state is kept in-memory and is volatile.
+            </summary>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider.#ctor">
             <summary>
             Creates an instance of <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider"/>.
@@ -3097,6 +3230,18 @@
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <exception cref="T:System.OperationCanceledException">The operation was canceled.</exception>
             <returns> A task that represents the asynchronous Actor activation notification processing.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider.Microsoft#ServiceFabric#Actors#Runtime#IActorStateProvider#ReminderCallbackCompletedAsync(Microsoft.ServiceFabric.Actors.ActorId,Microsoft.ServiceFabric.Actors.Runtime.IActorReminder,System.Threading.CancellationToken)">
+            <summary>
+            This method is invoked when a reminder fires and finishes executing its callback 
+            <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.IRemindable.ReceiveReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)"/> successfully.
+            </summary>
+            <param name="actorId">ID of the actor which own reminder</param>
+            <param name="reminder">Actor reminder that completed successfully.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>
+            A task that represents the asynchronous reminder callback completed notification processing.
+            </returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider.Microsoft#ServiceFabric#Actors#Runtime#IActorStateProvider#LoadStateAsync``1(Microsoft.ServiceFabric.Actors.ActorId,System.String,System.Threading.CancellationToken)">
             <summary>
@@ -3441,6 +3586,9 @@
             <summary>
             Function called during suspected data-loss.
             </summary>
+            <value>
+            A function representing data-loss callback function.
+            </value>
         </member>
         <member name="F:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider.CopyStateEnumerator.copyStateList">
             <summary>

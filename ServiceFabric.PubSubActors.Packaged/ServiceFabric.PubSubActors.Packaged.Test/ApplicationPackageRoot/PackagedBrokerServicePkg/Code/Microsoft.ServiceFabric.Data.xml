@@ -4,31 +4,45 @@
         <name>Microsoft.ServiceFabric.Data</name>
     </assembly>
     <members>
-        <member name="T:Microsoft.ServiceFabric.Data.SR">
-            <summary>
-              A strongly-typed resource class, for looking up localized strings, etc.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Data.SR.ResourceManager">
-            <summary>
-              Returns the cached ResourceManager instance used by this class.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Data.SR.Culture">
-            <summary>
-              Overrides the current thread's CurrentUICulture property for all
-              resource lookups using this strongly typed resource class.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Data.SR.Error_TypeLoadAssembly">
-            <summary>
-              Looks up a localized string similar to Could not load type &apos;{0}&apos; from assembly &apos;{1}&apos;.
-            </summary>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Data.ReliableStateManager">
             <summary>
             Manages all <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> for a service replica.
             Each replica in a service has its own state manager and thus its own set of <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Data.ReliableStateManager._impl">
+            <summary>
+            Reliable State Manager Replica implementation.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Data.ReliableStateManager.userTransactionChangedEventHandler">
+            <summary>
+            User's transaction changed event handler.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Data.ReliableStateManager.eventHandlerRegistrationLock">
+            <summary>
+            Lock for the event handler registration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Data.ReliableStateManager.isTransactionEventHandlerRegistered">
+            <summary>
+            Indicates whether event handler is registered with the implementation.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Data.ReliableStateManager.userStateManagerChangedEventHandler">
+            <summary>
+            User's state manager changed event handler.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Data.ReliableStateManager.isStateManagerEventHandlerRegistered">
+            <summary>
+            Indicates whether event handler is registered with implementation.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Data.ReliableStateManager.isClosingOrAborting">
+            <summary>
+            Indicates whether the component is closing or aborting.
             </summary>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.#ctor(System.Fabric.StatefulServiceContext,Microsoft.ServiceFabric.Data.ReliableStateManagerConfiguration)">
@@ -607,24 +621,70 @@
             Service Fabric cannot reliably manage the replica's lifecycle due to internal failures.
             </remarks>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.OnTransactionChangedHandler(System.Object,Microsoft.ServiceFabric.Data.Notifications.NotifyTransactionChangedEventArgs)">
+            <summary>
+            Transaction changed forwarder.
+            </summary>
+            <param name="sender">The sender.</param>
+            <param name="args">The notification.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.OnStateManagerChangedHandler(System.Object,Microsoft.ServiceFabric.Data.Notifications.NotifyStateManagerChangedEventArgs)">
+            <summary>
+            State manager changed forwarder.
+            </summary>
+            <param name="sender">The sender.</param>
+            <param name="args">The notification.</param>
+        </member>
         <member name="E:Microsoft.ServiceFabric.Data.ReliableStateManager.TransactionChanged">
             <summary>
-            Occurs when a transaction's state changes.
+            Occurs when a transaction changes.
             </summary>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
         </member>
         <member name="E:Microsoft.ServiceFabric.Data.ReliableStateManager.StateManagerChanged">
             <summary>
-            Occurs when State Manager's state changes.
+            Occurs when the state manager changes.
             </summary>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
         </member>
         <member name="P:Microsoft.ServiceFabric.Data.ReliableStateManager.OnDataLossAsync">
             <summary>
             Set this property to receive notification when this <see cref="T:Microsoft.ServiceFabric.Data.IStateProviderReplica"/> suspects data loss.
             </summary>
+            <value>
+            Function called as part of suspected data loss processing.
+            </value>
             <remarks>
-            The passed delegate may monitor the given cancellation token for cancellation requests, and should
-            return a task with result TRUE if state was restored from backup, and FALSE otherwise.
+            <para>
+            OnDataLossAsync function takes in CancellationToken and needs to return a Task that represents the asynchronous processing of the event.
+            Returning true indicates that the reliable state manager's state has been restored.
+            Returning false indicates that the reliable state manager's state has not been changed.
+            </para>
+            <para>
+            The passed delegate should monitor the given cancellation token for cancellation requests.
+            </para>
             </remarks>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Data.SR">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Data.SR.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Data.SR.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Data.SR.Error_TypeLoadAssembly">
+            <summary>
+              Looks up a localized string similar to Could not load type &apos;{0}&apos; from assembly &apos;{1}&apos;.
+            </summary>
         </member>
     </members>
 </doc>
