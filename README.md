@@ -11,6 +11,7 @@ It uses extension methods to
 
 ##Release notes:
 
+- 4.7.0 upgraded to new SDK (2.3.311)
 - 4.6.1 merged pr by kelvintmv
 - 4.6.0 upgraded to new SDK and packages (2.3.301) 
 - 4.5.4 fixed unregister issue found by schernets
