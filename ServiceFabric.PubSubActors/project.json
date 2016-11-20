@@ -1,7 +1,7 @@
 {
   "copyright": "2016",
   "title": "ServiceFabric.PubSubActors",
-  "version": "4.6.0",
+  "version": "4.6.1",
   "description": "ServiceFabric.PubSubActors adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. How to use this package: https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/README.md",
   "authors": [ "Loek Duys" ],
   "packOptions": {
