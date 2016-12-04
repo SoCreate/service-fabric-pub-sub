@@ -188,10 +188,13 @@ namespace ServiceFabric.PubSubActors
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
+                var linkedTokenSources = new List<CancellationTokenSource>();
+
                 try
                 {
                     var elements = _queues.ToArray();
                     var tasks = new List<Task>(elements.Length);
+
                     foreach (var element in elements)
                     {
                         var subscriber = element.Value;
@@ -200,6 +203,8 @@ namespace ServiceFabric.PubSubActors
                         //process messages for 3s, then allow other transactions to enqueue messages 
                         var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
                         var linked = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken);
+
+                        linkedTokenSources.Add(linked);
                         tasks.Add(ProcessQueues(linked.Token, subscriber, queueName));
                     }
                     await Task.WhenAll(tasks);
@@ -217,6 +222,13 @@ namespace ServiceFabric.PubSubActors
                 {
                     ServiceEventSourceMessage($"Exception caught while processing messages:'{ex.Message}'");
                     //swallow and move on..
+                }
+                finally
+                {
+                    foreach (var linkedTokenSource in linkedTokenSources)
+                    {
+                        linkedTokenSource.Dispose();
+                    }
                 }
                 await Task.Delay(Period, cancellationToken);
             }
