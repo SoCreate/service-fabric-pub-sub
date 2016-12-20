@@ -1,5 +1,5 @@
 {
-  "version": "4.7.1",
+  "version": "4.8.0",
   "copyright": "2016",
   "title": "ServiceFabric.PubSubActors.Interfaces",
   "authors": [ "Loek Duys" ],
@@ -25,7 +25,7 @@
     "platform": "x64"
   },
   "dependencies": {
-    "Microsoft.ServiceFabric.Actors": "2.3.311",
+    "Microsoft.ServiceFabric.Actors": "2.4.145",
     "Newtonsoft.Json": "9.0.1"
   }
 }
