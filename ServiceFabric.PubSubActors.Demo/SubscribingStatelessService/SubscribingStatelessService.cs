@@ -6,6 +6,7 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.DataContracts;
+using Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberServices;
@@ -15,7 +16,7 @@ namespace SubscribingStatelessService
 	/// <summary>
 	/// The FabricRuntime creates an instance of this class for each service type instance. 
 	/// </summary>
-	internal sealed class SubscribingStatelessService : StatelessService, ISubscriberService
+	internal sealed class SubscribingStatelessService : StatelessService, ISubscribingStatelessService
 	{
 	    private readonly ISubscriberServiceHelper _subscriberServiceHelper;
 
@@ -27,6 +28,7 @@ namespace SubscribingStatelessService
 		protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
 		{
 			yield return new ServiceInstanceListener(p => new SubscriberCommunicationListener(this, p), "StatelessSubscriberCommunicationListener");
+			yield return new ServiceInstanceListener(context => new FabricTransportServiceRemotingListener(context, this), "StatelessFabricTransportServiceRemotingListener");
 		}
 
 		protected override async Task OnOpenAsync(CancellationToken cancellationToken)
@@ -81,5 +83,12 @@ namespace SubscribingStatelessService
 			//TODO: handle message
 			return Task.FromResult(true);
 		}
+	}
+
+	public interface ISubscribingStatelessService : ISubscriberService
+	{
+		Task UnregisterAsync();
+
+		Task RegisterAsync();
 	}
 }

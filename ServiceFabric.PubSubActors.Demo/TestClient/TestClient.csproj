@@ -126,6 +126,10 @@
       <Project>{2b3cbc59-7925-42bb-9ea3-b45994c83725}</Project>
       <Name>SubscribingActor.Interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SubscribingStatelessService\SubscribingStatelessService.csproj">
+      <Project>{C6AEE050-41BD-4F06-A392-E479B833DC7D}</Project>
+      <Name>SubscribingStatelessService</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.ServiceFabric.Actors.2.4.145\build\Microsoft.ServiceFabric.Actors.targets" Condition="Exists('..\packages\Microsoft.ServiceFabric.Actors.2.4.145\build\Microsoft.ServiceFabric.Actors.targets')" />
