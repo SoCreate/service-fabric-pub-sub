@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -27,7 +28,7 @@ namespace TestClient
 			var subStateless = GetSubStatelessProxy();
 			RegisterSubscribers(applicationName);
 
-
+			var app = FabricRuntime.GetActivationContext().ApplicationName;
 
 
 

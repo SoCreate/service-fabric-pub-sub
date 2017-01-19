@@ -28,7 +28,6 @@ namespace ServiceFabric.PubSubActors
     public abstract class BrokerService : StatefulService, IBrokerService
     {
         private readonly ManualResetEventSlim _initializer = new ManualResetEventSlim(false);
-        private const string Subscribers = "Queues";
         private const long MaxDequeuesInOneIteration = 100;
 
         private readonly ConcurrentDictionary<string, ReferenceWrapper> _queues =
@@ -36,10 +35,15 @@ namespace ServiceFabric.PubSubActors
 
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
 
-        /// <summary>
-        /// The name that the <see cref="ServiceReplicaListener"/> instance will get.
-        /// </summary>
-        public const string ListenerName = "StatefulBrokerServiceFabricTransportServiceRemotingListener";
+		/// <summary>
+		/// Gets the state key for all subscriber queues.
+		/// </summary>
+		protected const string Subscribers = "Queues";
+
+		/// <summary>
+		/// The name that the <see cref="ServiceReplicaListener"/> instance will get.
+		/// </summary>
+		public const string ListenerName = "StatefulBrokerServiceFabricTransportServiceRemotingListener";
 
         /// <summary>
         /// When Set, this callback will be used to trace Service messages to.

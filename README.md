@@ -11,6 +11,7 @@ It uses extension methods to
 
 ##Release notes:
 
+- 4.8.1 BrokerService.Subscribers is now protected, not private
 - 4.8.0 upgraded to new SDK (2.4.145) 
 - 4.7.1 merged pull request by Sterlingg that fixes Dispose issue
 - 4.7.0 upgraded to new SDK (2.3.311)
