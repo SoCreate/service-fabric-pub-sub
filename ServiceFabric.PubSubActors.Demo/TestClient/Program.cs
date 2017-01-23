@@ -28,10 +28,6 @@ namespace TestClient
 			var subStateless = GetSubStatelessProxy();
 			RegisterSubscribers(applicationName);
 
-			var app = FabricRuntime.GetActivationContext().ApplicationName;
-
-
-
 			while (true)
 			{
 				Console.Clear();
