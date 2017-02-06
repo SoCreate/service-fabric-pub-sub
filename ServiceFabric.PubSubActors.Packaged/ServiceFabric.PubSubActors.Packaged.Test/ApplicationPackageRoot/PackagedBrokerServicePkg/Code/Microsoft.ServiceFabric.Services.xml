@@ -149,6 +149,102 @@
             </summary>
             <value>Maximum number of times to retry a specific exception.</value>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBaseWithSerializer">
+            <summary>
+            The base class used by remoting code generator to generate the type that dispatches requests from the client to the 
+            right interface and method of the remoted object.It caches the Serializer .
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase">
+            <summary>
+            The base class used by remoting code generator to generate the type that dispatches requests from the client to the 
+            right interface and method of the remoted object.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.ContinueWithResult``1(System.Int32,System.Threading.Tasks.Task{``0})">
+            <summary>
+            Internal - used by Service remoting
+            </summary>
+            <typeparam name="TRetval">Return value</typeparam>
+            <param name="methodId">method id</param>
+            <param name="task">continuation task</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.ContinueWith(System.Threading.Tasks.Task)">
+            <summary>
+            Internal - used by Service remoting
+            </summary>
+            <param name="task">continuation task</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.OnDispatchAsync(System.Int32,System.Object,System.Object,System.Threading.CancellationToken)">
+            <summary>
+            This method is implemented by the generated method dispatcher to dispatch request to the specified methodId of the 
+            interface implemented by the remoted object.
+            </summary>
+            <param name="methodId">Id of the method.</param>
+            <param name="remotedObject">The remoted object instance.</param>
+            <param name="requestBody">Request body</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. 
+            The result of the task is the return value from the method.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.OnDispatch(System.Int32,System.Object,System.Object)">
+            <summary>
+            This method is implemented by the generated method dispatcher to dispatch one way messages to the specified methodId of the 
+            interface implemented by the remoted object.
+            </summary>
+            <param name="methodId">Id of the method.</param>
+            <param name="remotedObject">The remoted object instance.</param>
+            <param name="messageBody">message body</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.CreateResponseBody(System.Int32,System.Object)">
+            <summary>
+            This method is implemented by the generated method dispatcher to create the response from the specified return value 
+            as a result of dispatching the method to the remoted object. 
+            </summary>
+            <param name="methodId">Id of the method.</param>
+            <param name="retval">The returned value from the method.</param>
+            <returns>A <see cref="T:System.Object">Object</see> that represents the response body to be sent back to the client.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.DispatchAsync(System.Object,System.Int32,System.Object,System.Threading.CancellationToken)">
+             <summary>
+            This method is used to dispatch request to the specified methodId of the 
+             interface implemented by the remoted object.
+             </summary>
+             <param name="objectImplementation"></param>
+             <param name="methodId"></param>
+             <param name="requestBody"></param>
+             <param name="cancellationToken"></param>
+             <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.Dispatch(System.Object,System.Int32,System.Object)">
+            <summary>
+            This method is used to dispatch one way messages to the specified methodId of the 
+            interface implemented by the remoted object.
+            </summary>
+            <param name="objectImplementation"></param>
+            <param name="methodId"></param>
+            <param name="messageBody"></param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.GetMethodName(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="methodId"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.InterfaceId">
+            <summary>
+             Interface Id is used to identify remoting Interfaces.
+            </summary>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingPartitionClient">
             <summary>
             Defines the interface for the client that communicate over remoting to a particular replica of a service partition.
@@ -1687,64 +1783,6 @@
             </summary>
             <returns>An instance of the generated proxy as <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Builder.ProxyBase"/></returns>
         </member>
-        <member name="T:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase">
-            <summary>
-            The base class used by remoting code generator to generate the type that dispatches requests from the client to the 
-            right interface and method of the remoted object.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.ContinueWithResult``1(System.Int32,System.Threading.Tasks.Task{``0})">
-            <summary>
-            Internal - used by Service remoting
-            </summary>
-            <typeparam name="TRetval">Return value</typeparam>
-            <param name="methodId">method id</param>
-            <param name="task">continuation task</param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation.
-            </returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.ContinueWith(System.Threading.Tasks.Task)">
-            <summary>
-            Internal - used by Service remoting
-            </summary>
-            <param name="task">continuation task</param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation.
-            </returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.OnDispatchAsync(System.Int32,System.Object,System.Object,System.Threading.CancellationToken)">
-            <summary>
-            This method is implemented by the generated method dispatcher to dispatch request to the specified methodId of the 
-            interface implemented by the remoted object.
-            </summary>
-            <param name="methodId">Id of the method.</param>
-            <param name="remotedObject">The remoted object instance.</param>
-            <param name="requestBody">Request body</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. 
-            The result of the task is the return value from the method.
-            </returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.OnDispatch(System.Int32,System.Object,System.Object)">
-            <summary>
-            This method is implemented by the generated method dispatcher to dispatch one way messages to the specified methodId of the 
-            interface implemented by the remoted object.
-            </summary>
-            <param name="methodId">Id of the method.</param>
-            <param name="remotedObject">The remoted object instance.</param>
-            <param name="messageBody">message body</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Remoting.Builder.MethodDispatcherBase.CreateResponseBody(System.Int32,System.Object)">
-            <summary>
-            This method is implemented by the generated method dispatcher to create the response from the specified return value 
-            as a result of dispatching the method to the remoted object. 
-            </summary>
-            <param name="methodId">Id of the method.</param>
-            <param name="retval">The returned value from the method.</param>
-            <returns>A <see cref="T:System.Object">Object</see> that represents the response body to be sent back to the client.</returns>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Remoting.Builder.ProxyBase">
             <summary>
             The base class used by remoting code generator to generate the proxy for the remoted interfaces.
@@ -2757,11 +2795,6 @@
               Looks up a localized string similar to ConfigPackageName {0} was not found..
             </summary>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorEndpointAlreadyExists">
-            <summary>
-              Looks up a localized string similar to Endpoint with Name &apos;{0}&apos; already exists..
-            </summary>
-        </member>
         <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorHeaderAlreadyExists">
             <summary>
               Looks up a localized string similar to Header with name &apos;{0}&apos; already exists.
@@ -2780,6 +2813,16 @@
         <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorInvalidPartitionEndpointAddress">
             <summary>
               Looks up a localized string similar to The EndpointAddress &apos;{0}&apos; for partition &apos;{1}&apos; is not in a format understood by the client.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorListenerAlreadyExists">
+            <summary>
+              Looks up a localized string similar to Listener with Name &apos;{0}&apos; already exists. When multiple communication listeners are used, a unique name should be specified for each listener..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorListenerNameNotSpecified">
+            <summary>
+              Looks up a localized string similar to Unique Name must be specified for each listener when multiple communication listeners are used.
             </summary>
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.SR.ErrorMethodNotImplemented">

@@ -37,8 +37,8 @@
             property.
             </para>
             <para>
-            As the ordering of elements is not strictly guaranteed, assumptions about the ordering of any two items in the queue MUST NOT
-            be made.  The best-effort first-in first-out ordering is provided for fairness; the time that an item spends in the queue should
+            As the ordering of elements is not strictly guaranteed, assumptions about the ordering of any two values in the queue MUST NOT
+            be made.  The best-effort first-in first-out ordering is provided for fairness; the time that an value spends in the queue should
             be related to the failure rate (failures may alter the queue's ordering) and the dequeue rate, but not the enqueue rate.
             </para>
             <para>
@@ -48,6 +48,11 @@
             <para>
             Values stored in this queue MUST NOT be mutated outside the context of an operation on the queue. It is
             highly recommended to make <typeparamref name="T"/> immutable in order to avoid accidental data corruption.
+            </para>
+            <para>
+            Transaction is the unit of concurrency: Users can have multiple transactions in-flight at any given point of time but for a given transaction each API must be called one at a time.
+            So all Reliable Collection APIs that take in a transaction and return a Task, must be awaited one at a time.
+            <seealso cref="T:Microsoft.ServiceFabric.Data.ITransaction"/>
             </para>
             </remarks>
         </member>
@@ -63,140 +68,207 @@
             <returns>The <see cref="T:System.Uri"/> name of this <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.EnqueueAsync(Microsoft.ServiceFabric.Data.ITransaction,`0,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})">
-            <summary>
-            <para>
-            Preview feature. Not for production use. See the <see href="https://aka.ms/reliableconcurrentqueuepreview">documentation</see> for details.
-            </para>
-            <para>
-            Stage the enqueue of a value into the queue.
-            </para>
-            </summary>
-            
-            <param name="tx">Transaction to associate this operation with.</param>
-            <param name="value">The value to add to the end of the queue. The value can be null for reference types.</param>
-            <param name="cancellationToken">The token to monitor for cancellation requests. The default is <see cref="P:System.Threading.CancellationToken.None"/>.</param>
-            <param name="timeout">The amount of time to wait for the operation to complete before throwing a TimeoutException. The default is null.  If null is passed, a default timeout will be used.</param>
-            
-            <returns>Task that represents the asynchronous enqueue operation.</returns>
-            
-            <remarks>
-            A <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.DequeueAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/> operation cannot return any value for which its <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.EnqueueAsync(Microsoft.ServiceFabric.Data.ITransaction,`0,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/> has not yet been committed.
-            This includes the transaction in which the value was enqueued; as a consequence, <see cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1"/> does not support Read-Your-Writes.
-            </remarks>
-            
-            <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null.</exception>
-            <exception cref="T:System.OperationCanceledException">The operation was canceled via <paramref name="cancellationToken"/>.</exception>
-            <exception cref="T:System.Fabric.FabricNotPrimaryException">The replica is not in <cref name="ReplicaRole.Primary"/>.</exception>
-            <exception cref="T:System.Fabric.FabricNotReadableException">The replica is not readable.  Retriable.</exception>
-            <exception cref="T:System.InvalidOperationException">
-            The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: committed or aborted.
-            </exception>
-            <exception cref="T:System.Fabric.FabricObjectClosedException">The <see cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1"/> is being closed by the runtime.</exception>
-            <exception cref="T:System.TimeoutException">The operation was unable to be accepted within the given timeout.  Retriable.</exception>
-            
-            <example>
-            This example shows how to use <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.EnqueueAsync(Microsoft.ServiceFabric.Data.ITransaction,`0,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/> to enqueue an item.
-            <code>
-            <![CDATA[
-            protected override async Task RunAsync(CancellationToken cancellationToken)
-            {
-                var concurrentQueue = await this.StateManager.GetOrAddAsync<IReliableConcurrentQueue<long>>(new Uri("fabric:/concurrentQueue"));
-                using (var tx = this.StateManager.CreateTransaction())
-                {
-                    await concurrentQueue.EnqueueAsync(tx, 12L, cancellationToken);
-                    await tx.CommitAsync();
-                }
-            }
-            ]]>
-            </code>
-            </example>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.DequeueAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})">
              <summary>
              <para>
              Preview feature. Not for production use. See the <see href="https://aka.ms/reliableconcurrentqueuepreview">documentation</see> for details.
              </para>
              <para>
-             Tentatively dequeue an item from the queue.
+             Stage the enqueue of a value into the queue.
              </para>
              </summary>
              
              <param name="tx">Transaction to associate this operation with.</param>
+             <param name="value">The value to add to the end of the queue. The value can be null for reference types.</param>
              <param name="cancellationToken">The token to monitor for cancellation requests. The default is <see cref="P:System.Threading.CancellationToken.None"/>.</param>
              <param name="timeout">The amount of time to wait for the operation to complete before throwing a TimeoutException. The default is null.  If null is passed, a default timeout will be used.</param>
              
-             <returns>A task that represents the asynchronous dequeue operation.  The task result is the value dequeued.</returns>
+             <returns>Task that represents the asynchronous enqueue operation.</returns>
              
              <remarks>
-             <para>
-             While <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.DequeueAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/> can only return values for which the corresponding Enqueue was committed, Dequeue operations are not isolated
-             from one another.  Once a transaction has dequeued a value, other transactions cannot dequeue it, but are not blocked from dequeuing other values.
-             </para>
-             <para>
-             When a transaction or transactions including one or more <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.DequeueAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/> operations aborts, the dequeued items will be added back at
-             the head of the queue in an arbitrary order.  This will ensure that these items will be dequeued again soon, improving the fairness of the
-             data structure, but without enforcing strict ordering (which would require reducing the allowed concurrency, as in <see cref="T:Microsoft.ServiceFabric.Data.Collections.IReliableQueue`1"/>).
-             </para>
+             A <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.DequeueAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/> operation cannot return any value for which its <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.EnqueueAsync(Microsoft.ServiceFabric.Data.ITransaction,`0,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/> has not yet been committed.
+             This includes the transaction in which the value was enqueued; as a consequence, <see cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1"/> does not support Read-Your-Writes.
              </remarks>
              
-             <exception cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.QueueEmptyException">
-             The queue is currently empty.  Retriable; when encountering this exception, the caller should wait some time for additional enqueue operations
-             before issuing another dequeue.</exception>
+             <exception cref="T:System.Fabric.FabricNotPrimaryException">The replica is no longer in <cref name="ReplicaRole.Primary"/>.</exception>
+             <exception cref="T:System.Fabric.FabricNotReadableException">The replica is currently not readable.</exception>
+             <exception cref="T:System.Fabric.FabricObjectClosedException">The <see cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1"/> was closed by the runtime.</exception>
+             <exception cref="T:System.TimeoutException">
+             The operation was unable to be completed within the given timeout.  The transaction should be aborted and
+             a new transaction should be created to retry.
+             </exception>
              <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null.</exception>
              <exception cref="T:System.OperationCanceledException">The operation was canceled via <paramref name="cancellationToken"/>.</exception>
-             <exception cref="T:System.Fabric.FabricNotPrimaryException">The replica is not in <cref name="ReplicaRole.Primary"/>.</exception>
-             <exception cref="T:System.Fabric.FabricNotReadableException">The replica is not readable.  Retriable.</exception>
              <exception cref="T:System.InvalidOperationException">
-             The exception that is thrown when a method call is invalid for the object's current state.
+             Thrown when a method call is invalid for the object's current state.
              Example, transaction used is already terminated: committed or aborted.
              </exception>
-             <exception cref="T:System.Fabric.FabricObjectClosedException">The <see cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1"/> is being closed by the runtime.</exception>
-             <exception cref="T:System.TimeoutException">The operation was unable to be accepted within the given timeout.  Retriable.</exception>
              
              <example>
-             This example shows how to dequeue and log infinitely with retry, until the cancellation token is canceled.  
+             This example shows how to use <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.EnqueueAsync(Microsoft.ServiceFabric.Data.ITransaction,`0,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/> to enqueue a value with retry.
              <code>
              <![CDATA[
              protected override async Task RunAsync(CancellationToken cancellationToken)
              {
                  var concurrentQueue = await this.StateManager.GetOrAddAsync<IReliableConcurrentQueue<long>>(new Uri("fabric:/concurrentQueue"));
-             
-                 // Assumption: items are being enqueued from another source (e.g. the communication listener).
+            
                  while (true)
                  {
+                     cancellationToken.ThrowIfCancellationRequested();
+             
                      try
                      {
                          using (var tx = this.StateManager.CreateTransaction())
                          {
-                             var dequeueOutput = await concurrentQueue.DequeueAsync(tx, cancellationToken);
+                             await concurrentQueue.EnqueueAsync(tx, 12L, cancellationToken);
                              await tx.CommitAsync();
-                             Console.WriteLine("Dequeue #" + dequeueOutput);
+            
+                             return;
                          }
                      }
-                     catch (QueueEmptyException)
+                     catch (FabricNotPrimaryException e)
                      {
-                         Console.WriteLine("Queue was empty for dequeue");
+                         // Gracefully exit RunAsync as the new primary should have RunAsync invoked on it and continue work.
+                         // If instead enqueue was being executed as part of a client request, the client would be signaled to re-resolve.
+                         Console.WriteLine("Replica is not primary, exiting RunAsync: " + e);
+                         return;
+                     }
+                     catch (FabricNotReadableException e)
+                     {
+                         // Retry until the queue is readable or a different exception is thrown.
+                         Console.WriteLine("Queue is not readable, retrying the transaction: " + e);
+                     }
+                     catch (FabricObjectClosedException e)
+                     {
+                         // Gracefully exit RunAsync as this is happening due to replica close.
+                         // If instead enqueue was being executed as part of a client request, the client would be signaled to re-resolve.
+                         Console.WriteLine("Replica is closing, exiting RunAsync: " + e);
+                         return;
+                     }
+                     catch (TimeoutException e)
+                     {
+                         Console.WriteLine("Encountered TimeoutException during EnqueueAsync, retrying the transaction: " + e);
                      }
             
-                     // delay and retry
-                     await Task.Delay(TimeSpan.FromMilliseconds(10), cancellationToken);
+                     // Delay and retry.
+                     await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
                  }
              }
              ]]>
              </code>
              </example>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.DequeueAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})">
+            <summary>
+            <para>
+            Preview feature. Not for production use. See the <see href="https://aka.ms/reliableconcurrentqueuepreview">documentation</see> for details.
+            </para>
+            <para>
+            Tentatively dequeue a value from the queue.
+            </para>
+            </summary>
+            
+            <param name="tx">Transaction to associate this operation with.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests. The default is <see cref="P:System.Threading.CancellationToken.None"/>.</param>
+            <param name="timeout">The amount of time to wait for the operation to complete before throwing a TimeoutException. The default is null.  If null is passed, a default timeout will be used.</param>
+            
+            <returns>A task that represents the asynchronous dequeue operation.  The task result is the value dequeued.</returns>
+            
+            <remarks>
+            <para>
+            While <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.DequeueAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/> can only return values for which the corresponding <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.EnqueueAsync(Microsoft.ServiceFabric.Data.ITransaction,`0,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/> was committed, Dequeue operations are not isolated
+            from one another.  Once a transaction has dequeued a value, other transactions cannot dequeue it, but are not blocked from dequeuing other values.
+            </para>
+            <para>
+            When a transaction or transactions including one or more <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.DequeueAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/> operations aborts, the dequeued values will be added back at
+            the head of the queue in an arbitrary order.  This will ensure that these values will be dequeued again soon, improving the fairness of the
+            data structure, but without enforcing strict ordering (which would require reducing the allowed concurrency, as in <see cref="T:Microsoft.ServiceFabric.Data.Collections.IReliableQueue`1"/>).
+            </para>
+            </remarks>
+            
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">The replica is no longer in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.Fabric.FabricNotReadableException">The replica is currently not readable.</exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">The <see cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1"/> was closed by the runtime.</exception>
+            <exception cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.QueueEmptyException"> 
+            The queue is currently empty.  Retriable; when encountering this exception, the caller should wait some time for additional enqueue operations
+            before issuing another dequeue.</exception>
+            <exception cref="T:System.TimeoutException">
+            The operation was unable to be completed within the given timeout.  The transaction should be aborted and
+            a new transaction should be created to retry.
+            </exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null.</exception>
+            <exception cref="T:System.OperationCanceledException">The operation was canceled via <paramref name="cancellationToken"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when a method call is invalid for the object's current state.
+            Example, transaction used is already terminated: committed or aborted.
+            </exception>
+            <example>
+            This example shows how to dequeue and log infinitely with retry, until the cancellation token is canceled.  
+            <code>
+            <![CDATA[
+            protected override async Task RunAsync(CancellationToken cancellationToken)
+            {
+                var concurrentQueue = await this.StateManager.GetOrAddAsync<IReliableConcurrentQueue<long>>(new Uri("fabric:/concurrentQueue"));
+            
+                // Assumption: values are being enqueued by another source (e.g. the communication listener).
+                while (true)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+            
+                    try
+                    {
+                        using (var tx = this.StateManager.CreateTransaction())
+                        {
+                            var dequeueOutput = await concurrentQueue.DequeueAsync(tx, cancellationToken);
+                            await tx.CommitAsync();
+                            Console.WriteLine("Dequeue #" + dequeueOutput);
+                        }
+                    }
+                    catch (FabricNotPrimaryException e)
+                    {
+                        // Gracefully exit RunAsync as the new primary should have RunAsync invoked on it and continue work.
+                        // If instead dequeue was being executed as part of a client request, the client would be signaled to re-resolve.
+                        Console.WriteLine("Replica is not primary, exiting RunAsync: " + e);
+                        return;
+                    }
+                    catch (FabricNotReadableException e)
+                    {
+                        // Retry until the queue is readable or a different exception is thrown.
+                        Console.WriteLine("Queue is not readable, retrying the transaction: " + e);
+                    }
+                    catch (FabricObjectClosedException e)
+                    {
+                        // Gracefully exit RunAsync as this is happening due to replica close.
+                        // If instead dequeue was being executed as part of a client request, the client would be signaled to re-resolve.
+                        Console.WriteLine("Replica is closing, exiting RunAsync: " + e);
+                        return;
+                    }
+                    catch (QueueEmptyException e)
+                    {
+                        Console.WriteLine("Queue was empty for DequeueAsync, retrying the transaction: " + e);
+                    }
+                    catch (TimeoutException e)
+                    {
+                        Console.WriteLine("Encountered TimeoutException during DequeueAsync, retrying the transaction: " + e);
+                    }
+                    
+                    // Delay and retry.
+                    await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+                }
+            }
+            ]]>
+            </code>
+            </example>
+        </member>
         <member name="P:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.Count">
              <summary>
-            <para>
+             <para>
              Preview feature. Not for production use. See the <see href="https://aka.ms/reliableconcurrentqueuepreview">documentation</see> for details.
-            </para>
-            <para>
+             </para>
+             <para>
              Gets the number of values in the <see cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1"/>.
-            </para>
+             </para>
              </summary>
-             
+              
              <remarks>
              <para>
              This count represents the number of values currently visible to <see cref="M:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1.DequeueAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})"/>.  Uncommitted Enqueues will not
@@ -207,11 +279,10 @@
              from other transactions, the count also cannot be isolated from other transactions.  
              </para>
              </remarks>
-            <value>The number of values in  the <see cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1"/>
-                .</value>
-            <exception cref="T:System.Fabric.FabricNotReadableException">The replica is not readable.  Retriable.</exception>
-            <exception cref="T:System.Fabric.FabricObjectClosedException">The <see cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1"/> is being closed by the runtime.</exception>
-             
+             <value>The number of values in  the <see cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1"/>.</value>
+             <exception cref="T:System.Fabric.FabricNotReadableException">The replica is currently not readable.</exception>
+             <exception cref="T:System.Fabric.FabricObjectClosedException">The <see cref="T:Microsoft.ServiceFabric.Data.Collections.Preview.IReliableConcurrentQueue`1"/> was closed by the runtime.</exception>
+              
              <example>
              This example shows how to monitor the queue's count infinitely, until the cancellation token is canceled.
              <code>
@@ -220,16 +291,33 @@
              {
                  var concurrentQueue = await this.StateManager.GetOrAddAsync<IReliableConcurrentQueue<long>>(new Uri("fabric:/concurrentQueue"));
             
-                 // Assumption: items are being enqueued/dequeued in another place (e.g. the communication listener).
+                 // Assumption: values are being enqueued/dequeued in another place (e.g. the communication listener).
                  var observer = Task.Run(
-                     async() =>
-                     {
-                         while (true)
+                     async () =>
                          {
-                             Console.WriteLine("Count: " + concurrentQueue.GetCount());
-                             await Task.Delay(TimeSpan.FromMilliseconds(10), cancellationToken);
-                         }
-                     },
+                             while (true)
+                             {
+                                 cancellationToken.ThrowIfCancellationRequested();
+            
+                                 try
+                                 {
+                                     Console.WriteLine("Count: " + concurrentQueue.Count);
+                                 }
+                                 catch (FabricNotReadableException e)
+                                 {
+                                     // Retry until the queue is readable or a different exception is thrown.
+                                     Console.WriteLine("Queue is not readable, retrying the observation: " + e);
+                                 }
+                                 catch (FabricObjectClosedException e)
+                                 {
+                                     // Gracefully exit as this is happening due to replica close.
+                                     Console.WriteLine("Replica is closing, stopping observer: " + e);
+                                     return;
+                                 }
+                                 
+                                 await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+                             }
+                         },
                      cancellationToken);
              }
              ]]>
@@ -825,6 +913,12 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>, or <paramref name="timeout"/> is negative.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when a method call is invalid for the object's current state.
+            Example, transaction used is already terminated: committed or aborted.
+            </exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.GetOrAddAsync``1(Microsoft.ServiceFabric.Data.ITransaction,System.Uri)">
@@ -858,6 +952,12 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when a method call is invalid for the object's current state.
+            Example, transaction used is already terminated: committed or aborted.
+            </exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.GetOrAddAsync``1(System.Uri,System.TimeSpan)">
@@ -891,6 +991,8 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>, or <paramref name="timeout"/> is negative.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.GetOrAddAsync``1(System.Uri)">
@@ -923,6 +1025,8 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.GetOrAddAsync``1(Microsoft.ServiceFabric.Data.ITransaction,System.String,System.TimeSpan)">
@@ -957,6 +1061,12 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>, or <paramref name="timeout"/> is negative.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when a method call is invalid for the object's current state.
+            Example, transaction used is already terminated: committed or aborted.
+            </exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.GetOrAddAsync``1(Microsoft.ServiceFabric.Data.ITransaction,System.String)">
@@ -990,6 +1100,12 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when a method call is invalid for the object's current state.
+            Example, transaction used is already terminated: committed or aborted.
+            </exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.GetOrAddAsync``1(System.String,System.TimeSpan)">
@@ -1023,6 +1139,8 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>, or <paramref name="timeout"/> is negative.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.GetOrAddAsync``1(System.String)">
@@ -1055,6 +1173,8 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An instance of the type <typeparamref name="T"/> cannot be created, or the existing <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not of type <typeparamref name="T"/>.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous operation. The task result is the reliable state instance.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.RemoveAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Uri,System.TimeSpan)">
@@ -1072,6 +1192,12 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist, or <paramref name="timeout"/> is negative.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when a method call is invalid for the object's current state.
+            Example, transaction used is already terminated: committed or aborted.
+            </exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous remove operation.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.RemoveAsync(Microsoft.ServiceFabric.Data.ITransaction,System.Uri)">
@@ -1088,6 +1214,12 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when a method call is invalid for the object's current state.
+            Example, transaction used is already terminated: committed or aborted.
+            </exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous remove operation.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.RemoveAsync(System.Uri,System.TimeSpan)">
@@ -1104,6 +1236,8 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist, or <paramref name="timeout"/> is negative.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous remove operation.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.RemoveAsync(System.Uri)">
@@ -1119,6 +1253,8 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous remove operation.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.RemoveAsync(Microsoft.ServiceFabric.Data.ITransaction,System.String,System.TimeSpan)">
@@ -1136,6 +1272,12 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist, or <paramref name="timeout"/> is negative.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when a method call is invalid for the object's current state.
+            Example, transaction used is already terminated: committed or aborted.
+            </exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous remove operation.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.RemoveAsync(Microsoft.ServiceFabric.Data.ITransaction,System.String)">
@@ -1152,6 +1294,12 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="tx"/> is null, or <paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when a method call is invalid for the object's current state.
+            Example, transaction used is already terminated: committed or aborted.
+            </exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous remove operation.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.RemoveAsync(System.String,System.TimeSpan)">
@@ -1168,6 +1316,8 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist, or <paramref name="timeout"/> is negative.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the given timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous remove operation.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.RemoveAsync(System.String)">
@@ -1183,6 +1333,8 @@
             <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">An <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> with the given name does not exist.</exception>
             <exception cref="T:System.TimeoutException">The operation failed to complete within the default timeout.</exception>
+            <exception cref="T:System.Fabric.FabricNotPrimaryException">Thrown when the <cref name="IReliableStateManager"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous remove operation.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.TryGetAsync``1(System.Uri)">
@@ -1199,6 +1351,11 @@
             </param>
             <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not convertible to type <typeparamref name="T"/>.</exception>
+            <exception cref="T:System.Fabric.FabricNotReadableException">
+            Exception indicates that the State Manager cannot retrive a reliable collection.
+            <cref name="FabricNotReadableException"/> can be thrown in all <cref name="ReplicaRole"/>s.
+            For example, when a <cref name="ReplicaRole.Primary"/> or <cref name="ReplicaRole.ActiveSecondary"/> looses <cref name="IStatefulServicePartition.ReadStatus"/>.</exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous operation. The task result is a tuple indicating whether the reliable state was found, and if so the instance.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.IReliableStateManager.TryGetAsync``1(System.String)">
@@ -1215,6 +1372,11 @@
             </param>
             <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.</exception>
             <exception cref="T:System.ArgumentException">The <see cref="T:Microsoft.ServiceFabric.Data.IReliableState"/> instance is not convertible to type <typeparamref name="T"/>.</exception>
+            <exception cref="T:System.Fabric.FabricNotReadableException">
+            Exception indicates that the State Manager cannot retrive a reliable collection.
+            <cref name="FabricNotReadableException"/> can be thrown in all <cref name="ReplicaRole"/>s.
+            For example, when a <cref name="ReplicaRole.Primary"/> or <cref name="ReplicaRole.ActiveSecondary"/> looses <cref name="IStatefulServicePartition.ReadStatus"/>.</exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
             <returns>Task that represents the asynchronous operation. The task result is a tuple indicating whether the reliable state was found, and if so the instance.</returns>
         </member>
         <member name="E:Microsoft.ServiceFabric.Data.IReliableStateManager.TransactionChanged">
@@ -1364,6 +1526,43 @@
                     </description>
                 </item>
             </list>
+            
+            <para>
+            Any instance member of this type are not guaranteed to be thread safe. 
+            This makes transactions the unit of concurrency: Users can have multiple transactions in-flight at any given point of time but for a given transaction each API must be called one at a time.
+            So all Reliable Collection APIs that take in a transaction and return a Task, must be awaited one at a time.
+            </para>
+            
+            <para>
+            Following is an example of a correct usage.
+            <code>
+            <![CDATA[
+            using (var txn = this.StateManager.CreateTransaction())
+            {
+                var dequeueOutput = await concurrentQueue.DequeueAsync(txn, cancellationToken);
+                var dequeueOutput = await concurrentQueue.DequeueAsync(txn, cancellationToken);
+                await txn.CommitAsync();
+            }
+            ]]>
+            </code>
+            </para>
+            
+            <para>
+            Following is an example of incorrect usage that has undefined behavior.
+            <code>
+            <![CDATA[
+            using (var txn = this.StateManager.CreateTransaction())
+            {
+                List<Task> taskList = new List<Task>();
+                taskList.Add(concurrentQueue.DequeueAsync(txn, cancellationToken));
+                taskList.Add(concurrentQueue.DequeueAsync(txn, cancellationToken));
+            
+                await Task.WhenAll(taskList);
+                await txn.CommitAsync();
+            }
+            ]]>
+            </code>
+            </para>
             </remarks>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.ITransaction.CommitAsync">
@@ -1447,7 +1646,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous operation. The task result indicates the number of elements.</returns>
         </member>
@@ -1464,10 +1663,18 @@
             Represents a reliable collection of key/value pairs that are persisted and replicated.
             </summary>
             <typeparam name="TKey">The type of the keys in the reliable dictionary.</typeparam>
-            <typeparam name="TValue">The type of the values in the reliable dictionary.</typeparam>
+            <typeparam name="TValue">
+            The type of the values in the reliable dictionary.</typeparam>
             <remarks>Keys or values stored in this dictionary MUST NOT be mutated outside the context of an operation on the 
             dictionary.  It is highly recommended to make both <typeparamref name="TKey"/> and <typeparamref name="TValue"/> 
-            immutable in order to avoid accidental data corruption.</remarks>
+            immutable in order to avoid accidental data corruption.
+            
+            <para>
+            Transaction is the unit of concurrency: Users can have multiple transactions in-flight at any given point of time but for a given transaction each API must be called one at a time.
+            So all Reliable Collection APIs that take in a transaction and return a Task, must be awaited one at a time.
+            <seealso cref="T:Microsoft.ServiceFabric.Data.ITransaction"/>
+            </para>
+            </remarks>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.Collections.IReliableDictionary`2.AddAsync(Microsoft.ServiceFabric.Data.ITransaction,`0,`1)">
             <summary>
@@ -1482,7 +1689,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous add operation.</returns>
         </member>
@@ -1502,7 +1709,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous add operation.</returns>
         </member>
@@ -1520,7 +1727,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             Task that represents the asynchronous add or update operation. The task result is the new value for the key. This will be
@@ -1541,7 +1748,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             Task that represents the asynchronous add or update operation. The task result is the new value for the key. This will be
@@ -1566,7 +1773,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             Task that represents the asynchronous add or update operation. The task result is the new value for the key. This will be
@@ -1591,7 +1798,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             Task that represents the asynchronous add or update operation. The task result is the new value for the key. This will be
@@ -1626,7 +1833,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous operation. The task result indicates whether the key exists.</returns>
         </member>
@@ -1647,7 +1854,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous operation. The task result indicates whether the key exists.</returns>
         </member>
@@ -1671,7 +1878,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous operation. The task result indicates whether the key exists.</returns>
         </member>
@@ -1696,7 +1903,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous operation. The task result indicates whether the key exists.</returns>
         </member>
@@ -1713,7 +1920,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <remarks>
             The enumerator returned from the reliable dictionary is safe to use concurrently with reads and writes
@@ -1729,7 +1936,7 @@
             <param name="enumerationMode">The enumeration mode to use. The default is Unordered.</param>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <remarks>
             The enumerator returned from the reliable dictionary is safe to use concurrently with reads and writes
@@ -1746,7 +1953,7 @@
             <param name="enumerationMode">The enumeration mode to use. The default is Unordered.</param>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <remarks>
             The enumerator returned from the reliable dictionary is safe to use concurrently with reads and writes
@@ -1766,7 +1973,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             A task that represents the asynchronous add operation. The task result is the value for the key. This will be
@@ -1786,7 +1993,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             A task that represents the asynchronous add operation. The task result is the value for the key. This will be either the
@@ -1809,7 +2016,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             A task that represents the asynchronous add operation. The task result is the value for the key. This will be
@@ -1833,7 +2040,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             A task that represents the asynchronous add operation. The task result is the value for the key. This will be either the
@@ -1852,7 +2059,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous add operation. The task result indicates whether the key/value pair was added.</returns>
         </member>
@@ -1872,7 +2079,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous add operation. The task result indicates whether the key/value pair was added.</returns>
         </member>
@@ -1892,7 +2099,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             A task that represents the asynchronous read operation. The task result is a tuple indicating
@@ -1916,7 +2123,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             A task that represents the asynchronous read operation. The task result is a tuple indicating
@@ -1943,7 +2150,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             A task that represents the asynchronous read operation. The task result is a tuple indicating
@@ -1971,7 +2178,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             A task that represents the asynchronous read operation. The task result is a tuple indicating
@@ -1989,7 +2196,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             Task that represents the asynchronous remove operation. The task result is a tuple indicating
@@ -2011,7 +2218,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             Task that represents the asynchronous remove operation. The task result is a tuple indicating
@@ -2031,7 +2238,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous update operation. The task result indicates whether the object was updated.</returns>
         </member>
@@ -2052,7 +2259,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous update operation. The task result indicates whether the object was updated.</returns>
         </member>
@@ -2069,7 +2276,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous update operation.</returns>
         </member>
@@ -2089,7 +2296,7 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableDictionary{TKey, TValue}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>A task that represents the asynchronous update operation.</returns>
         </member>
@@ -2117,8 +2324,16 @@
             Represents a reliable first-in, first-out collection of objects that are persisted and replicated.
             </summary>
             <typeparam name="T">The type of the elements contained in the reliable queue.</typeparam>
-            <remarks>Values stored in this queue MUST NOT be mutated outside the context of an operation on the queue. It is
-             highly recommended to make <typeparamref name="T"/> immutable in order to avoid accidental data corruption.
+            <remarks>
+            <para>
+            Values stored in this queue MUST NOT be mutated outside the context of an operation on the queue. It is
+            highly recommended to make <typeparamref name="T"/> immutable in order to avoid accidental data corruption.
+            </para>
+            <para>
+            Transaction is the unit of concurrency: Users can have multiple transactions in-flight at any given point of time but for a given transaction each API must be called one at a time.
+            So all Reliable Collection APIs that take in a transaction and return a Task, must be awaited one at a time.
+            <seealso cref="T:Microsoft.ServiceFabric.Data.ITransaction"/>
+            </para>
             </remarks>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.Collections.IReliableQueue`1.EnqueueAsync(Microsoft.ServiceFabric.Data.ITransaction,`0)">
@@ -2132,8 +2347,9 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableQueue{T}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
+            <remarks>If a retriable exception is thrown by this method, it is recommended to dispose the transaction <paramref name="tx"/> and try again with a new transaction.</remarks>
             <returns>Task that represents the asynchronous enqueue operation.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.Collections.IReliableQueue`1.EnqueueAsync(Microsoft.ServiceFabric.Data.ITransaction,`0,System.TimeSpan,System.Threading.CancellationToken)">
@@ -2151,8 +2367,9 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableQueue{T}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
+            <remarks>If a retriable exception is thrown by this method, it is recommended to dispose the transaction <paramref name="tx"/> and try again with a new transaction.</remarks>
             <returns>Task that represents the asynchronous enqueue operation.</returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Data.Collections.IReliableQueue`1.TryDequeueAsync(Microsoft.ServiceFabric.Data.ITransaction)">
@@ -2165,8 +2382,9 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableQueue{T}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
+            <remarks>If a retriable exception is thrown by this method, it is recommended to dispose the transaction <paramref name="tx"/> and try again with a new transaction.</remarks>
             <returns>
             Task that represents the asynchronous dequeue operation. The task result is a tuple indicating
             whether an object was removed and if so, the object.
@@ -2186,8 +2404,9 @@
             <exception cref="T:System.Fabric.FabricNotPrimaryException">The exception that is thrown when the <cref name="IReliableQueue{T}"/> is not in <cref name="ReplicaRole.Primary"/>.</exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
+            <remarks>If a retriable exception is thrown by this method, it is recommended to dispose the transaction <paramref name="tx"/> and try again with a new transaction.</remarks>
             <returns>
             Task that represents the asynchronous dequeue operation. The task result is a tuple indicating
             whether an object was removed and if so, the object.
@@ -2208,7 +2427,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             Task that represents the asynchronous peek operation. The task result is a tuple indicating
@@ -2234,7 +2453,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             Task that represents the asynchronous peek operation. The task result is a tuple indicating
@@ -2257,7 +2476,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             Task that represents the asynchronous peek operation. The task result is a tuple indicating
@@ -2284,7 +2503,7 @@
             </exception>
             <exception cref="T:System.InvalidOperationException">
             The exception that is thrown when a method call is invalid for the object's current state.
-            Example, transaction used is already terminated: comitted or aborted.
+            Example, transaction used is already terminated: committed or aborted.
             </exception>
             <returns>
             Task that represents the asynchronous peek operation. The task result is a tuple indicating

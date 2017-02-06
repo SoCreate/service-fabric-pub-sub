@@ -4,6 +4,32 @@
         <name>System.Fabric</name>
     </assembly>
     <members>
+        <member name="T:System.Fabric.Query.ApplicationNameResult">
+            <summary>
+            <para>Describes an application name.</para>
+            </summary>
+        </member>
+        <member name="P:System.Fabric.Query.ApplicationNameResult.ApplicationName">
+            <summary>
+            <para>Gets the name of the application.</para>
+            </summary>
+            <value>
+            <para>The name of the application.</para>
+            </value>
+        </member>
+        <member name="T:System.Fabric.Query.ServiceNameResult">
+            <summary>
+            <para>Describes an service name.</para>
+            </summary>
+        </member>
+        <member name="P:System.Fabric.Query.ServiceNameResult.ServiceName">
+            <summary>
+            <para>Gets the name of the service.</para>
+            </summary>
+            <value>
+            <para>The name of the service.</para>
+            </value>
+        </member>
         <member name="T:System.Fabric.ApplicationUpgradeProgress">
             <summary>
             <para>Represents the upgrade status of the application instance.</para>
@@ -641,39 +667,56 @@
             <para>Returns <see cref="T:System.Threading.Tasks.Task`1"/> of type long, the LSN of the rollback operation.</para>
             </returns>
         </member>
-        <member name="T:System.Fabric.Chaos.DataStructures.ChaosEvent">
+        <member name="T:System.Fabric.ByteSerializable">
             <summary>
-            This is the base class for all the different types of events that Chaos generates
+            A class that needs to be serialized/deserialized to/from a byte array should inherit from this base class
             </summary>
         </member>
-        <member name="T:System.Fabric.Common.ByteSerializable">
+        <member name="T:System.Fabric.IByteSerializable">
             <summary>
-            A class that need to be serialized/deserialized to/from a byte array should inherit from this base class
+            <para>Exposes the methods to serialize the object into a byte[] or deserialize the object from a byte[]</para>
             </summary>
         </member>
-        <member name="M:System.Fabric.Common.ByteSerializable.ToBytes">
+        <member name="M:System.Fabric.IByteSerializable.ToBytes">
             <summary>
-            This is the default implementation to convert a Chaos event into a byte array
+            Retrieves a byte[] representation of the object
+            </summary>
+            <returns>A byte[]</returns>
+        </member>
+        <member name="M:System.Fabric.IByteSerializable.FromBytes(System.Byte[])">
+            <summary>
+            Populates an object from a byte[]
+            </summary>
+            <param name="data">byte[] representation of the object</param>
+        </member>
+        <member name="M:System.Fabric.ByteSerializable.ToBytes">
+            <summary>
+            This is the default implementation to convert an object into a byte array
             </summary>
             <returns>A byte array</returns>
         </member>
-        <member name="M:System.Fabric.Common.ByteSerializable.FromBytes(System.Byte[])">
+        <member name="M:System.Fabric.ByteSerializable.FromBytes(System.Byte[])">
             <summary>
-            This is the default implementation to covert a Chaos event back from a byte array
+            This is the default implementation to covert an object back from a byte array
             </summary>
-            <param name="data">Byte array representation of the Chaos event</param>
+            <param name="data">Byte array representation of the object</param>
         </member>
-        <member name="M:System.Fabric.Common.ByteSerializable.Write(System.IO.BinaryWriter)">
+        <member name="M:System.Fabric.ByteSerializable.Write(System.IO.BinaryWriter)">
             <summary>
             This method must be implemented by derived classes so that they can be converted into a byte array
             </summary>
             <param name="bw">A BinaryWriter object</param>
         </member>
-        <member name="M:System.Fabric.Common.ByteSerializable.Read(System.IO.BinaryReader)">
+        <member name="M:System.Fabric.ByteSerializable.Read(System.IO.BinaryReader)">
             <summary>
             This method must be implemented by derived classes so that they can be converted back from a byte array
             </summary>
             <param name="br">A BinaryReader object</param>
+        </member>
+        <member name="T:System.Fabric.Chaos.DataStructures.ChaosEvent">
+            <summary>
+            This is the base class for all the different types of events that Chaos generates
+            </summary>
         </member>
         <member name="M:System.Fabric.Chaos.DataStructures.ChaosEvent.#ctor(System.DateTime)">
             <summary>
@@ -1020,7 +1063,7 @@
             </summary>
             <param name="maxConcurrentFaults">Maximum number of concurrent faults induced per iteration with the lowest being 1. The higher the concurrency the more aggressive the failovers 
             thus inducing more complex series of failures to uncover bugs. using 2 or 3 for this is recommended.</param>
-            <param name="timeToRun">Total time Chaos sould run</param>
+            <param name="timeToRun">Total time Chaos should run</param>
             <returns>The object containing the Chaos scenario parameters, typed as ChaosScenarioParameters</returns>
         </member>
         <member name="M:System.Fabric.Chaos.DataStructures.ChaosParameters.#ctor">
@@ -1032,7 +1075,7 @@
             <summary>
             <para>Initializes a new instance of the <see cref="T:System.Fabric.Chaos.DataStructures.ChaosParameters"/> class.</para>
             </summary>
-            <param name="maxClusterStabilizationTimeout">The maximum amount of time to wait for the entire cluster to stabilize after a fault iteration before failing the test.</param>
+            <param name="maxClusterStabilizationTimeout">The maximum amount of time to wait for the entire cluster to stabilize after a fault iteration.</param>
             <param name="maxConcurrentFaults">Maximum number of concurrent faults induced per iteration with the lowest being 1. The higher the concurrency the more aggressive the failovers 
             thus inducing more complex series of failures to uncover bugs. using 2 or 3 for this is recommended.</param>
             <param name="enableMoveReplicaFaults">Enables or disables the MovePrimary and MoveSecondary faults.</param>
@@ -1043,7 +1086,7 @@
             <summary>
             <para>Initializes a new instance of the <see cref="T:System.Fabric.Chaos.DataStructures.ChaosParameters"/> class.</para>
             </summary>
-            <param name="maxClusterStabilizationTimeout">The maximum amount of time to wait for the entire cluster to stabilize after a fault iteration before failing the test.</param>
+            <param name="maxClusterStabilizationTimeout">The maximum amount of time to wait for the entire cluster to stabilize after a fault iteration.</param>
             <param name="maxConcurrentFaults">Maximum number of concurrent faults induced per iteration with the lowest being 1. The higher the concurrency the more aggressive the failovers 
             thus inducing more complex series of failures to uncover bugs. using 2 or 3 for this is recommended.</param>
             <param name="enableMoveReplicaFaults">Enables or disables the MovePrimary and MoveSecondary faults.</param>
@@ -1053,15 +1096,30 @@
         </member>
         <member name="M:System.Fabric.Chaos.DataStructures.ChaosParameters.#ctor(System.TimeSpan,System.Int64,System.Boolean,System.TimeSpan,System.Collections.Generic.Dictionary{System.String,System.String},System.TimeSpan,System.TimeSpan)">
             <summary>
-            
+            <para>Initializes a new instance of the <see cref="T:System.Fabric.Chaos.DataStructures.ChaosParameters"/> class.</para>
             </summary>
-            <param name="maxClusterStabilizationTimeout"></param>
-            <param name="maxConcurrentFaults"></param>
-            <param name="enableMoveReplicaFaults"></param>
-            <param name="timeToRun"></param>
-            <param name="context"></param>
-            <param name="waitTimeBetweenInterations"></param>
-            <param name="waitTimeBetweenFaults"></param>
+            <param name="maxClusterStabilizationTimeout">The maximum amount of time to wait for the entire cluster to stabilize after a fault iteration.</param>
+            <param name="maxConcurrentFaults">Maximum number of concurrent faults induced per iteration with the lowest being 1. The higher the concurrency the more aggressive the failovers 
+            thus inducing more complex series of failures to uncover bugs. using 2 or 3 for this is recommended.</param>
+            <param name="enableMoveReplicaFaults">Enables or disables the MovePrimary and MoveSecondary faults.</param>
+            <param name="timeToRun">After running for this much time, Chaos will stop.</param>
+            <param name="context">This is a bag of (key, value) pairs. This can be used to record detailed context about why Chaos is being started for example.</param>
+            <param name="waitTimeBetweenIterations">This is the amount of pause between two consecutive iterations of fault inducing. The more the pause, the less is the rate of faults over time.</param>
+            <param name="waitTimeBetweenFaults">This is the amount of pause between two consecutive faults in a single iteration -- the more the pause, the less the concurrency of faults.</param>
+        </member>
+        <member name="M:System.Fabric.Chaos.DataStructures.ChaosParameters.#ctor(System.TimeSpan,System.Int64,System.Boolean,System.TimeSpan,System.Collections.Generic.Dictionary{System.String,System.String},System.TimeSpan,System.TimeSpan,System.Fabric.Health.ClusterHealthPolicy)">
+            <summary>
+            <para>Initializes a new instance of the <see cref="T:System.Fabric.Chaos.DataStructures.ChaosParameters"/> class.</para>
+            </summary>
+            <param name="maxClusterStabilizationTimeout">The maximum amount of time to wait for the entire cluster to stabilize after a fault iteration.</param>
+            <param name="maxConcurrentFaults">Maximum number of concurrent faults induced per iteration with the lowest being 1. The higher the concurrency the more aggressive the failovers 
+            thus inducing more complex series of failures to uncover bugs. using 2 or 3 for this is recommended.</param>
+            <param name="enableMoveReplicaFaults">Enables or disables the MovePrimary and MoveSecondary faults.</param>
+            <param name="timeToRun">After running for this much time, Chaos will stop.</param>
+            <param name="context">This is a bag of (key, value) pairs. This can be used to record detailed context about why Chaos is being started for example.</param>
+            <param name="waitTimeBetweenIterations">This is the amount of pause between two consecutive iterations of fault inducing. The more the pause, the less is the rate of faults over time.</param>
+            <param name="waitTimeBetweenFaults">This is the amount of pause between two consecutive faults in a single iteration -- the more the pause, the less the concurrency of faults.</param>
+            <param name="clusterHealthPolicy">The cluster health policy that determines how healthy a cluster must be in order for Chaos to go on inducing faults.</param>
         </member>
         <member name="M:System.Fabric.Chaos.DataStructures.ChaosParameters.ToString">
             <summary>
@@ -1131,6 +1189,15 @@
             <value>
             Returns the max run-time of the scenario as TimeSpan
             </value>
+        </member>
+        <member name="P:System.Fabric.Chaos.DataStructures.ChaosParameters.ClusterHealthPolicy">
+            <summary>
+            ClusterHealthPolicy determines the state of the health of the entities that Chaos
+            ensures before going onto the next set of faults. Setting 'ConsiderWarningAsError' to false
+            would let Chaos go onto the next set of faults while there are entities in the cluster with
+            healthState == warning (although Chaos will skip the entities in warning while choosing
+            faultable entities.)
+            </summary>
         </member>
         <member name="T:System.Fabric.CheckExistsPropertyOperation">
             <summary>
@@ -1468,6 +1535,29 @@
             this is avaliable only when the action is in Completed or Faulted state.
             </summary>
             <value>The PartitionRestartResult object.</value>
+        </member>
+        <member name="T:System.Fabric.NodeTransitionProgress">
+            <summary>
+            Returns NodeTransitionProgress object.
+            </summary>
+            <remarks>
+            This class returns the TestCommandProgressState, Result (when in Completed or Faulted state), 
+            and Exception (when in Faulted state) information for the node transition command.
+            </remarks>
+        </member>
+        <member name="M:System.Fabric.NodeTransitionProgress.ToString">
+            <summary>
+            Returns a string representation of the contained information
+            </summary>
+            <returns>A string that has State, InvokeDataLossResult, and Exception information.
+            State is always presnt; but depending on State, the Result and the Exception may not be present.</returns>
+        </member>
+        <member name="P:System.Fabric.NodeTransitionProgress.Result">
+            <summary>
+            Gets the result of the node transition command.
+            This is avaliable only when the action is in Completed or Faulted state.
+            </summary>
+            <value>The NodeCommandResult object.</value>
         </member>
         <member name="T:System.Fabric.RestoreSettings">
             <summary>
@@ -2119,6 +2209,15 @@
             <param name="machineName"></param>
             <returns></returns>
         </member>
+        <member name="M:System.Fabric.Common.Helpers.GetRemotePathIfNotLocalMachine(System.String,System.String)">
+            <summary>
+            Wrapper of GetRemotePath which checks if the machineName corresponds to the current machine. 
+            If it does, returns the local path, otherwise returns GetRemotePath(path, machineName).
+            </summary>
+            <param name="path">Local path</param>
+            <param name="machineName"></param>
+            <returns></returns>
+        </member>
         <member name="M:System.Fabric.Common.Helpers.CopyDirectory(System.String,System.String)">
             <summary>
             Copies the directory specified by sourcePath to the destPath
@@ -2612,6 +2711,11 @@
             Debug channel.
             </summary>
         </member>
+        <member name="T:System.Fabric.Common.Tracing.GenericEventDescriptor">
+            <summary>
+                Contains the metadata that defines an event.
+            </summary>
+        </member>
         <member name="T:System.Fabric.Common.Tracing.FabricEvents">
             <summary>
             Maintains structured trace events.
@@ -2706,6 +2810,32 @@
             <param name="ex">The exception to trace</param>
         </member>
         <member name="M:System.Fabric.Common.Tracing.FabricEvents.ExtensionsEvents.WriteExceptionAsWarningWithId(System.String,System.String,System.Exception,System.String,System.Object[])">
+            <summary>
+            Writes a message with an exception  and an id 
+            </summary>
+            <param name="type">Type of the event.</param>
+            <param name="id">The id of the event.</param>            
+            <param name="ex">The exception to trace</param>
+            <param name="format">Format string.</param>
+            <param name="args">The arguments</param>
+        </member>
+        <member name="M:System.Fabric.Common.Tracing.FabricEvents.ExtensionsEvents.WriteExceptionAsInfo(System.String,System.Exception,System.String,System.Object[])">
+            <summary>
+            Writes a message with an exception
+            </summary>
+            <param name="type">Type of the event.</param>
+            <param name="ex">The exception to trace</param>
+            <param name="format">Format string.</param>
+            <param name="args">The arguments</param>
+        </member>
+        <member name="M:System.Fabric.Common.Tracing.FabricEvents.ExtensionsEvents.WriteExceptionAsInfo(System.String,System.Exception)">
+            <summary>
+            Writes a message with an exception
+            </summary>
+            <param name="type">Type of the event.</param>
+            <param name="ex">The exception to trace</param>
+        </member>
+        <member name="M:System.Fabric.Common.Tracing.FabricEvents.ExtensionsEvents.WriteExceptionAsInfoWithId(System.String,System.String,System.Exception,System.String,System.Object[])">
             <summary>
             Writes a message with an exception  and an id 
             </summary>
@@ -4370,7 +4500,7 @@
         </member>
         <member name="P:System.Fabric.Description.DeleteApplicationDescription.ForceDelete">
             <summary>
-            <para>Gets the flag that specifies whether the application should be given a chance to gracefully clean up its state and close.</para>
+            <para>Gets or sets the flag that specifies whether the application should be given a chance to gracefully clean up its state and close.</para>
             </summary>
             <value>
             <para>Flag that specifies whether the application should be given a chance to gracefully clean up its state and close.</para>
@@ -5333,6 +5463,37 @@
             <remarks><para> Only children that match the filter will be returned. 
             All children will be used to evaluate the partition aggregated health state.
             If the filter is not specified, all partition children are returned.</para></remarks>
+        </member>
+        <member name="T:System.Fabric.Description.ProvisionApplicationTypeDescription">
+            <summary>
+            <para>Describes an application type to be provisioned by using 
+            <see cref="M:System.Fabric.FabricClient.ApplicationManagementClient.ProvisionApplicationAsync(System.Fabric.Description.ProvisionApplicationTypeDescription,System.TimeSpan,System.Threading.CancellationToken)"/>.</para>
+            </summary>
+        </member>
+        <member name="M:System.Fabric.Description.ProvisionApplicationTypeDescription.#ctor(System.String)">
+            <summary>
+            <para>Instantiates an instance of <see cref="T:System.Fabric.Description.ProvisionApplicationTypeDescription"/>. </para>
+            </summary>
+            <param name="buildPath">
+            <para>The relative path to the application package in the ImageStore location specified in the Cluster Manifest.</para>
+            </param>
+        </member>
+        <member name="P:System.Fabric.Description.ProvisionApplicationTypeDescription.BuildPath">
+            <summary>
+            <para>Gets the relative path to the application package in the ImageStore location specified in the Cluster Manifest.</para>
+            </summary>
+            <value>
+            <para>The application build path.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.Description.ProvisionApplicationTypeDescription.Async">
+            <summary>
+            <para>Gets or sets the flag indicating whether provisioning should occur asynchronously.</para>
+            </summary>
+            <value>
+            <para>If this flag is false, then the behavior is equivalent to calling <see cref="M:System.Fabric.FabricClient.ApplicationManagementClient.ProvisionApplicationAsync(System.String,System.TimeSpan,System.Threading.CancellationToken)"/>. The timeout argument is applied to the provision operation itself and the returned task completes only when the provision operation completes in the system.</para>
+            <para>If this flag is true, then the timeout argument is only applied to message delivery and the returned task completes once the system has accepted the request. The system will process the provision operation without any timeout limit and its state can be queried using <see cref="M:System.Fabric.FabricClient.QueryClient.GetApplicationTypeListAsync"/>. The pending provision operation can be interrupted using <see cref="M:System.Fabric.FabricClient.ApplicationManagementClient.UnprovisionApplicationAsync(System.String,System.String)"/>.</para>
+            </value>
         </member>
         <member name="T:System.Fabric.Description.ReplicaHealthQueryDescription">
             <summary>
@@ -7258,6 +7419,83 @@
             <para>The specified value was outside the range of integer values from zero to 100.</para>
             </exception>
         </member>
+        <member name="T:System.Fabric.Description.NodeTransitionDescription">
+            <summary>
+            Describes information about how a node should be transitioned, and is used with StartNodeTransitionAsync().  
+            This object should not be used directly, the derived classes should be used.
+            </summary>
+        </member>
+        <member name="M:System.Fabric.Description.NodeTransitionDescription.#ctor(System.Fabric.NodeTransitionType,System.Guid,System.String,System.Numerics.BigInteger)">
+            <summary>
+            Constructs a NodeTransitionDescription
+            </summary>
+            <param name="nodeTransitionType">Indicates the type of transition to perform.  NodeTransitionType.Start will start a stopped node.  NodeTransitionType.Stop will stop a node that is up.</param>
+            <param name="operationId">A Guid to identify this operation.  This should be unique, and should not be used with other operations.</param>        
+            <param name="nodeName">The name of the node to start or stop.  The name can be determined through GetNodeListAsync().</param>
+            <param name="nodeInstanceId">The node instance id of the target node.  This can be determined through GetNodeListAsync().</param>
+        </member>
+        <member name="M:System.Fabric.Description.NodeTransitionDescription.ToString">
+            <summary>
+            Prints a string representation of this object.
+            </summary>
+        </member>
+        <member name="P:System.Fabric.Description.NodeTransitionDescription.NodeTransitionType">
+            <summary>
+            NodeTransitionType determines what type of transition to perform.  Start will start a stopped node.  Stop will stop an up node.
+            </summary>
+        </member>
+        <member name="P:System.Fabric.Description.NodeTransitionDescription.OperationId">
+            <summary>
+            A Guid to identify this operation.  This should be unique, and should not be used with other operations.
+            </summary>
+        </member>
+        <member name="P:System.Fabric.Description.NodeTransitionDescription.NodeName">
+            <summary>
+            The name of the node to start or stop.  The name can be determined through GetNodeListAsync().
+            </summary>
+        </member>
+        <member name="P:System.Fabric.Description.NodeTransitionDescription.NodeInstanceId">
+            <summary>
+            The node instance id of the target node.  This can be determined through GetNodeListAsync().
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Description.NodeStartDescription">
+            <summary>
+            Describes information about how a node should be started using StartNodeTransitionAsync().  
+            </summary>
+        </member>
+        <member name="M:System.Fabric.Description.NodeStartDescription.#ctor(System.Guid,System.String,System.Numerics.BigInteger)">
+            <summary>
+            Create an instance of NodeStartDescription, which describes information about how a node should be started using StartNodeTransitionAsync().  
+            </summary>
+            <param name="operationId">A Guid to identify this operation.  This should be unique, and should not be used with other operations.</param>        
+            <param name="nodeName">The name of the node to start or stop.  The name can be determined through GetNodeListAsync().</param>
+            <param name="nodeInstanceId">The node instance id of the target node.  This can be determined through GetNodeListAsync().</param>
+        </member>
+        <member name="T:System.Fabric.Description.NodeStopDescription">
+            <summary>
+            Describes information about how a node should be stopped using StartNodeTransitionAsync().  
+            </summary>
+        </member>
+        <member name="M:System.Fabric.Description.NodeStopDescription.#ctor(System.Guid,System.String,System.Numerics.BigInteger,System.Int32)">
+            <summary>
+            Constructs a NodeTransitionDescription, which describes information about a node to stop.
+            </summary>        
+            <param name="operationId">A Guid to identify this operation.  This should be unique, and should not be used with other operations.</param>        
+            <param name="nodeName">The name of the node to start or stop.  The name can be determined through GetNodeListAsync().</param>
+            <param name="nodeInstanceId">The node instance id of the target node.  This can be determined through GetNodeListAsync().</param>
+            <param name="stopDurationInSeconds">The duration to keep the node stopped.  After this time expires, the node will automatically come back up.  The units is in seconds.  The minimum value is 600, the maximum is 14400.</param>
+        </member>
+        <member name="M:System.Fabric.Description.NodeStopDescription.ToString">
+            <summary>
+            Prints a string representation of the object.
+            </summary>        
+        </member>
+        <member name="P:System.Fabric.Description.NodeStopDescription.StopDurationInSeconds">
+            <summary>
+            The duration to keep the node stopped.  After this time expires, the node will automatically come back up.  The units is in seconds.  The minimum value is 600, the maximum is 14400.
+            </summary>
+        </member>
         <member name="T:System.Fabric.Description.UniformInt64RangePartitionSchemeDescription">
             <summary>
             <para>Describes a partitioning scheme where an integer range is allocated evenly across a number of partitions.</para>
@@ -7377,6 +7615,15 @@
             <summary>
             Verify the completion of the action.
             </summary>
+        </member>
+        <member name="M:System.Fabric.Common.FabricCluster.GetWriteQuorumSize(System.Int64)">
+            <summary>
+            Computes the minimum majority based write quorum size
+            </summary>
+            <param name="replicaSetSize">The size of the replica set whose write quorum size is to be calculated</param>
+            <returns>The size of the write quorum</returns>
+            <remarks>'replicaSetSize' can be an even or odd positive integer. If it is even, it has the form 2*m and the write quorum size is m+1 -- the minimum majority;
+            if the replicaSetSize is odd, it has the form 2*m+1 and the write quorum size is again m+1 -- the minimum majority.</remarks>
         </member>
         <member name="M:System.Fabric.Common.UnreliableTransportBehavior.AddFilterForPartitionId(System.Guid)">
             <summary>
@@ -7505,6 +7752,90 @@
             Parameters for system faults, e.g., FM Rebuild
             </summary>
         </member>
+        <member name="M:System.Fabric.Chaos.RandomActionGenerator.IsInfrastructureUpgradingAction.IsInfrastructureUpgradingActionHandler.GetInfrastructureServiceStatus(System.Fabric.FabricClient,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Fetches the current status of the InfraStructureService instances.
+            </summary>
+            <param name="fabricClient">The FabricClient to make API calls again the InfrastructureService</param>
+            <param name="operationTimeout">Total time of all retries.</param>
+            <param name="requestTimeout">Timeout for a single query.</param>
+            <param name="ct">CancellationToken</param>
+            <returns>A dictionary which provides status of all infrastructure service instances.</returns>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.CoordinatorStateData">
+            <summary>
+            Common base class for the 2 different types of coordinators that IS supports.
+            </summary>
+            <remarks>
+            There is little in common between the 2 coordinators of IS. Using this base class more for
+            minimizing change in other modules in this code base than for genuinely sharing common stuff.
+            </remarks>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.InfrastructureServiceMode">
+            <summary>
+            Modes of operation of the IS.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Chaos.Common.InfrastructureServiceMode.Serial">
+            <summary>
+            IS can process only one Azure infrastructure job at a time.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Chaos.Common.InfrastructureServiceMode.Parallel">
+            <summary>
+            IS can process multiple Azure infrastructure jobs at a time.
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.CoordinatorStateDataSerial">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.CoordinatorStateDataParallel">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.JobSummary">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.JobStepSummary">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.ImpactedRoleInstance">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.InfrastructureTaskStateData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.NodeTaskDescriptionData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.ManagementNotificationData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.JobData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Chaos.Common.JobCollectionData">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:System.Fabric.Chaos.RandomActionGenerator.StateTransitionAction">
             <summary>
             This class will represent an action on WindowsFabric cluster which gets generated during RandomSession.
@@ -7548,6 +7879,12 @@
             <summary>
             Action generator will create RestartNodeAction rather than StopNodeAction with this much probability.
             </summary>
+        </member>
+        <member name="M:System.Fabric.Chaos.RandomActionGenerator.PartitionEntity.GetFaultReadyReplicaList">
+            <summary>
+             Taking safe mode into account, returns the list of replicas which are ready to be faulted.
+            </summary>
+            <returns>Readonly list of faultready replicas</returns>
         </member>
         <member name="T:System.Fabric.Chaos.RandomActionGenerator.RandomExtensions">
             <summary>
@@ -8826,7 +9163,7 @@
               <para>The description of the application.</para>
             </param>
             <returns>
-              <para>The created Service Fabric application.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
               <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> 
@@ -8893,7 +9230,7 @@
             <para>Defines the maximum amount of time the system will allow this operation to continue before returning <see cref="T:System.TimeoutException"/>.</para>
             </param>
             <returns>
-              <para>The created Service Fabric application.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
               <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> 
@@ -8951,7 +9288,9 @@
             Updates a Service Fabric application.
             </summary>
             <param name="applicationUpdateDescription">Application update description.</param>
-            <returns>The updated Service Fabric application.</returns>
+            <returns>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
+            </returns>
             <exception cref="T:System.Fabric.FabricException">
                 <para>
                     <see cref="F:System.Fabric.FabricErrorCode.InvalidNameUri"/>: The application name is not a valid Naming URI.
@@ -8988,7 +9327,9 @@
             <param name="applicationUpdateDescription">Application update description.</param>
             <param name="timeout">Defines the maximum amount of time the system will allow this operation to continue before returning <see cref="T:System.TimeoutException"/>.</param>
             <param name="cancellationToken">The CancellationToken that the operation is observing. It can be used to propagate notification that the operation should be canceled.</param>
-            <returns>The updated Service Fabric application.</returns>
+            <returns>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
+            </returns>
             <exception cref="T:System.Fabric.FabricException">
                 <para>
                     <see cref="F:System.Fabric.FabricErrorCode.InvalidNameUri"/>: The application name is not a valid Naming URI.
@@ -9026,7 +9367,7 @@
             <para>The URI of the application instance name.</para>
             </param>
             <returns>
-            <para>The deleted application instance from the cluster.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9063,7 +9404,7 @@
             <para>The <see cref="T:System.Threading.CancellationToken"/> that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
             </param>
             <returns>
-            <para>The deleted application instance from the cluster.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9094,7 +9435,7 @@
             <para>The description of the application to be deleted.</para>
             </param>
             <returns>
-            <para>The deleted application instance from the cluster.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9132,7 +9473,7 @@
             <para>The <see cref="T:System.Threading.CancellationToken"/> that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
             </param>
             <returns>
-            <para>The deleted application instance from the cluster.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9164,7 +9505,7 @@
             <para>Relative path to the application package in the ImageStore location specified in the Cluster Manifest.</para>
             </param>
             <returns>
-            <para>The registered Service Fabric application.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9211,7 +9552,7 @@
         </member>
         <member name="M:System.Fabric.FabricClient.ApplicationManagementClient.ProvisionApplicationAsync(System.String,System.TimeSpan,System.Threading.CancellationToken)">
             <summary>
-            <para>Provision or register a  application type with the cluster.</para>
+            <para>Provision or register an application type with the cluster.</para>
             </summary>
             <param name="applicationBuildPath">
             <para>The relative path to the application package in the ImageStore location specified in the Cluster Manifest.</para>
@@ -9223,7 +9564,119 @@
             <para>The <see cref="T:System.Threading.CancellationToken"/> that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
             </param>
             <returns>
-            <para>The registered Service Fabric application.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ImageBuilderValidationError"/>: There are errors in the manifests being provisioned. </para>
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ApplicationTypeProvisionInProgress"/>: Another version of the application type is currently being provisioned. </para>
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.InvalidNameUri"/>: The application name is not a valid Naming URI.</para>
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.CorruptedImageStoreObjectFound"/>: A corrupted file was encountered on the ImageStore.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricElementAlreadyExistsException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ApplicationTypeAlreadyExists"/>: The application type has already been provisioned</para>
+            </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+            <para>There was an error accessing a file on the ImageStore.</para>
+            </exception>
+            <exception cref="T:System.IO.FileNotFoundException">
+            <para>A required file was not found on the ImageStore.</para>
+            </exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException">
+            <para>A required directory was not found on the ImageStore.</para>
+            </exception>
+            <exception cref="T:System.IO.PathTooLongException">
+            <para>A path to an ImageStore file/directory was too long.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ImageStoreIOException"/>: There was an IO error communicating with the ImageStore.</para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+            <para>The request timed out but may have already been accepted for processing by the system.</para>
+            </exception>
+            <exception cref="T:System.OperationCanceledException">
+            <para>The request was canceled before the timeout expired but may have already been accepted for processing by the system.</para>
+            </exception>
+            <remarks>
+            <para>This is mandatory before an application instance can be created.</para>
+            </remarks>
+        </member>
+        <member name="M:System.Fabric.FabricClient.ApplicationManagementClient.ProvisionApplicationAsync(System.Fabric.Description.ProvisionApplicationTypeDescription)">
+            <summary>
+            <para>Provision or register an application type with the cluster.</para>
+            </summary>
+            <param name="description">
+            <para>Description of the of provision request.</para>
+            </param>
+            <returns>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ImageBuilderValidationError"/>: There are errors in the manifests being provisioned. </para>
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ApplicationTypeProvisionInProgress"/>: Another version of the application type is currently being provisioned. </para>
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.InvalidNameUri"/>: The application name is not a valid Naming URI.</para>
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.CorruptedImageStoreObjectFound"/>: A corrupted file was encountered on the ImageStore.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricElementAlreadyExistsException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ApplicationTypeAlreadyExists"/>: The application type has already been provisioned</para>
+            </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+            <para>There was an error accessing a file on the ImageStore.</para>
+            </exception>
+            <exception cref="T:System.IO.FileNotFoundException">
+            <para>A required file was not found on the ImageStore.</para>
+            </exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException">
+            <para>A required directory was not found on the ImageStore.</para>
+            </exception>
+            <exception cref="T:System.IO.PathTooLongException">
+            <para>A path to an ImageStore file/directory was too long.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ImageStoreIOException"/>: There was an IO error communicating with the ImageStore.</para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+            <para>The request timed out but may have already been accepted for processing by the system.</para>
+            </exception>
+            <exception cref="T:System.OperationCanceledException">
+            <para>The request was canceled before the timeout expired but may have already been accepted for processing by the system.</para>
+            </exception>
+            <remarks>
+            <para>This is mandatory before an application instance can be created.</para>
+            </remarks>
+        </member>
+        <member name="M:System.Fabric.FabricClient.ApplicationManagementClient.ProvisionApplicationAsync(System.Fabric.Description.ProvisionApplicationTypeDescription,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            <para>Provision or register an application type with the cluster.</para>
+            </summary>
+            <param name="description">
+            <para>Description of the of provision request.</para>
+            </param>
+            <param name="timeout">
+            <para>The maximum amount of time the system will allow this operation to continue before returning <see cref="T:System.TimeoutException"/>.</para>
+            </param>
+            <param name="cancellationToken">
+            <para>The <see cref="T:System.Threading.CancellationToken"/> that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
+            </param>
+            <returns>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9279,7 +9732,7 @@
             <para>The version of the application type.</para>
             </param>
             <returns>
-            <para>The removed Service Fabric application type from the cluster.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9319,7 +9772,7 @@
             <para>The <see cref="T:System.Threading.CancellationToken"/> that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
             </param>
             <returns>
-            <para>The removed Service Fabric application type from the cluster.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9350,7 +9803,7 @@
               <para>The description of the upgrade policy and the application to be upgrade.</para>
             </param>
             <returns>
-              <para>The upgraded application instance.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
               <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9410,7 +9863,7 @@
             <para>The token that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
             </param>
             <returns>
-              <para>The upgraded application instance.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
               <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9464,7 +9917,7 @@
             <para>Description of parameters to modify. Unspecified parameters are left unmodified and will retain their current value in the upgrade.</para>
             </param>
             <returns>
-            <para>Returns <see cref="T:System.Threading.Tasks.Task"/>.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricException">
             <para>
@@ -9485,7 +9938,7 @@
             <para>The token that the operation is observing. It can be used to propagate a notification that the operation should be canceled.</para>
             </param>
             <returns>
-            <para>Returns <see cref="T:System.Threading.Tasks.Task"/>.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricException">
             <para>
@@ -9500,7 +9953,7 @@
             <para>Name of the application</para>
             </param>
             <returns>
-            <para>Returns <see cref="T:System.Threading.Tasks.Task"/>.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricException">
             <para>
@@ -9521,7 +9974,7 @@
             <para>The <see cref="T:System.Threading.CancellationToken"/> that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
             </param>
             <returns>
-            <para>Returns <see cref="T:System.Threading.Tasks.Task"/>.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
         </member>
         <member name="M:System.Fabric.FabricClient.ApplicationManagementClient.GetApplicationUpgradeProgressAsync(System.Uri)">
@@ -9532,7 +9985,7 @@
             <para>The URI of the application instance name.</para>
             </param>
             <returns>
-            <para>The upgrade progress of the specified application instance.</para>
+            <para>A <see cref="T:System.Threading.Tasks.Task"/> whose result is the upgrade progress of the specified application instance.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9562,7 +10015,7 @@
             <para>The <see cref="T:System.Threading.CancellationToken"/> that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
             </param>
             <returns>
-            <para>The upgrade progress of the specified application instance.</para>
+            <para>A <see cref="T:System.Threading.Tasks.Task"/> whose result is the upgrade progress of the specified application instance.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9586,7 +10039,7 @@
             <para>–The Upgrade progress of the application instance of interest. This provides information about the next upgrade domain to be upgraded.</para>
             </param>
             <returns>
-            <para>The upgraded application instance.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9619,7 +10072,7 @@
             <para>The <see cref="T:System.Threading.CancellationToken"/> that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
             </param>
             <returns>
-            <para>The upgraded application instance.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -9664,7 +10117,7 @@
               <para>The <see cref="T:System.Threading.CancellationToken"/>that the operation is observing. It can be used to propagate notification that the operation should be canceled</para>
             </param>
             <returns>
-              <para>Returns <see cref="T:System.Threading.Tasks.Task"/>.</para>
+              <para>A <see cref="T:System.Threading.Tasks.Task"/> representing the operation.</para>
             </returns>
         </member>
         <member name="M:System.Fabric.FabricClient.ApplicationManagementClient.GetApplicationManifestAsync(System.String,System.String)">
@@ -9678,7 +10131,7 @@
             <para>The type version as specified in the Application Manifest.</para>
             </param>
             <returns>
-            <para>A Task whose result is the raw XML string contents of the Application Manifest.</para>
+            <para>A <see cref="T:System.Threading.Tasks.Task"/> whose result is the raw XML string contents of the Application Manifest.</para>
             </returns>
             <exception cref="F:System.Fabric.FabricErrorCode.ApplicationTypeNotFound">
             <para>The requested application type and version has not been provisioned.</para>
@@ -9701,7 +10154,7 @@
             <para>The <see cref="T:System.Threading.CancellationToken"/> that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
             </param>
             <returns>
-            <para>A Task whose result is the raw XML string contents of the Application Manifest.</para>
+            <para>A <see cref="T:System.Threading.Tasks.Task"/> whose result is the raw XML string contents of the Application Manifest.</para>
             </returns>
             <exception cref="F:System.Fabric.FabricErrorCode.ApplicationTypeNotFound">
             <para>The requested application type and version has not been provisioned.</para>
@@ -17764,7 +18217,7 @@
             <para>Gets the details for all applications created in the system.</para>
             </summary>
             <returns>
-            <para>A task that represents the asynchronous operation.</para>
+            <para>A task that represents the asynchronous query operation. The value of TResult parameter is an <see cref="T:System.Fabric.Query.ApplicationList"/>.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
@@ -17790,7 +18243,7 @@
             <para>The application name to get details for.</para>
             </param>
             <returns>
-            <para>A task that represents the asynchronous operation.</para>
+            <para>A task that represents the asynchronous query operation. The value of TResult parameter is an <see cref="T:System.Fabric.Query.ApplicationList"/>. If the provided application name has no matching applications, it will return a list of 0 entries.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>
@@ -17818,7 +18271,7 @@
             <para>The continuation token obtained from a previous query.</para>
             </param>
             <returns>
-            <para>A task that represents the asynchronous operation. It contains the list of applications as <see cref="T:System.Fabric.Query.ApplicationList"/>.</para>
+            <para>A task that represents the asynchronous query operation. The value of TResult parameter is an <see cref="T:System.Fabric.Query.ApplicationList"/>. If the provided application name has no matching applications, it will return a list of 0 entries.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>
@@ -17847,7 +18300,7 @@
             <para>Propagates notification that operations should be canceled.</para>
             </param>
             <returns>
-            <para>A task that represents the asynchronous operation.</para>
+            <para>A task that represents the asynchronous query operation. The value of TResult parameter is an <see cref="T:System.Fabric.Query.ApplicationList"/>. If the provided application name has no matching applications, it will return a list of 0 entries.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>
@@ -17881,7 +18334,7 @@
             <para>Propagates notification that operation should be canceled.</para>
             </param>
             <returns>
-            <para>A task that represents the asynchronous operation. It contains the list of applications as <see cref="T:System.Fabric.Query.ApplicationList"/>.</para>
+            <para>A task that represents the asynchronous query operation. The value of TResult parameter is an <see cref="T:System.Fabric.Query.ApplicationList"/>. If the provided application name has no matching applications, it will return a list of 0 entries.</para>
             </returns>
             <exception cref="T:System.Fabric.FabricObjectClosedException">
             <para>
@@ -19509,6 +19962,70 @@
             <para>The request timed out.</para>
             </exception>
         </member>
+        <member name="M:System.Fabric.FabricClient.QueryClient.GetServiceNameAsync(System.Guid,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            <para>Gets the service name for the specified partition.</para>
+            </summary>
+            <param name="partitionId">
+            <para>The id of the partition.</para>
+            </param>
+            <param name="timeout">
+            <para>Specifies the duration this operation has to complete before timing out.</para>
+            </param>
+            <param name="cancellationToken">
+            <para>Propagates notification that operations should be canceled.</para>
+            </param>
+            <returns>
+            <para>The service name of the partition.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>
+                See <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+            <para>
+                See <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+            <para>
+                See also <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+        </member>
+        <member name="M:System.Fabric.FabricClient.QueryClient.GetApplicationNameAsync(System.Uri,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            <para>Gets the application name for the specified service.</para>
+            </summary>
+            <param name="serviceName">
+            <para>The name of the service.</para>
+            </param>
+            <param name="timeout">
+            <para>Specifies the duration this operation has to complete before timing out.</para>
+            </param>
+            <param name="cancellationToken">
+            <para>Propagates notification that operations should be canceled.</para>
+            </param>
+            <returns>
+            <para>A task that represents the asynchronous operation.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>The <see cref="T:System.Fabric.FabricClient"/> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient"/> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient"/> object.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>
+                See <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+            <para>
+                See <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+            <para>
+                See also <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+        </member>
         <member name="T:System.Fabric.FabricClient.RepairManagementClient">
             <summary>
             <para>Provides methods for managing repair tasks.</para>
@@ -19734,6 +20251,61 @@
             </param>
             <returns>
             <para>The list of repair tasks matching all of the given filters.</para>
+            </returns>
+        </member>
+        <member name="M:System.Fabric.FabricClient.RepairManagementClient.UpdateRepairTaskHealthPolicyAsync(System.String,System.Int64,System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            <para>Updates the health policy of the given repair task.</para>
+            </summary>
+            <param name="repairTaskId">
+            <para>The ID of the repair task for which the health policy is to be updated.</para>
+            </param>
+            <param name="version">
+            <para>The current version number of the repair task. If non-zero, then the request will only succeed if this value matches the actual current value of the repair task. If zero, then no version check is performed.</para>
+            </param>
+            <param name="performPreparingHealthCheck">
+            <para>
+            A nullable boolean indicating if health check is to be performed in the Preparing stage of the repair task.
+            Specify <c>null</c> for this parameter if the existing value should not be altered. Otherwise, specify the desired new value. 
+            </para>
+            </param>
+            <param name="performRestoringHealthCheck">
+            <para>
+            A nullable boolean indicating if health check is to be performed in the Restoring stage of the repair task.
+            Specify <c>null</c> for this parameter if the existing value should not be altered. Otherwise, specify the desired new value. 
+            </para>
+            </param>            
+        </member>
+        <member name="M:System.Fabric.FabricClient.RepairManagementClient.UpdateRepairTaskHealthPolicyAsync(System.String,System.Int64,System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            <para>Updates the health policy of the given repair task.</para>
+            </summary>
+            <param name="repairTaskId">
+            <para>The ID of the repair task for which the health policy is to be updated.</para>
+            </param>
+            <param name="version">
+            <para>The current version number of the repair task. If non-zero, then the request will only succeed if this value matches the actual current value of the repair task. If zero, then no version check is performed.</para>
+            </param>
+            <param name="performPreparingHealthCheck">
+            <para>
+            A nullable boolean indicating if health check is to be performed in the Preparing stage of the repair task.
+            Specify <c>null</c> for this parameter if the existing value should not be altered. Else, specify the appropriate <c>bool</c> value. 
+            </para>
+            </param>
+            <param name="performRestoringHealthCheck">
+            <para>
+            A nullable boolean indicating if health check is to be performed in the Restoring stage of the repair task.
+            Specify <c>null</c> for this parameter if the existing value should not be altered. Else, specify the appropriate <c>bool</c> value. 
+            </para>
+            </param>            
+            <param name="timeout">
+            <para>The maximum amount of time Service Fabric will allow this operation to continue before returning a <see cref="T:System.TimeoutException"/>.</para>
+            </param>
+            <param name="cancellationToken">
+            <para>The optional cancellation token that the operation is observing. It can be used to send a notification that the operation should be canceled. Note that cancellation is advisory and that the operation may still be completed even if it is cancelled.</para>
+            </param>
+            <returns>
+            <para>A task representing the asynchronous operation.</para>
             </returns>
         </member>
         <member name="T:System.Fabric.FabricClient.ServiceGroupManagementClient">
@@ -22136,6 +22708,33 @@
             The FaultAnalysisService must be enabled to use this API.
             </para>
             </remarks>
+        </member>
+        <member name="M:System.Fabric.FabricClient.TestManagementClient.StartNodeTransitionAsync(System.Fabric.Description.NodeTransitionDescription,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Starts or stops a cluster node.  A cluster node is a process, not the OS instance itself.  To start a node, pass in an object of type NodeStartDescription into 
+            the description parameter.  To stop a node, pass in an object of type NodeStopDescription.  After this API returns, call GetNodeTransitionProgressAsync()
+            to get progress on the operation.
+            </summary>
+            <param name="description">An object which describes what type of node transition to perform.  The transition can be to start or stop a node.</param>            
+            <param name="operationTimeout">The timeout for this API call.</param>
+            <param name="token">The cancellationToken</param>
+            <remarks>The FaultAnalysisService must be enabled to use this API.</remarks>
+            <returns>A task</returns>
+            <exception cref="T:System.Fabric.FabricException">The <see cref="P:System.Fabric.FabricException.ErrorCode"/> property will indicate the reason.        
+              If the errorCode is InstanceIdMismatch, the nodeInstance provided does not match the instance of the node that was stopped.      
+            </exception>
+            <exception cref="T:System.TimeoutException">The operation timed out.</exception>
+            <exception cref="T:System.ArgumentNullException">An argument with a value of null was passed in.</exception>                 
+        </member>
+        <member name="M:System.Fabric.FabricClient.TestManagementClient.GetNodeTransitionProgressAsync(System.Guid,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Gets the progress of a command started using StartNodeTransitionAsync().
+            </summary>
+            <param name="operationId">The operationId passed in when the test command was started using StartNodeTransitionAsync().</param>
+            <param name="timeout">Timeout.</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <remarks>The FaultAnalysisService must be enabled to use this API.</remarks>
+            <returns>A PartitionRestartProgress object, containing TestCommandProgressState and PartitionRestartResult.</returns>
         </member>
         <member name="M:System.Fabric.FabricClient.TestManagementClient.CleanTestStateAsync">
             <summary>
@@ -24756,6 +25355,51 @@
         <member name="F:System.Fabric.FabricErrorCode.FabricDataRootNotFound">
             <summary>
             Fabric Data Root is not defined on the target machine.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.FabricErrorCode.InvalidRestoreData">
+            <summary>
+            Indicates that restore metadata present in supplied restore directory in invalid.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.FabricErrorCode.DuplicateBackups">
+            <summary>
+            Indicates that backup-chain in specified restore directory contains duplicate backups.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.FabricErrorCode.InvalidBackupChain">
+            <summary>
+            Indicates that backup-chain in specified restore directory has one or more missing backups.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.FabricErrorCode.StopInProgress">
+            <summary>
+            An operation is already in progress.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.FabricErrorCode.AlreadyStopped">
+            <summary>
+            The node is already in a stopped state
+            </summary>
+        </member>
+        <member name="F:System.Fabric.FabricErrorCode.NodeIsDown">
+            <summary>
+            The node is down (not stopped).
+            </summary>
+        </member>
+        <member name="F:System.Fabric.FabricErrorCode.NodeTransitionInProgress">
+            <summary>
+            Node transition in progress
+            </summary>
+        </member>
+        <member name="F:System.Fabric.FabricErrorCode.InvalidInstanceId">
+            <summary>
+            The provided instance id is invalid.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.FabricErrorCode.InvalidDuration">
+            <summary>
+            The provided duration is invalid.
             </summary>
         </member>
         <member name="T:System.Fabric.FabricInvalidPartitionKeyException">
@@ -33199,6 +33843,16 @@
             in a scenario where backup is used mainly to truncate logs.
             </summary>            
         </member>
+        <member name="T:System.Fabric.Interop.NativeTypes.FABRIC_REPAIR_TASK_HEALTH_POLICY_UPDATE_SETTINGS_FLAGS">
+            <summary>
+            These flags determine which <see cref="T:System.Fabric.Interop.NativeTypes.FABRIC_REPAIR_TASK_HEALTH_POLICY_UPDATE_DESCRIPTION"/>
+            should be used while updating the repair task policy. 
+            For each member in <see cref="T:System.Fabric.Interop.NativeTypes.FABRIC_REPAIR_TASK_HEALTH_POLICY_UPDATE_DESCRIPTION"/> that is
+            updatable after the repair task is created, there exists a corresponding flag
+            below. Only if the flag is set, will the member be updated when making the API
+            call <see cref="M:System.Fabric.Interop.NativeClient.IFabricRepairManagementClient2.BeginUpdateRepairTaskHealthPolicy(System.IntPtr,System.UInt32,System.Fabric.Interop.NativeCommon.IFabricAsyncOperationCallback)"/>.
+            </summary>
+        </member>
         <member name="T:System.Fabric.Interop.NativeTypes.FABRIC_STORE_BACKUP_OPTION">
             <summary>
             Backup options for the store.
@@ -33244,12 +33898,35 @@
             Update metrics and capacities.
             </summary>
         </member>
+        <member name="T:System.Fabric.Interop.NativeTypes.FABRIC_REPAIR_TASK_HEALTH_POLICY_UPDATE_DESCRIPTION">
+            <summary>
+            The description structure passed to IFabricRepairManagermentClient2.BeginUpdateRepairTaskHealthPolicy
+            to update the health policy.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Interop.NativeTypes.FABRIC_REPAIR_TASK_HEALTH_POLICY_UPDATE_DESCRIPTION.Flags">
+            <summary>
+            <see cref="T:System.Fabric.Interop.NativeTypes.FABRIC_REPAIR_TASK_HEALTH_POLICY_UPDATE_SETTINGS_FLAGS"/> to determine
+            which members of this structure should be used for updating health policy.
+            E.g. if we pass in PerformPreparingHealthCheck = false in 
+            <see cref="M:System.Fabric.Interop.NativeClient.IFabricRepairManagementClient2.BeginUpdateRepairTaskHealthPolicy(System.IntPtr,System.UInt32,System.Fabric.Interop.NativeCommon.IFabricAsyncOperationCallback)"/>, does it mean
+            unset the health check for the repair task or leave it unchanged from
+            whatever state it was in during repair task creation?
+            By checking this flag for the corresponding bit, we can determine
+            whether to set/unset the boolean member.
+            </summary>
+        </member>
         <member name="T:System.Fabric.Interop.NativeTypes.FABRIC_START_NODE_DESCRIPTION_USING_NODE_NAME">
             <summary>
             StartNode
             </summary>
         </member>
         <member name="T:System.Fabric.Interop.NativeTypes.FABRIC_STOP_NODE_DESCRIPTION_USING_NODE_NAME">
+            <summary>
+            StopNode
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Interop.NativeTypes.FABRIC_STOP_NODE_DESCRIPTION_INTERNAL">
             <summary>
             StopNode
             </summary>
@@ -34767,6 +35444,12 @@
             Returns the full copy mode.
             </value>
         </member>
+        <member name="P:System.Fabric.KeyValueStoreReplicaSettings.LogTruncationIntervalInMinutes">
+            <summary>
+            Gets or sets the interval after which <see cref="T:System.Fabric.KeyValueStoreReplica"/> tries to truncate local store logs
+            if local store has <see cref="P:System.Fabric.LocalEseStoreSettings.EnableIncrementalBackup"/> enabled and no backup has been initiated by user during this interval.
+            </summary>
+        </member>
         <member name="T:System.Fabric.KeyValueStoreTransactionSettings">
             <summary>
             <para>Specifies the optional settings to describe the behavior of transactions supported by <see cref="T:System.Fabric.KeyValueStoreReplica"/>.</para>
@@ -35519,6 +36202,26 @@
             <value>
             <para>Returns <see cref="T:System.Numerics.BigInteger"/>.</para>
             </value>
+        </member>
+        <member name="T:System.Fabric.NodeTransitionType">
+            <summary>
+            <para>Describes the type of node transition</para>
+            </summary>    
+        </member>
+        <member name="F:System.Fabric.NodeTransitionType.Invalid">
+            <summary>
+            <para>Indicates that the node transition type is invalid. This value is not used.</para>
+            </summary>
+        </member>
+        <member name="F:System.Fabric.NodeTransitionType.Start">
+            <summary>
+            <para>Indicates that the node should be started.</para>
+            </summary>        
+        </member>
+        <member name="F:System.Fabric.NodeTransitionType.Stop">
+            <summary>
+            <para>Indicates that the node should be stopped.</para>
+            </summary>        
         </member>
         <member name="T:System.Fabric.OperationData">
             <summary>
@@ -36563,6 +37266,22 @@
             <para>The application type version.</para>
             </value>
         </member>
+        <member name="P:System.Fabric.Query.ApplicationType.Status">
+            <summary>
+            <para>Gets the application type status.</para>
+            </summary>
+            <value>
+            <para>The application type status.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.Query.ApplicationType.StatusDetails">
+            <summary>
+            <para>Gets the application type status details.</para>
+            </summary>
+            <value>
+            <para>The application type status details.</para>
+            </value>
+        </member>
         <member name="P:System.Fabric.Query.ApplicationType.DefaultParameters">
             <summary>
             <para>Gets the default application parameters applied to this instance of the application.</para>
@@ -36570,6 +37289,36 @@
             <value>
             <para>The default application parameters applied to this instance of the application.</para>
             </value>
+        </member>
+        <member name="T:System.Fabric.Query.ApplicationTypeStatus">
+            <summary>
+            Specifies the status of the application type.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Query.ApplicationTypeStatus.Invalid">
+            <summary>
+            Invalid.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Query.ApplicationTypeStatus.Provisioning">
+            <summary>
+            Currently being provisioned.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Query.ApplicationTypeStatus.Available">
+            <summary>
+            Currently available for use.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Query.ApplicationTypeStatus.Unprovisioning">
+            <summary>
+            Currently being unprovisioned.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Query.ApplicationTypeStatus.Failed">
+            <summary>
+            Unavailable for use due to provisioning failure.
+            </summary>
         </member>
         <member name="T:System.Fabric.Query.ClusterLoadInformation">
             <summary>
@@ -38930,6 +39679,24 @@
             <para>The node up time.</para>
             </value>
         </member>
+        <member name="P:System.Fabric.Query.Node.NodeUpTimeInSeconds">
+            <summary>
+            Used by the serializer
+            </summary>
+        </member>
+        <member name="P:System.Fabric.Query.Node.NodeDownTime">
+            <summary>
+            <para>Gets the node down time.</para>
+            </summary>
+            <value>
+            <para>The node down time.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.Query.Node.NodeDownTimeInSeconds">
+            <summary>
+            Used by the serializer
+            </summary>
+        </member>
         <member name="P:System.Fabric.Query.Node.HealthState">
             <summary>
             <para>Gets the health state.</para>
@@ -38988,6 +39755,16 @@
             </summary>
             <value>
             <para>The node deactivation information.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.Query.Node.IsStopped">
+            <summary>
+            <para>
+            True if a node is stopped.  A node is in a stopped state if it was the target of a successful call to StartNodeTransitionAsync with a NodeTransitionType of Stop.
+            </para>
+            </summary>
+            <value>
+            <para>Whether or not a node is stopped</para>
             </value>
         </member>
         <member name="T:System.Fabric.Query.NodeStatus">
@@ -39958,14 +40735,6 @@
             </summary>
             <value>
             <para>The last in build duration.</para>
-            </value>
-        </member>
-        <member name="P:System.Fabric.Query.Replica.ReplicaInstanceId">
-            <summary>
-            <para>Gets the replica instace identifier.</para>
-            </summary>
-            <value>
-            <para>The replica instance identifier.</para>
             </value>
         </member>
         <member name="P:System.Fabric.Query.Replica.LastInBuildDurationInSeconds">
@@ -41095,6 +41864,70 @@
             <para>The time when the repair task entered the Completed state.</para>
             </value>
         </member>
+        <member name="P:System.Fabric.Repair.RepairTask.PreparingHealthCheckStartTimestamp">
+            <summary>
+            <para>Gets the time when the repair task started the health check in the Preparing state.</para>
+            </summary>
+            <value>
+            <para>The time when the repair task started the health check in the Preparing state.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.Repair.RepairTask.PreparingHealthCheckEndTimestamp">
+            <summary>
+            <para>Gets the time when the repair task completed the health check in the Preparing state.</para>
+            </summary>
+            <value>
+            <para>The time when the repair task completed the health check in the Preparing state.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.Repair.RepairTask.RestoringHealthCheckStartTimestamp">
+            <summary>
+            <para>Gets the time when the repair task started the health check in the Restoring state.</para>
+            </summary>
+            <value>
+            <para>The time when the repair task started the health check in the Restoring state.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.Repair.RepairTask.RestoringHealthCheckEndTimestamp">
+            <summary>
+            <para>Gets the time when the repair task completed the health check in the Restoring state.</para>
+            </summary>
+            <value>
+            <para>The time when the repair task completed the health check in the Restoring state.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.Repair.RepairTask.PreparingHealthCheckState">
+            <summary>
+            <para>Gets the workflow state of the health check when the repair task is in the Preparing state.</para>
+            </summary>
+            <value>
+            <para>The workflow state of the health check when the repair task is in the Preparing state.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.Repair.RepairTask.RestoringHealthCheckState">
+            <summary>
+            <para>Gets the workflow state of the health check when the repair task is in the Restoring state.</para>
+            </summary>
+            <value>
+            <para>The workflow state of the health check when the repair task is in the Restoring state.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.Repair.RepairTask.PerformPreparingHealthCheck">
+            <summary>
+            <para>Gets or sets a value to determine if health checks have to be performed when the repair task enters the Preparing state.</para>
+            </summary>
+            <value>
+            <para>A value to determine if health checks have to be performed when the repair task enters the Preparing state.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.Repair.RepairTask.PerformRestoringHealthCheck">
+            <summary>
+            <para>Gets or sets a value to determine if health checks have to be performed when the repair task enters the Restoring state.</para>
+            </summary>
+            <value>
+            <para>A value to determine if health checks have to be performed when the repair task enters the Restoring state.</para>
+            </value>
+        </member>
         <member name="M:System.Fabric.Repair.ClusterRepairTask.#ctor(System.String,System.String)">
             <summary>
             <para>Initializes a new instance of the <see cref="T:System.Fabric.Repair.ClusterRepairTask"/> class.</para>
@@ -41176,6 +42009,11 @@
         <member name="F:System.Fabric.Repair.NodeImpactLevel.RemoveData">
             <summary>
             <para>Indicates that the node is expected to stop, and may lose all of its persisted state prior to restarting.</para>
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Repair.NodeImpactLevel.RemoveNode">
+            <summary>
+            <para>Indicates that the node is to be removed from the cluster.</para>
             </summary>
         </member>
         <member name="T:System.Fabric.Repair.NodeRepairImpactDescription">
@@ -41492,6 +42330,13 @@
             otherwise, <languageKeyword>false</languageKeyword>.</para>
             </value>
         </member>
+        <member name="T:System.Fabric.Repair.RepairTaskHealthPolicyUpdateDescription">
+            <summary>
+            Class used for simplifying passing in parameters from clients. 
+            Currently this exists just for testability client (test harness) to invoke via REST
+            and hence is marked as internal
+            </summary>
+        </member>
         <member name="T:System.Fabric.Repair.RepairTaskResult">
             <summary>
             <para>Specifies the result of the repair task.</para>
@@ -41635,6 +42480,38 @@
         <member name="F:System.Fabric.Repair.RepairTaskStateFilter.All">
             <summary>
             <para>Includes all repair tasks, regardless of state.</para>
+            </summary>
+        </member>
+        <member name="T:System.Fabric.Repair.RepairTaskHealthCheckState">
+            <summary>
+            <para>Specifies the workflow state of a repair task's health check when the repair 
+            task enters either the Preparing or Restoring state.</para>
+            </summary>
+            <remarks>Separate health checks are done when a repair task enters the Preparing and Restoring states.</remarks>
+        </member>
+        <member name="F:System.Fabric.Repair.RepairTaskHealthCheckState.NotStarted">
+            <summary>
+            Indicates that the health check hasn't started.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Repair.RepairTaskHealthCheckState.InProgress">
+            <summary>
+            Indicates that the health check is in progress
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Repair.RepairTaskHealthCheckState.Succeeded">
+            <summary>
+            Indicates that the health check succeeded.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Repair.RepairTaskHealthCheckState.Skipped">
+            <summary>
+            Indicates that the health check was skipped.
+            </summary>
+        </member>
+        <member name="F:System.Fabric.Repair.RepairTaskHealthCheckState.TimedOut">
+            <summary>
+            Indicates that the health check timed out.
             </summary>
         </member>
         <member name="T:System.Fabric.Repair.SystemNodeRepairAction">
@@ -42784,6 +43661,22 @@
             </summary>
             <value>The partition selected by the test command.</value>
         </member>
+        <member name="T:System.Fabric.Result.NodeCommandResult">
+            <summary>
+            Returns node command result object.
+            </summary>    
+        </member>
+        <member name="M:System.Fabric.Result.NodeCommandResult.ToString">
+            <summary>
+            Returns the string representation of the Exception, if the command failed.
+            </summary>
+        </member>
+        <member name="P:System.Fabric.Result.NodeCommandResult.NodeResult">
+            <summary>
+            Gets the NodeResult object, which contains the information about the target node.
+            </summary>
+            <value>The NodeResult object.</value>
+        </member>
         <member name="T:System.Fabric.Result.RestartNodeResult">
             <summary>
             Returns Restart node result object.
@@ -43865,6 +44758,29 @@
             </summary>
             <value>
             <para>The backup option used</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.StoreBackupInfo.BackupChainId">
+            <summary>
+            <para>
+            Gets the ID of backup-chain to which this backup belongs. A backup chain contains
+            one full backup and zero or more continuous incremental backup(s) and starts at full backup. 
+            </para>
+            </summary>
+            <value>
+            <para>The ID of backup chain.</para>
+            </value>
+        </member>
+        <member name="P:System.Fabric.StoreBackupInfo.BackupIndex">
+            <summary>
+            <para>
+            Gets the index of this backup in the backup-chain to which this backup belongs.
+            A backup chain contains one full backup and zero or more continuous incremental backup(s).
+            and starts at full backup. Since full backup starts the chain, its backup index is always zero.
+            </para>
+            </summary>
+            <value>
+            <para>The backup index of current backup.</para>
             </value>
         </member>
         <member name="T:System.Fabric.Query.PagedListHelper">

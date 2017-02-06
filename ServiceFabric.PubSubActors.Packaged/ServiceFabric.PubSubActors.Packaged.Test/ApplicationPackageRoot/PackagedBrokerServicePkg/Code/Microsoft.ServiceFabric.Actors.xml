@@ -1594,7 +1594,8 @@
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.OnDeactivateAsync">
             <summary>
-             Override this method to release any resources including unregistering the timers. This method is called right before the actor is deactivated. 
+             Override this method to release any resources. This method is called when actor is deactivated (garbage collected by Actor Runtime).
+             Actor operations like state changes should not be called from this method.
             </summary>
             <returns>A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding OnDeactivateAsync operation.</returns>
         </member>
@@ -2648,6 +2649,34 @@
             A <see cref="T:System.Fabric.LocalStoreSettings"/> that describes local key value store settings.
             </param>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.#ctor(System.Boolean)">
+            <summary>
+            Creates an instance of <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider"/> with specified settings.
+            </summary>
+            <param name="enableIncrementalBackup">
+            Indicates whether to enable incremental backup feature.
+            This sets the <see cref="P:System.Fabric.LocalEseStoreSettings.EnableIncrementalBackup"/> setting.
+            </param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.#ctor(System.Boolean,System.Int32)">
+            <summary>
+            Creates an instance of <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider"/> with specified settings.
+            </summary>
+            <param name="enableIncrementalBackup">
+            Indicates whether to enable incremental backup feature.
+            This sets the <see cref="P:System.Fabric.LocalEseStoreSettings.EnableIncrementalBackup"/> setting.
+            </param>
+            <param name="logTruncationIntervalInMinutes">
+            Indicates the interval after which <see cref="T:System.Fabric.KeyValueStoreReplica"/> tries to truncate local store logs.
+            </param>
+            <remarks>
+            When incremental backup is enabled for <see cref="T:System.Fabric.KeyValueStoreReplica"/>, it does not use circular buffer
+            to manage its transaction logs and periodically truncates the logs both on primary and secondary replica(s).
+            The process of taking backup(s) automatically truncates logs. On the primary replica, if no user backup
+            is initiated for <paramref name="logTruncationIntervalInMinutes"/>, <see cref="T:System.Fabric.KeyValueStoreReplica"/>
+            automatically truncates the logs.
+            </remarks>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.Microsoft#ServiceFabric#Actors#Runtime#IActorStateProvider#Initialize(Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation)">
             <summary>
             Initializes the actor state provider with type information
@@ -2973,156 +3002,45 @@
             actor an exception of type <see cref="T:System.Fabric.FabricException"/> will be thrown.
             </summary>
         </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider">
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ReliableCollectionsActorStateProvider">
             <summary>
-            Actor state provider that uses a ReliableDictionary for actor storage.
+            Provides an implementation of <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider"/> which 
+            uses <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/> to store and persist the actor state.
             </summary>
         </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.LogicalTimestampKey">
-            <summary>
-            Logical timestamp key.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.DefaultTransientErrorRetryDelayInSeconds">
-            <summary>
-            Default back off for transient exceptions.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.actorPresenceStateProviderName">
-            <summary>
-            Uri for the actor presence state provider dictionary.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.stateProviderName">
-            <summary>
-            Uri for the actor state provider dictionary.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.reminderStateProviderName">
-            <summary>
-            Uri for the reminder state provider dictionary.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.logicalTimeStateProviderName">
-            <summary>
-            Uri for the logical time state provider dictionary.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.stateManager">
-            <summary>
-            Gets the fabric store replica. This component provides data storage and replication.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.replicaRole">
-            <summary>
-            Role of this replica
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.logicalTimeManager">
-            <summary>
-            Volatile logical time manager.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.actorPresencestateProvider">
-            <summary>
-            State provider to keep track of all existing actors.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.stateProvider">
-            <summary>
-            Internal state provider.
-            </summary>
-            TODO: This should not be byte[].
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.reminderStateProvider">
-            <summary>
-            Reminder state provider.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.logicalTimeStateProvider">
-            <summary>
-            Logical time state provider.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.IsStateProvidersInitialized">
-            <summary>
-            Indicates if the state providers have been initialized.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.transientErrorRetryDelay">
-            <summary>
-            Back off for transient errors.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.#ctor">
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReliableCollectionsActorStateProvider.#ctor">
             <summary>
             Initializes a new instance of the ReliableDictionaryActorStateProvider class.
             </summary>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.#ctor(System.TimeSpan)">
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReliableCollectionsActorStateProvider.#ctor(Microsoft.ServiceFabric.Data.ReliableStateManagerConfiguration)">
             <summary>
-            Initializes a new instance of the ReliableDictionaryActorStateProvider class.
+            Initializes a new instance of the ReliableDictionaryActorStateProvider class 
+            with specified configuration.
             </summary>
-            <param name="retryDelay">Back off for retries.</param>
+            <param name="stateManagerConfig">
+            A <see cref="T:Microsoft.ServiceFabric.Data.ReliableStateManagerConfiguration"/> that describes <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/> configuration. 
+            </param>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.Microsoft#ServiceFabric#Data#IStateProviderReplica#CloseAsync(System.Threading.CancellationToken)">
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReliableCollectionsActorStateProvider.#ctor(Microsoft.ServiceFabric.Data.ReliableStateManagerConfiguration,System.Int32,System.Int32)">
             <summary>
-            Close of the replica.
+            Initializes a new instance of the ReliableDictionaryActorStateProvider class 
+            with specified configuration.
             </summary>
-            <param name="cancellationToken">The cancelation token.</param>
-            <returns>Task that represents the asynchronous operation.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.Microsoft#ServiceFabric#Data#IStateProviderReplica#Abort">
-            <summary>
-            Abort of the replica.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.InitializeStateProvidersAsync(System.Threading.CancellationToken)">
-            <summary>
-            Creates or finds the singleton state provider.
-            </summary>
-            <returns>Task that represents the asynchronous operation.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.CreateReminderStorageKey(Microsoft.ServiceFabric.Actors.ActorId,Microsoft.ServiceFabric.Actors.Runtime.IActorReminder)">
-            <summary>
-            Creates a reminder key.
-            </summary>
-            <param name="actorId">The actor id.</param>
-            <param name="reminder">The reminder.</param>
-            <returns>String that represents the key.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.CreateReminderStorageKey(Microsoft.ServiceFabric.Actors.ActorId,System.String)">
-            <summary>
-            Creates a reminder key.
-            </summary>
-            <param name="actorId">The actor id.</param>
-            <param name="reminderName">Name of the reminder.</param>
-            <returns>String that represents the key.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.RemoveActorAtomically(Microsoft.ServiceFabric.Actors.ActorId)">
-            <summary>
-            Removes all the state and reminder associated with actor.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.ServiceInitializationParameters">
-            <summary>
-            Gets the initialization parameters for the service.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.ActorTypeInformation">
-            <summary>
-            Gets the actor type information.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.StateProvider">
-            <summary>
-            Gets the reliable dictionary to maintain state for the actors.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ReliableDictionaryActorStateProvider.OnDataLossAsync">
-            <summary>
-            On data loss event.
-            </summary>
+            <param name="stateManagerConfig">
+            A <see cref="T:Microsoft.ServiceFabric.Data.ReliableStateManagerConfiguration"/> that describes <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/> configuration.
+            </param>
+            <param name="actorStateDictionaryCount">
+            Number of <see cref="T:Microsoft.ServiceFabric.Data.Collections.IReliableDictionary`2"/> across which actor states will be partitioned and stored.
+            </param>
+            <param name="reminderDictionaryCount">
+            Number of <see cref="T:Microsoft.ServiceFabric.Data.Collections.IReliableDictionary`2"/> across which reminders will be partitioned and stored.
+            </param>
+            <remarks>
+            Values for <paramref name="actorStateDictionaryCount"/> and <paramref name="reminderDictionaryCount"/> can be specified
+            only once when the Actor Service is created for first time. It cannot be changed after that and 
+            <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ReliableCollectionsActorStateProvider"/> will ignore any values that are different from first time.
+            </remarks>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.StateChangeKind">
             <summary>
