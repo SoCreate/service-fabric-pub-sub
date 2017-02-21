@@ -28,8 +28,6 @@ namespace ServiceFabric.PubSubActors
     public abstract class BrokerService : StatefulService, IBrokerService
     {
         private readonly ManualResetEventSlim _initializer = new ManualResetEventSlim(false);
-        private const long MaxDequeuesInOneIteration = 100;
-
         private readonly ConcurrentDictionary<string, ReferenceWrapper> _queues =
             new ConcurrentDictionary<string, ReferenceWrapper>();
 
@@ -59,6 +57,16 @@ namespace ServiceFabric.PubSubActors
         /// Gets or sets the interval to wait between batches of publishing messages. (Default: 5s)
         /// </summary>
         protected TimeSpan Period { get; set; } = TimeSpan.FromSeconds(5);
+
+        /// <summary>
+        /// Get or Sets the maximum period to process messages before allowing enqueuing
+        /// </summary>
+        protected TimeSpan MaxProcessingPeriod { get; set; } = TimeSpan.FromSeconds(3);
+
+        /// <summary>
+        /// Gets or Sets the maximum number of messages to de-queue in one iteration of process queue
+        /// </summary>
+        protected long MaxDequeuesInOneIteration { get; set; }= 100;
 
         /// <summary>
         /// Creates a new instance using the provided context and registers this instance for automatic discovery if needed.
@@ -204,8 +212,8 @@ namespace ServiceFabric.PubSubActors
                         var subscriber = element.Value;
                         string queueName = element.Key;
 
-                        //process messages for 3s, then allow other transactions to enqueue messages 
-                        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                        //process messages for given time, then allow other transactions to enqueue messages 
+                        var cts = new CancellationTokenSource(MaxProcessingPeriod);
                         var linked = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken);
 
                         linkedTokenSources.Add(linked);
