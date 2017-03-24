@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>ServiceFabric.PubSubActors.PackagedBrokerService</id>
-    <version>4.9.0</version>
+    <version>5.0.0</version>
     <title>ServiceFabric.PubSubActors.PackagedBrokerService</title>
     <authors>Loek Duys</authors>
     <owners>Loek Duys</owners>
@@ -18,12 +18,12 @@
     <copyright>Copyright ©  2017</copyright>
     <dependencies>
       <group targetFramework=".NETFramework4.5.1">
-        <dependency id="ServiceFabric.PubSubActors" version="4.9.0" />
-        <dependency id="ServiceFabric.PubSubActors.Interfaces" version="4.9.0" />
+        <dependency id="ServiceFabric.PubSubActors" version="5.0.0" />
+        <dependency id="ServiceFabric.PubSubActors.Interfaces" version="5.0.0" />
       </group>
       <group targetFramework=".NETFramework4.6">
-        <dependency id="ServiceFabric.PubSubActors" version="4.9.0" />
-        <dependency id="ServiceFabric.PubSubActors.Interfaces" version="4.9.0" />
+        <dependency id="ServiceFabric.PubSubActors" version="5.0.0" />
+        <dependency id="ServiceFabric.PubSubActors.Interfaces" version="5.0.0" />
       </group>
     </dependencies>
     <references></references>
