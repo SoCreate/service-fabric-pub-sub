@@ -29,10 +29,10 @@
   },
   "dependencies": {
     "ServiceFabric.PubSubActors.Interfaces": { "target": "project" },
-    "Newtonsoft.Json": "9.0.1",
-    "Microsoft.ServiceFabric.Actors": "2.4.164",
-    "Microsoft.ServiceFabric.Services": "2.4.164",
-    "Microsoft.ServiceFabric.Services.Wcf": "2.4.164",
+    "Newtonsoft.Json": "10.0.1",
+    "Microsoft.ServiceFabric.Actors": "2.5.216",
+    "Microsoft.ServiceFabric.Services": "2.5.216",
+    "Microsoft.ServiceFabric.Services.Wcf": "2.5.216",
     "System.Collections.Immutable": "1.3.1"
   }
 }

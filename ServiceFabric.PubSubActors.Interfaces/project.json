@@ -25,7 +25,7 @@
     "platform": "x64"
   },
   "dependencies": {
-    "Microsoft.ServiceFabric.Actors": "2.4.164",
-    "Newtonsoft.Json": "9.0.1"
+    "Microsoft.ServiceFabric.Actors": "2.5.216",
+    "Newtonsoft.Json": "10.0.1"
   }
 }

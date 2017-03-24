@@ -11,6 +11,7 @@ It uses extension methods to
 
 ##Release notes:
 
+- 1.7.0 Upgraded nuget packages (SF 2.5.216)
 - 4.9.1 merged PR by johnkattenhorn that changes 2 consts into properties on BrokerService
 - 4.9.0 upgraded to new SDK (2.4.164) 
 - 4.8.1 BrokerService.Subscribers is now protected, not private
