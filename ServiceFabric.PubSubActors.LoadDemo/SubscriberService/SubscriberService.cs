@@ -57,23 +57,30 @@ namespace SubscriberService
             var brokerServiceName = await _brokerServiceLocator.LocateAsync();
 
             //subscribe to messages by their type name:
-            string setting = GetConfigurationValue(Context, "MessageSettings", "MessageTypeCount");
+            string setting = GetConfigurationValue(Context, Messagesettings, "MessageTypeCount");
             if (string.IsNullOrWhiteSpace(setting) || !int.TryParse(setting, out _messageTypeCount))
             {
                 return;
             }
             int amount;
-            setting = GetConfigurationValue(Context, "MessageSettings", "Amount");
+            setting = GetConfigurationValue(Context, Messagesettings, "Amount");
             if (string.IsNullOrWhiteSpace(setting) || !int.TryParse(setting, out amount))
             {
                 return;
             }
             _messagesExpectedCount = amount;
 
-            for (int i = 0; i < _messageTypeCount; i++)
+			bool useConcurrentBroker = false;
+			setting = GetConfigurationValue(Context, Messagesettings, "UseConcurrentBroker");
+			if (!string.IsNullOrWhiteSpace(setting))
+			{
+				bool.TryParse(setting, out useConcurrentBroker);
+			}
+
+			for (int i = 0; i < _messageTypeCount; i++)
             {
                 string messageTypeName = $"DataContract{i}";
-                await SubscribeAsync(messageTypeName);
+                await SubscribeAsync(messageTypeName, useConcurrentBroker);
                 ServiceEventSource.Current.ServiceMessage(this,
                     $"Subscribing to {amount} instances of Message Type {messageTypeName}.");
             }
@@ -112,8 +119,9 @@ namespace SubscriberService
         }
 
         private Stopwatch _stopwatch;
+	    private static readonly string Messagesettings = "MessageSettings";
 
-        public async Task ReceiveMessageAsync(MessageWrapper message)
+	    public async Task ReceiveMessageAsync(MessageWrapper message)
         {
             DataContract dc = JsonConvert.DeserializeObject<DataContract>(message.Payload);
             var set = _messagesReceived[message.MessageType];
@@ -160,11 +168,22 @@ namespace SubscriberService
             return endPointType;
         }
 
-        private async Task SubscribeAsync(string messageTypeName)
+        private async Task SubscribeAsync(string messageTypeName, bool useConcurrentBroker)
         {
-            var brokerServiceName = await _brokerServiceLocator.LocateAsync();
+			var builder = new UriBuilder(Context.CodePackageActivationContext.ApplicationName);
+			if (useConcurrentBroker)
+			{
+				builder.Path += "/ConcurrentBrokerService";
+			}
+			else
+			{
+				builder.Path += "/BrokerService";
+			}
+			var brokerSvcLocation = builder.Uri;
 
-            var brokerService = await ServiceFabric.PubSubActors.PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageTypeName, brokerServiceName);
+			ServiceEventSource.Current.ServiceMessage(this, $"Using Broker Service at '{brokerSvcLocation}'.");
+
+			var brokerService = await ServiceFabric.PubSubActors.PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageTypeName, brokerSvcLocation);
             var serviceReference = SubscriberServiceExtensions.CreateServiceReference(Context, Partition.PartitionInfo);
             await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageTypeName);
 

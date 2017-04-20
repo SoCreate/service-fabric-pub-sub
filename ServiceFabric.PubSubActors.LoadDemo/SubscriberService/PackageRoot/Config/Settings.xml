@@ -3,5 +3,6 @@
   <Section Name="MessageSettings">
     <Parameter Name="Amount" Value="100" />
     <Parameter Name="MessageTypeCount" Value="2" />
+    <Parameter Name="UseConcurrentBroker" Value="True" />
   </Section>
 </Settings>

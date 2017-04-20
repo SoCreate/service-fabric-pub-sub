@@ -19,9 +19,10 @@ namespace PublisherService
     /// </summary>
     internal sealed class PublisherService : StatelessService
     {
+	    private static readonly string Messagesettings = "MessageSettings";
 
 
-        public PublisherService(StatelessServiceContext context)
+	    public PublisherService(StatelessServiceContext context)
             : base(context)
         { }
 
@@ -34,7 +35,7 @@ namespace PublisherService
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
             int delay;
-            string setting = GetConfigurationValue(Context, "MessageSettings", "InitialDelaySec");
+            string setting = GetConfigurationValue(Context, Messagesettings, "InitialDelaySec");
             if (!string.IsNullOrWhiteSpace(setting) && int.TryParse(setting, out delay))
             {
                 ServiceEventSource.Current.ServiceMessage(this, $"Sleeping for {delay} seconds.");
@@ -44,7 +45,7 @@ namespace PublisherService
 
 
             int ammount;
-            setting = GetConfigurationValue(Context, "MessageSettings", "Amount");
+            setting = GetConfigurationValue(Context, Messagesettings, "Amount");
             if (string.IsNullOrWhiteSpace(setting) || !int.TryParse(setting, out ammount))
             {
                 return;
@@ -52,13 +53,21 @@ namespace PublisherService
 
 
             int messageTypeCount;
-            setting = GetConfigurationValue(Context, "MessageSettings", "MessageTypeCount");
+            setting = GetConfigurationValue(Context, Messagesettings, "MessageTypeCount");
             if (string.IsNullOrWhiteSpace(setting) || !int.TryParse(setting, out messageTypeCount))
             {
                 return;
             }
 
-            AssemblyName asmName = new AssemblyName();
+
+			bool useConcurrentBroker = false;
+			setting = GetConfigurationValue(Context, Messagesettings, "UseConcurrentBroker");
+			if (!string.IsNullOrWhiteSpace(setting))
+			{
+				bool.TryParse(setting, out useConcurrentBroker);
+			}
+
+			AssemblyName asmName = new AssemblyName();
             asmName.Name = "Dynamic";
             AssemblyBuilder asmBuild = Thread.GetDomain().DefineDynamicAssembly(asmName, AssemblyBuilderAccess.RunAndSave);
             ModuleBuilder modBuild = asmBuild.DefineDynamicModule("Module", "Dynamic.dll");
@@ -97,12 +106,21 @@ namespace PublisherService
 
             
             var helper = new PublisherServiceHelper();
-            var brokerSvcLocator = new BrokerServiceLocator();
-            var brokerSvcLocation = await brokerSvcLocator.LocateAsync();
+           var builder = new UriBuilder(Context.CodePackageActivationContext.ApplicationName);
+	        if (useConcurrentBroker)
+	        {
+		        builder.Path += "/ConcurrentBrokerService";
+	        }
+	        else
+	        {
+		        builder.Path += "/BrokerService";
+	        }
+	        var brokerSvcLocation = builder.Uri;
 
-            //sending starts here:
+			ServiceEventSource.Current.ServiceMessage(this, $"Using Broker Service at '{brokerSvcLocation}'.");
+			//sending starts here:
 
-            Stopwatch sw = Stopwatch.StartNew();
+			Stopwatch sw = Stopwatch.StartNew();
             Parallel.For(0, allMessages.Length, options, i =>
             {
                 var message = allMessages[i];
