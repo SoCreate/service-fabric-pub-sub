@@ -152,7 +152,7 @@ namespace ServiceFabric.PubSubActors.PublisherActors
         {
             
             var resolvedPartition = await GetPartitionForMessageAsync(messageTypeName, brokerServiceName);
-            var brokerService = ServiceProxy.Create<IBrokerService>(brokerServiceName, resolvedPartition, listenerName: BrokerService.ListenerName);
+            var brokerService = ServiceProxy.Create<IBrokerService>(brokerServiceName, resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
             return brokerService;
         }
 	}

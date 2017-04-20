@@ -29,7 +29,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
             }
 
             var brokerActor = GetBrokerActorForMessage(applicationName, message);
-            var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
+            var wrapper = MessageWrapper.CreateMessageWrapper(message);
             await brokerActor.PublishMessageAsync(wrapper);
         }
 
@@ -52,7 +52,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
             }
 
             var brokerActor = GetBrokerActorForMessage(applicationName, message);
-            var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
+            var wrapper = MessageWrapper.CreateMessageWrapper(message);
             await brokerActor.PublishMessageAsync(wrapper);
         }
 
@@ -101,7 +101,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
 
             var brokerService =
                 await PublisherActorExtensions.GetBrokerServiceForMessageAsync(message, brokerServiceName);
-            var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
+            var wrapper = MessageWrapper.CreateMessageWrapper(message);
             await brokerService.PublishMessageAsync(wrapper);
         }
 
@@ -133,7 +133,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
 
             var brokerService =
                 await PublisherActorExtensions.GetBrokerServiceForMessageAsync(message, brokerServiceName);
-            var wrapper = PublisherActorExtensions.CreateMessageWrapper(message);
+            var wrapper = MessageWrapper.CreateMessageWrapper(message);
             await brokerService.PublishMessageAsync(wrapper);
         }
 
@@ -154,6 +154,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
                 string value = property.GetValue<string>();
                 return new Uri(value);
             }
+            // ReSharper disable once EmptyGeneralCatchClause
             catch
             {
             }

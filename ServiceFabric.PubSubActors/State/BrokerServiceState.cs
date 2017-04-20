@@ -84,7 +84,7 @@ namespace ServiceFabric.PubSubActors.State
     }
 
     [DataContract]
-    internal class Reference
+    public class Reference
     {
         [DataMember]
         public ReferenceWrapper ServiceOrActorReference { get; private set; }

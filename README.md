@@ -11,6 +11,8 @@ It uses extension methods to
 
 ##Release notes:
 
+- 6.0.3 Add experimental support for IReliableConcurrentQueue, using `BrokerServiceUnordered`. Used in the LoadDemo app.
+- 5.1.0 Add custom serialization option for kotvisbj
 - 5.0.0 Upgraded nuget packages (SF 2.5.216)
 - 4.9.1 merged PR by johnkattenhorn that changes 2 consts into properties on BrokerService
 - 4.9.0 upgraded to new SDK (2.4.164) 

@@ -1,5 +1,4 @@
 ﻿using System.Runtime.Serialization;
-using Newtonsoft.Json;
 
 namespace ServiceFabric.PubSubActors.Interfaces
 {
@@ -31,17 +30,22 @@ namespace ServiceFabric.PubSubActors.Interfaces
 
     public partial class MessageWrapper
     {
-        /// <summary>
-        /// Convert the provided <paramref name="message"/> into a <see cref="MessageWrapper"/>
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public static MessageWrapper CreateMessageWrapper(object message)
+		/// <summary>
+		/// Gets or sets the <see cref="IPayloadSerializer"/> to use when setting the <see cref="Payload"/>. Defaults to <see cref="DefaultPayloadSerializer"/> which uses Json.Net.
+		/// </summary>
+		public static IPayloadSerializer PayloadSerializer { get; set; } = new DefaultPayloadSerializer();
+
+	    /// <summary>
+	    /// Convert the provided <paramref name="message"/> into a <see cref="MessageWrapper"/>
+	    /// </summary>
+	    /// <param name="message"></param>
+	    /// <returns></returns> 
+	    public static MessageWrapper CreateMessageWrapper(object message)
         {
             var wrapper = new MessageWrapper
             {
                 MessageType = message.GetType().FullName,
-                Payload = JsonConvert.SerializeObject(message),
+                Payload = (PayloadSerializer ?? new DefaultPayloadSerializer()).Serialize(message),
             };
             return wrapper;
         }
