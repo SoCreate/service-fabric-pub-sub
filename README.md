@@ -9,7 +9,7 @@ It uses extension methods to
 - StatelessService
 - StatefulService
 
-##Release notes:
+## Release notes:
 
 - 6.0.3 Add experimental support for IReliableConcurrentQueue, using `BrokerServiceUnordered`. Used in the LoadDemo app.
 - 5.1.0 Add custom serialization option for kotvisbj
@@ -43,19 +43,27 @@ https://www.nuget.org/packages/ServiceFabric.PubSubActors.PackagedBrokerService 
 3. Publish a message
 
 	3.1. From an Actor:  
-	``` javascript
+	``` csharp
 	using ServiceFabric.PubSubActors.PublisherActors;
+	using ServiceFabric.PubSubActors.Helpers;
 	[..]
-	this.PublishMessageToBrokerServiceAsync(..);  	//use any JSON serializable object as a message
+	var publisherActorHelper = new PublisherActorHelper(new BrokerServiceLocator());
+	await publisherActorHelper.PublishMessageAsync(this, new PublishedMessageTwo { Content = "Hello PubSub World, from Actor, using Broker Service!" });
+        //use any JSON serializable object as a message, not just PublishedMessageTwo
 	```
 
 	3.2. From a Service:  
-	``` javascript
+	``` csharp
 	using ServiceFabric.PubSubActors.PublisherServices;
+	using ServiceFabric.PubSubActors.Helpers;
 	[..]
-	this.PublishMessageToBrokerServiceAsync(..);	//use any JSON serializable object as a message
+	var publisherServiceHelper = new PublisherServiceHelper(new BrokerServiceLocator());
+	await publisherServiceHelper.PublishMessageAsync(this, new PublishedMessageTwo { Content = "Hello PubSub World, from Service, using Broker Service!" });
+	//use any JSON serializable object as a message
 	```
 
+	*you can use dependency injection with the Publisher helpers to facilitate unit testing*
+	
 4. Subscribe to messages
 
 	4.1. From an Actor: implement ISubscriberActor (like described below)
@@ -155,6 +163,9 @@ internal sealed class PubSubService : BrokerService
 ```
 
 ### Optional, for 'Large Scale Messaging' using Broker Actors: Add a RelayBrokerActor type to your existing BrokerActor (Not in combination with the BrokerService)
+
+**Preferably, just use the BrokerService/BrokerServiceUnordered**
+
 *Actors of this type will be used to relay messges from a BrokerActor, and relay it to registered subscribers, and every instance will publish one type of message.*
 
 Add a new Stateful Reliable Actor project. Call it 'PubkSubRelayActor'.
@@ -223,69 +234,8 @@ public interface ISubscribingActor : ISubscriberActor
 
 Open the file 'SubscribingActor.cs' and replace the contents with the code below.
 **notice that this Actor now implements 'ISubscriberActor' indirectly.**
-```javascript
-using ServiceFabric.PubSubActors.SubscriberActors;
+https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/SubscribingActor/SubscribingActor.cs
 
-[ActorService(Name = nameof(ISubscribingActor))]
-[StatePersistence(StatePersistence.None)]
-internal class SubscribingActor : Actor, ISubscribingActor
-{
-	private const string WellKnownRelayBrokerId = "WellKnownRelayBroker";
-	//register to the default broker:
-	public Task RegisterAsync()
-	{
-		return this.RegisterMessageTypeAsync(typeof(PublishedMessageOne)); //register as subscriber for this type of messages
-	}
-	public Task UnregisterAsync()
-	{
-		return this.UnregisterMessageTypeAsync(typeof(PublishedMessageOne), true); //unregister as subscriber for this type of messages
-	}
-	
-	//for large scale messaging, register a relay to the original broker, and register as a subscriber to that relay:
-	public Task RegisterWithRelayAsync()
-	{
-		//register as subscriber for this type of messages at the relay broker
-		//using the default Broker for the message type as source for the relay broker
-		return this.RegisterMessageTypeWithRelayBrokerAsync(typeof(PublishedMessageOne), new ActorId(WellKnownRelayBrokerId), null); 
-	}
-	public Task UnregisterWithRelayAsync()
-	{
-		//unregister as subscriber for this type of messages at the relay broker
-		return this.UnregisterMessageTypeWithRelayBrokerAsync(typeof(PublishedMessageOne), new ActorId(WellKnownRelayBrokerId), null,  true); 
-	}
-	
- 	public Task RegisterWithBrokerServiceAsync()
-        {
-            return this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
-        }
-
-        public Task UnregisterWithBrokerServiceAsync()
-        {
-            return this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
-        }
-
-	public Task ReceiveMessageAsync(MessageWrapper message)
-	{
-		var payload = this.Deserialize<PublishedMessageOne>(message);
-		ActorEventSource.Current.ActorMessage(this, $"Received message: {payload.Content}");
-		//TODO: handle message
-		return Task.FromResult(true);
-	}
-}
-```
-You can now register 'SubscriberActor' by calling 'RegisterAsync', to start receiving messages from the PubSubActor using 'ReceiveMessageAsync'.
-
-You can now register 'SubscriberActor' by calling 'RegisterWithRelayAsync', to start receiving messages from the PubSubRelayActor instance "WellKnownRelayBroker", using 'ReceiveMessageAsync'.
-
-You could so by adding this code to the Program.Main method, call it from within the Actor itself, or call it from the outside using the interface "ISubscribingActor"
-
-```javascript
-//from outside the Actor, using the custom interface ISubscribingActor
-ActorId actorId = new ActorId("SubActor");
-string applicationName = "fabric:/MyServiceFabricApp"; //replace with your application name
-ISubscriberActor subActor = ActorProxy.Create<ISubscribingActor>(actorId, applicationName, nameof(ISubscribingActor));
-subActor.RegisterAsync().GetAwaiter().GetResult();
-```
 
 ### Subscribing to messages using Services
 *Create a sample Service that implements 'ISubscriberService', to become a subscriber to messages.*
@@ -299,104 +249,7 @@ Add a project reference to the shared data contracts library ('DataContracts').
 Now open the file SubscribingStatefulService.cs in the project 'SubscribingStatefulService' and replace the contents with this code:
 (Implement 'ServiceFabric.PubSubActors.SubscriberServices.ISubscriberService' and self-register.)
 
-```javascript
-using ServiceFabric.PubSubActors.Interfaces;
-using ServiceFabric.PubSubActors.SubscriberServices;
-
-internal sealed class SubscribingStatefulService : StatefulService, ISubscriberService
-{
-	public SubscribingStatefulService(StatefulServiceContext serviceContext) : base(serviceContext)
-	{
-	}
-
-	public SubscribingStatefulService(StatefulServiceContext serviceContext, IReliableStateManagerReplica 						reliableStateManagerReplica) : base(serviceContext, reliableStateManagerReplica)
-	{
-	}
-		
-	protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
-	{
-		//add SubscriberCommunicationListener for receiving published messages.
-		yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p), "StatefulSubscriberCommunicationListener);
-	}
-
-	protected override Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
-	{
-		return RegisterAsync();
-	}
-		
-	public async Task RegisterAsync()
-	{	
-		//register with BrokerActor:	
-	    	await this.RegisterMessageTypeAsync(typeof(PublishedMessageOne));
-	    	//register with BrokerService:
-            	await this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
-	}
-
-	public async Task UnregisterAsync()
-	{
-		//unregister with BrokerActor:	
-		await this.UnregisterMessageTypeAsync(typeof(PublishedMessageOne), true);
-		//unregister with BrokerService:
-            	await this.UnregisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo), true);
-	}
-
-	//receives published messages:
-	public Task ReceiveMessageAsync(MessageWrapper message)
-	{
-		var payload = this.Deserialize<PublishedMessageOne>(message);
-		ServiceEventSource.Current.ServiceMessage(this, $"Received message: {payload.Content}");
-		//TODO: handle message
-		return Task.FromResult(true);
-	}
-}
-```
-You can also call 'RegisterAsync' to make the service register itself as subscriber, after adding it to a custom interface, provided 'OnOpenAsync' has been called first.
-#### Subscribing to a RelayBroker
-
-For large scale messaging support, subscribe to a (Well known) Relay Broker. Follow the steps from above, but use this code in the service:
-``` javascript
-internal sealed class SubscribingToRelayStatefulService : StatefulService, ISubscriberService
-{
-	private const string WellKnownRelayBrokerId = "WellKnownRelayBroker";
-	public SubscribingToRelayStatefulService(StatefulServiceContext serviceContext) : base(serviceContext)
-	{
-	}
-	public SubscribingToRelayStatefulService(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica) : base(serviceContext, reliableStateManagerReplica)
-	{
-	}
-
-	protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
-	{
-		yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p), "RelayStatefullSubscriberCommunicationListener");
-	}
-
-	protected override async Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
-	{
-		await RegisterAsync();
-		//do other stuff
-	}
-
-	public Task RegisterAsync()
-	{
-		return this.RegisterMessageTypeWithRelayBrokerAsync(typeof(PublishedMessageOne), new ActorId(WellKnownRelayBrokerId), null);
-	}
-
-	public Task UnregisterAsync()
-	{
-		return this.UnregisterMessageTypeWithRelayBrokerAsync(typeof(PublishedMessageOne), new ActorId(WellKnownRelayBrokerId), null, true);
-	}
-
-	public Task ReceiveMessageAsync(MessageWrapper message)
-	{
-		var payload = this.Deserialize<PublishedMessageOne>(message);
-		ServiceEventSource.Current.ServiceMessage(this, $"Received message: {payload.Content}");
-		//TODO: handle message
-		return Task.FromResult(true);
-	}
-}
-```
-
-
+https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/SubscribingStatefulService/SubscribingStatefulService.cs
 
 ### Publishing messages from Actors
 *Create a sample Actor that publishes messages.*
@@ -422,37 +275,7 @@ public interface IPublishingActor : IActor
 
 Now open the file PublishingActor.cs in the project 'PublishingActor' and replace the contents with this code:
 
-```javascript
-using ServiceFabric.PubSubActors.PublisherActors;
-[StatePersistence(StatePersistence.None)]
-internal class PublishingActor : Actor, IPublishingActor
-{
-	//publish to BrokerActor
-	async Task<string> IPublishingActor.PublishMessageOneAsync()
-	{
-		ActorEventSource.Current.ActorMessage(this, "Publishing Message");
-		await this.PublishMessageAsync(new PublishedMessageOne {Content = "Hello PubSub World, from Actor!"});
-		return "Message published to Broker Actor";
-	}
-	
-	//publish to BrokerService
-	async Task<string> IPublishingActor.PublishMessageTwoAsync()
-        {
-            ActorEventSource.Current.ActorMessage(this, "Publishing Message");
-
-            await this.PublishMessageToBrokerServiceAsync(new PublishedMessageTwo { Content = "Hello PubSub World, from Actor, using 	Broker Service!" });
-            return "Message published to broker service";
-        }
-}
-```
-You can now ask the PublishingActor to publish a message to subscribers:
-
-```javascript
-string applicationName = "fabric:/MyServiceFabricApp";  //replace with your application name
-var actorId = new ActorId("PubActor");
-pubActor = ActorProxy.Create<IPublishingActor>(actorId, applicationName);
-pubActor.PublishMessageOneAsync()
-```
+https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/PublishingActor/PublishingActor.cs
 
 ### Publishing messages from Services
 *Create a sample Service that publishes messages.*
@@ -477,26 +300,5 @@ public interface IPublishingStatelessService : IService
 }
 ```
 Open the file 'PublishingStatelessService.cs'. Replace the contents with the code below:
-```javascript
-internal sealed class PublishingStatelessService : StatelessService, IPublishingStatelessService
-{
-	protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
-	{
-		yield return new ServiceInstanceListener(context => new FabricTransportServiceRemotingListener(context, this), "StatelessFabricTransportServiceRemotingListener");
-	}
 
-	async Task<string> IPublishingStatelessService.PublishMessageOneAsync()
-	{
-		ServiceEventSource.Current.ServiceMessage(this, "Publishing Message");
-		await this.PublishMessageAsync(new PublishedMessageOne { Content = "Hello PubSub World, from Service!" });
-		return "Message published tot broker actor";
-	}
-	
-	async Task<string> IPublishingStatelessService.PublishMessageTwoAsync()
-        {
-            ServiceEventSource.Current.ServiceMessage(this, "Publishing Message");
-            await this.PublishMessageToBrokerServiceAsync(new PublishedMessageTwo { Content = "Hello PubSub World, from Service, using Broker Service!" });
-            return "Message published to broker service";
-        }
-}
-```
+https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/PublishingStatelessService/PublishingStatelessService.cs
