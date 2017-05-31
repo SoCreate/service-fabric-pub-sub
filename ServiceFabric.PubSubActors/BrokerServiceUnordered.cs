@@ -3,7 +3,7 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data;
-using Microsoft.ServiceFabric.Data.Collections.Preview;
+using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.PublisherActors;
@@ -64,10 +64,10 @@ namespace ServiceFabric.PubSubActors
 
 				await TimeoutRetryHelper.ExecuteInTransaction(StateManager, async (tx, token, state) =>
 				{
-					var message = await queue.DequeueAsync(tx, cancellationToken);
-					if (message != null)
+					var result = await queue.TryDequeueAsync(tx, cancellationToken);
+					if (result.HasValue)
 					{
-						await subscriber.PublishAsync(message);
+						await subscriber.PublishAsync(result.Value);
 					}
 				}, cancellationToken: cancellationToken);
 			}
