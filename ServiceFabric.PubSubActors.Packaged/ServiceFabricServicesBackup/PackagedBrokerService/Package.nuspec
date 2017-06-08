@@ -1,0 +1,38 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>ServiceFabric.PubSubActors.PackagedBrokerService</id>
+    <version>5.0.0</version>
+    <title>ServiceFabric.PubSubActors.PackagedBrokerService</title>
+    <authors>Loek Duys</authors>
+    <owners>Loek Duys</owners>
+    <description>(Add to Service Fabric Application.) ServiceFabric.PubSubActors adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. How to use this package: https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/README.md</description>
+    <releaseNotes>
+    </releaseNotes>
+    <summary>Add to Service Fabric Application. Pre-packaged Service Fabric Stateful Service that acts as message broker for pub-sub communication inside the cluster.</summary>
+    <language>en-US</language>
+    <projectUrl>https://github.com/loekd/ServiceFabric.PubSubActors</projectUrl>
+    <iconUrl>https://nuget.org/Content/Images/packageDefaultIcon-50x50.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/LICENSE.md</licenseUrl>
+    <copyright>Copyright ©  2017</copyright>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5.1">
+        <dependency id="ServiceFabric.PubSubActors" version="5.0.0" />
+        <dependency id="ServiceFabric.PubSubActors.Interfaces" version="5.0.0" />
+      </group>
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="ServiceFabric.PubSubActors" version="5.0.0" />
+        <dependency id="ServiceFabric.PubSubActors.Interfaces" version="5.0.0" />
+      </group>
+    </dependencies>
+    <references></references>
+    <tags>ServiceFabric Service Fabric Actor Pub Sub Reliable Package</tags>
+  </metadata>
+  <files>
+    <file src="PackageRoot\**\*.*" target="PackagedBrokerServicePkg" />
+    <file src="bin\x64\$configuration$\**\*.*" target="PackagedBrokerServicePkg\Code" />
+    <file src="tools\" target="tools" />
+    <file src="content\" target="content" />
+  </files>
+</package>
