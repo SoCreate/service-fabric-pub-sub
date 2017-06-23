@@ -9,6 +9,12 @@ It uses extension methods to
 - StatelessService
 - StatefulService
 
+## Contribute!
+Contributions are welcome.
+Please upgrade the package version with a minor tick if there are no breaking changes. And add a line to the readme.md, stating the changes, e.g. 'upgraded to SF version x.y.z'.
+Doing so will allow me to simply accept the PR, which will automatically trigger the release of a new package.
+Please also make sure all feature additions have a corresponding unit test.
+
 ## Release notes:
 
 - 7.0.0 upgraded to new sdk (2.6.210) and VS2017
