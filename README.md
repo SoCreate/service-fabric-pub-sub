@@ -17,6 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 7.1.1 Upgraded nuget packages (SF 2.7.198)
 - 7.1.0 upgraded to new sdk (2.6.220)
 - 7.0.0 upgraded to new sdk (2.6.210) and VS2017
 - 6.0.3 Add experimental support for IReliableConcurrentQueue, using `BrokerServiceUnordered`. Used in the LoadDemo app.
