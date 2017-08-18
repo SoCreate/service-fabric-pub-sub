@@ -136,34 +136,41 @@
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClient`1">
             <summary>
             A WCF client created by <see cref="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClientFactory`1"/> to communicate 
-            with server fabric service using <see cref="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime.WcfCommunicationListener`1"/>.
+            with a Service Fabric service using <see cref="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime.WcfCommunicationListener`1"/>.
             </summary>
             <typeparam name="TServiceContract">WCF service contract</typeparam>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClient`1.Finalize">
+            <summary>
+            Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
+            </summary>
+        </member>
         <member name="P:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClient`1.ResolvedServicePartition">
             <summary>
-            Gets or Sets the Resolved service partition which was used when this client was created.
+            Gets or sets the resolved service partition which contains information about the partition
+            and the endpoints that can be used to communication with the service replica or instance.
             </summary>
-            <value><see cref="T:System.Fabric.ResolvedServicePartition"/> object</value>
+            <value>The resolved service partition.</value>
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClient`1.ListenerName">
             <summary>
-            Gets or Sets the name of the listener in the replica or instance to which the client is
+            Gets or sets the name of the listener in the service replica or instance to which the client is
             connected to.
             </summary>
-            <value>Name of the listener</value>
+            <value>The name of the listener in the service replica or instance to which the client is
+            connected to.</value>
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClient`1.Endpoint">
             <summary>
-            Gets or Sets the service endpoint to which the client is connected to.
+            Gets or sets the service endpoint to which the client is connected to.
             </summary>
-            <value><see cref="T:System.Fabric.ResolvedServiceEndpoint"/></value>
+            <value>The service endpoint to which the client is connected to.</value>
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClient`1.Channel">
             <summary>
             Gets the WCF channel for the specified contract that this communication client uses.
             </summary>
-            <value>WCF channel</value>
+            <value>The WCF channel for the specified contract that this communication client uses.</value>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClientFactory`1">
             <summary>
@@ -685,6 +692,16 @@
         <member name="P:Microsoft.ServiceFabric.Services.Wcf.SR.ErrorCommunicationClientOpenTimeout">
             <summary>
               Looks up a localized string similar to Communication client open didn’t complete within the open timeout &apos;{0}&apos;.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Wcf.SR.ErrorExceptionSerializationFailed1">
+            <summary>
+              Looks up a localized string similar to The exception {0} was unhandled on the service and could not be serialized for transferring to the client..
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Wcf.SR.ErrorExceptionSerializationFailed2">
+            <summary>
+              Looks up a localized string similar to Detailed Exception Information: {0}.
             </summary>
         </member>
     </members>

@@ -31,9 +31,13 @@
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Data.Interfaces.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Data.Interfaces.xml" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Data.xml" />
+    <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.FabricTransport.dll" />
+    <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.FabricTransport.xml" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Internal.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Internal.Strings.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Services.dll" />
+    <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Services.Remoting.dll" />
+    <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Services.Remoting.xml" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Services.Wcf.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Services.Wcf.xml" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\Microsoft.ServiceFabric.Services.xml" />
@@ -43,10 +47,11 @@
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\PackagedBrokerService.exe.config" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\ServiceFabric.PubSubActors.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\ServiceFabric.PubSubActors.Interfaces.dll" />
-    <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\ServiceFabricServiceModel.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Collections.Immutable.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Collections.Immutable.xml" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Fabric.dll" />
+    <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Fabric.Management.ServiceModel.dll" />
+    <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Fabric.Management.ServiceModel.XmlSerializers.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Fabric.Strings.dll" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Code\System.Fabric.xml" />
     <Content Include="ApplicationPackageRoot\PackagedBrokerServicePkg\Config\Settings.xml" />
