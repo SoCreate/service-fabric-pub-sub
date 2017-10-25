@@ -35,7 +35,7 @@ namespace ServiceFabric.PubSubActors
 		/// <param name="serviceContext"></param>
 		/// <param name="reliableStateManagerReplica"></param>
 		/// <param name="enableAutoDiscovery"></param>
-		protected BrokerService(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica, bool enableAutoDiscovery = true)
+		protected BrokerService(StatefulServiceContext serviceContext, IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true)
 			: base(serviceContext, reliableStateManagerReplica, enableAutoDiscovery)
 		{
 		}

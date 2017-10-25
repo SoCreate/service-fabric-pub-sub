@@ -17,6 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 7.2.0 Upgraded nuget packages (SF 2.8.219)
 - 7.1.1 Upgraded nuget packages (SF 2.7.198)
 - 7.1.0 upgraded to new sdk (2.6.220)
 - 7.0.0 upgraded to new sdk (2.6.210) and VS2017

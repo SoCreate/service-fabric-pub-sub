@@ -10,6 +10,7 @@ using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.V1.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Interfaces;
@@ -38,15 +39,15 @@ namespace ServiceFabric.PubSubActors
 		/// </summary>
 		protected const string Subscribers = "Queues";
 
-		/// <summary>
-		/// The name that the <see cref="ServiceReplicaListener"/> instance will get.
-		/// </summary>
-		public const string ListenerName = "StatefulBrokerServiceFabricTransportServiceRemotingListener";
+	    /// <summary>
+	    /// The name that the <see cref="ServiceReplicaListener"/> instance will get.
+	    /// </summary>
+	    public const string ListenerName = BrokerServiceListenerSettings.ListenerName;
 
-		/// <summary>
-		/// When Set, this callback will be used to trace Service messages to.
-		/// </summary>
-		protected Action<string> ServiceEventSourceMessageCallback { get; set; }
+        /// <summary>
+        /// When Set, this callback will be used to trace Service messages to.
+        /// </summary>
+        protected Action<string> ServiceEventSourceMessageCallback { get; set; }
 
 		/// <summary>
 		/// Gets or sets the interval to wait before starting to publish messages. (Default: 5s after Activation)
@@ -92,7 +93,7 @@ namespace ServiceFabric.PubSubActors
 		/// <param name="reliableStateManagerReplica"></param>
 		/// <param name="enableAutoDiscovery"></param>
 		protected BrokerServiceBase(StatefulServiceContext serviceContext,
-			IReliableStateManagerReplica reliableStateManagerReplica, bool enableAutoDiscovery = true)
+			IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true)
 			: base(serviceContext, reliableStateManagerReplica)
 		{
 			if (enableAutoDiscovery)
@@ -244,8 +245,7 @@ namespace ServiceFabric.PubSubActors
 		{
 			//add the pubsub listener
 			yield return new ServiceReplicaListener(context =>
-				new Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime.
-					FabricTransportServiceRemotingListener(context, this), ListenerName);
+				new FabricTransportServiceRemotingListener(context, this), ListenerName);
 		}
 
 		/// <summary>

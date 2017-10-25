@@ -4,7 +4,7 @@
     <Description>ServiceFabric.PubSubActors adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. How to use this package: https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/README.md</Description>
     <Copyright>2017</Copyright>
     <AssemblyTitle>ServiceFabric.PubSubActors</AssemblyTitle>
-    <Version>7.1.1</Version>
+    <Version>7.2.0</Version>
     <Authors>Loek Duys</Authors>
     <TargetFrameworks>net451;net46</TargetFrameworks>
     <PlatformTarget>x64</PlatformTarget>
@@ -38,10 +38,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="2.8.219" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="2.7.198" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="2.7.198" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services.Wcf" Version="2.7.198" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="2.8.219" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="2.8.219" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Wcf" Version="2.8.219" />
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
   </ItemGroup>
 

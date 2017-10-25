@@ -36,7 +36,7 @@ namespace ServiceFabric.PubSubActors
 		/// <param name="serviceContext"></param>
 		/// <param name="reliableStateManagerReplica"></param>
 		/// <param name="enableAutoDiscovery"></param>
-		protected BrokerServiceUnordered(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica, bool enableAutoDiscovery = true)
+		protected BrokerServiceUnordered(StatefulServiceContext serviceContext, IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true)
 			: base(serviceContext, reliableStateManagerReplica, enableAutoDiscovery)
 		{
 		}
