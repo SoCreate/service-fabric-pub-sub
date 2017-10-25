@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="2.8.219" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Fabric.MSBuild" Version="1.6.3" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="2.8.219" />
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="2.8.219" />
