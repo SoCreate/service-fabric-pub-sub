@@ -19,6 +19,8 @@ namespace ServiceFabric.PubSubActors.Interfaces
 		[DataMember(IsRequired = true)]
 		public Uri ServiceUri { get; set; }
 
+        [DataMember(IsRequired = false)]
+	    public long PartitionKey { get; set; }
 
 		[DataMember(IsRequired = true)]
 		public ServicePartitionKind PartitionKind { get; set; }

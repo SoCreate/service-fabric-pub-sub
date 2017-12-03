@@ -1,6 +1,9 @@
 using System;
+using System.Fabric;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Services.Client;
+using Microsoft.ServiceFabric.Services.Remoting.Client;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberServices;
 
@@ -12,7 +15,9 @@ namespace ServiceFabric.PubSubActors.State
 	[DataContract]
 	public class ServiceReferenceWrapper : ReferenceWrapper
 	{
-		public override string Name
+	    private readonly IServiceProxyFactory _serviceProxyFactory;
+
+	    public override string Name
 		{
 			get { return ServiceReference.Description; }
 		}
@@ -31,15 +36,15 @@ namespace ServiceFabric.PubSubActors.State
 		{
 		}
 
-		/// <summary>
-		/// Creates a new instance using the provided <see cref="ServiceReference"/>.
-		/// </summary>
-		/// <param name="serviceReference"></param>
-		public ServiceReferenceWrapper(ServiceReference serviceReference)
+	    /// <summary>
+	    /// Creates a new instance using the provided <see cref="ServiceReference"/>.
+	    /// </summary>
+	    /// <param name="serviceReference"></param>
+	    /// <param name="serviceProxyFactory">Optionak</param>
+	    public ServiceReferenceWrapper(ServiceReference serviceReference, IServiceProxyFactory serviceProxyFactory = null)
 		{
-			if (serviceReference == null) throw new ArgumentNullException(nameof(serviceReference));
-			
-			ServiceReference = serviceReference;
+		    _serviceProxyFactory = serviceProxyFactory ?? new ServiceProxyFactory();
+            ServiceReference = serviceReference ?? throw new ArgumentNullException(nameof(serviceReference));
 		}
 
 		/// <summary>
@@ -98,7 +103,22 @@ namespace ServiceFabric.PubSubActors.State
 		/// <returns></returns>
 		public override Task PublishAsync(MessageWrapper message)
 		{
-			var client = SubscriberServicePartitionClient.Create(ServiceReference);
+		    ServicePartitionKey partitionKey;
+		    switch (ServiceReference.PartitionKind)
+		    {
+		        case ServicePartitionKind.Singleton:
+                    partitionKey = ServicePartitionKey.Singleton;
+		            break;
+		        case ServicePartitionKind.Int64Range:
+                    partitionKey = new ServicePartitionKey(ServiceReference.PartitionKey);
+		            break;
+		        case ServicePartitionKind.Named:
+                    partitionKey = new ServicePartitionKey(ServiceReference.PartitionName);
+		            break;
+		        default:
+		            throw new ArgumentOutOfRangeException();
+		    }
+		    var client = _serviceProxyFactory.CreateServiceProxy<ISubscriberService>(ServiceReference.ServiceUri, partitionKey);
 			return client.ReceiveMessageAsync(message);
 		}
 	}
