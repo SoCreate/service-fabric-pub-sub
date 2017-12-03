@@ -7,6 +7,7 @@ using Common.DataContracts;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberServices;
@@ -24,16 +25,17 @@ namespace SubscribingToRelayStatefulService
 		{
 		}
 
-		public SubscribingToRelayStatefulService(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica) : base(serviceContext, reliableStateManagerReplica)
+		public SubscribingToRelayStatefulService(StatefulServiceContext serviceContext, IReliableStateManagerReplica2 reliableStateManagerReplica) : base(serviceContext, reliableStateManagerReplica)
 		{
 		}
 
 		protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
 		{
-			yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p), "RelayStatefullSubscriberCommunicationListener");
-		}
+		    return this.CreateServiceRemotingReplicaListeners();
+            //yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p), "RelayStatefullSubscriberCommunicationListener");
+        }
 
-		protected override async Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
+        protected override async Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
 		{
 			await TryRegisterAsync();
 		}

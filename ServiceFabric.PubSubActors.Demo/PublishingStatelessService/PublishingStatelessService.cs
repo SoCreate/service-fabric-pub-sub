@@ -13,6 +13,7 @@ using Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using ServiceFabric.PubSubActors.PublisherServices;
 using System.Fabric;
+using Microsoft.ServiceFabric.Services.Remoting.V1.FabricTransport.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 
 namespace PublishingStatelessService

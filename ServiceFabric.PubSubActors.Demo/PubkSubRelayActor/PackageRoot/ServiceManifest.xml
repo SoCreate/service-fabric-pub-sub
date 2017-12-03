@@ -6,11 +6,11 @@
         <Extension Name="__GeneratedServiceType__" GeneratedId="ed1eea87-2297-47d8-bc2d-d64cead7cc20|Persisted">
           <GeneratedNames xmlns="http://schemas.microsoft.com/2015/03/fabact-no-schema">
             <DefaultService Name="IRelayBrokerActor" />
-            <ServiceEndpoint Name="IRelayBrokerActorEndpoint" />
             <ReplicatorEndpoint Name="IRelayBrokerActorReplicatorEndpoint" />
             <ReplicatorConfigSection Name="IRelayBrokerActorReplicatorConfig" />
             <ReplicatorSecurityConfigSection Name="IRelayBrokerActorReplicatorSecurityConfig" />
             <StoreConfigSection Name="IRelayBrokerActorLocalStoreConfig" />
+            <ServiceEndpoint Name="IRelayBrokerActorEndpoint" />
           </GeneratedNames>
         </Extension>
       </Extensions>

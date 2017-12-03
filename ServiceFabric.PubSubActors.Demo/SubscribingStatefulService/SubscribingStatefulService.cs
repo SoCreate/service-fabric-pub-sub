@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Common.DataContracts;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Interfaces;
@@ -26,15 +27,16 @@ namespace SubscribingStatefulService
             _subscriberServiceHelper = new SubscriberServiceHelper(new BrokerServiceLocator());
         }
 
-        public SubscribingStatefulService(StatefulServiceContext serviceContext, IReliableStateManagerReplica reliableStateManagerReplica) : base(serviceContext, reliableStateManagerReplica)
+        public SubscribingStatefulService(StatefulServiceContext serviceContext, IReliableStateManagerReplica2 reliableStateManagerReplica) : base(serviceContext, reliableStateManagerReplica)
 		{
             _subscriberServiceHelper = new SubscriberServiceHelper(new BrokerServiceLocator());
         }
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
-		{
-			yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p), "StatefulSubscriberCommunicationListener");
-		}
+        {
+            return this.CreateServiceRemotingReplicaListeners(); //remoting listener
+            //yield return new ServiceReplicaListener(p => new SubscriberCommunicationListener(this, p), "StatefulSubscriberCommunicationListener");
+        }
 
 		protected override async Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
 		{
