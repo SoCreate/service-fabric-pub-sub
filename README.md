@@ -17,6 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 7.3.1 Sign assemblies in packages
 - 7.3.0 Upgraded nuget packages (SF 2.8.232) & removed WCF remoting code
 - 7.2.0 Upgraded nuget packages (SF 2.8.219)
 - 7.1.1 Upgraded nuget packages (SF 2.7.198)
