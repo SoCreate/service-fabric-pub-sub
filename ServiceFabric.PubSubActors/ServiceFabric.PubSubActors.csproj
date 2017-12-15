@@ -25,8 +25,13 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeSymbols>true</IncludeSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release'">
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <DelaySign>False</DelaySign>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>ServiceFabric.PubSubActors.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\ServiceFabric.PubSubActors.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>

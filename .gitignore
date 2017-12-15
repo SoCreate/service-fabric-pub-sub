@@ -213,3 +213,4 @@ ModelManifest.xml
 /publish nuget.bat
 /package.bat
 /ServiceFabric.PubSubActors.Packaged/PackagedBrokerService/packages.txt
+/ServiceFabric.PubSubActors.snk

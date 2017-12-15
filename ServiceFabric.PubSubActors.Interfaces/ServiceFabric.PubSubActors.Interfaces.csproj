@@ -25,7 +25,13 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeSymbols>true</IncludeSymbols>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>ServiceFabric.PubSubActors.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release'">
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <DelaySign>False</DelaySign>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\ServiceFabric.PubSubActors.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>

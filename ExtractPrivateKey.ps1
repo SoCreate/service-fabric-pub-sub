@@ -3,7 +3,7 @@
     [string] $pfxPwd
 )
 
-[string] $pfxFilePath = ".\src\ServiceFabric.PubSubActors\ServiceFabric.PubSubActors.pfx"
+[string] $pfxFilePath = ".\ServiceFabric.PubSubActors.pfx"
 [string] $snkFilePath = [IO.Path]::GetFileNameWithoutExtension($pfxFilePath) + ".snk";
 [byte[]] $certificateContent = Get-Content $pfxFilePath -Encoding Byte;
 $exportable = [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
