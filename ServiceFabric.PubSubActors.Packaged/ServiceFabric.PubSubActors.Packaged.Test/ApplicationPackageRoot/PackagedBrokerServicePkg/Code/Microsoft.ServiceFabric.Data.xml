@@ -57,6 +57,18 @@
             <param name="serviceContext">A <see cref="T:System.Fabric.StatefulServiceContext"/> that describes the service context.</param>
             <param name="configuration">Configuration parameters.</param>
         </member>
+        <member name="E:Microsoft.ServiceFabric.Data.ReliableStateManager.TransactionChanged">
+            <summary>
+            Occurs when a transaction changes.
+            </summary>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
+        </member>
+        <member name="E:Microsoft.ServiceFabric.Data.ReliableStateManager.StateManagerChanged">
+            <summary>
+            Occurs when the state manager changes.
+            </summary>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.GetAsyncEnumerator">
             <summary>
             Returns an enumerator that iterates through the collection.
@@ -648,6 +660,24 @@
             Also, backup will be marked as unsuccessful.
             </remarks>
         </member>
+        <member name="P:Microsoft.ServiceFabric.Data.ReliableStateManager.OnDataLossAsync">
+            <summary>
+            Set this property to receive notification when this <see cref="T:Microsoft.ServiceFabric.Data.IStateProviderReplica"/> suspects data loss.
+            </summary>
+            <value>
+            Function called as part of suspected data loss processing.
+            </value>
+            <remarks>
+            <para>
+            OnDataLossAsync function takes in CancellationToken and needs to return a Task that represents the asynchronous processing of the event.
+            Returning true indicates that the reliable state manager's state has been restored.
+            Returning false indicates that the reliable state manager's state has not been changed.
+            </para>
+            <para>
+            The passed delegate should monitor the given cancellation token for cancellation requests.
+            </para>
+            </remarks>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Data.ReliableStateManager.Microsoft#ServiceFabric#Data#IStateProviderReplica#Initialize(System.Fabric.StatefulServiceInitializationParameters)">
             <summary>
             Initialize the state provider replica using the service initialization information.
@@ -713,36 +743,6 @@
             </summary>
             <param name="sender">The sender.</param>
             <param name="args">The notification.</param>
-        </member>
-        <member name="E:Microsoft.ServiceFabric.Data.ReliableStateManager.TransactionChanged">
-            <summary>
-            Occurs when a transaction changes.
-            </summary>
-            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
-        </member>
-        <member name="E:Microsoft.ServiceFabric.Data.ReliableStateManager.StateManagerChanged">
-            <summary>
-            Occurs when the state manager changes.
-            </summary>
-            <exception cref="T:System.Fabric.FabricObjectClosedException">Indicates that the Reliable State Manager is closed.</exception>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Data.ReliableStateManager.OnDataLossAsync">
-            <summary>
-            Set this property to receive notification when this <see cref="T:Microsoft.ServiceFabric.Data.IStateProviderReplica"/> suspects data loss.
-            </summary>
-            <value>
-            Function called as part of suspected data loss processing.
-            </value>
-            <remarks>
-            <para>
-            OnDataLossAsync function takes in CancellationToken and needs to return a Task that represents the asynchronous processing of the event.
-            Returning true indicates that the reliable state manager's state has been restored.
-            Returning false indicates that the reliable state manager's state has not been changed.
-            </para>
-            <para>
-            The passed delegate should monitor the given cancellation token for cancellation requests.
-            </para>
-            </remarks>
         </member>
         <member name="T:Microsoft.ServiceFabric.Data.SR">
             <summary>

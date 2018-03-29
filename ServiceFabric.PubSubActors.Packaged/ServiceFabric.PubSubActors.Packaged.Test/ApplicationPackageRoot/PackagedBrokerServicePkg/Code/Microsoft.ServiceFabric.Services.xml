@@ -20,17 +20,17 @@
             </summary>
             <typeparam name="TCommunicationClient"></typeparam>
         </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientCacheEntry`1.Semaphore">
+            <summary>
+            This lock protects the members of the cache entry. Users of the this object
+            should acquire this lock before accessing the properties of the object.
+            </summary>
+        </member>
         <member name="F:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientCacheEntry`1.IsInCache">
             <summary>
             The IsInCache and IsCommunicationClientValid properties are used to synchronize the code using
             the cache client entry and the cache clean up code - to ensure that a valid client isn't cleaned up
             and also a client entry that is removed from cache is not used by the communication factory.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientCacheEntry`1.Semaphore">
-            <summary>
-            This lock protects the members of the cache entry. Users of the this object
-            should acquire this lock before accessing the properties of the object.
             </summary>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector">
@@ -149,474 +149,6 @@
             </summary>
             <value>Maximum number of times to retry a specific exception.</value>
         </member>
-        <member name="T:Microsoft.ServiceFabric.Services.Communication.ServiceException">
-            <summary>
-            Provides an information about an exception from the service. This exception is thrown when the actual
-            exception from the service cannot be serialized for transferring to client.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceException.#ctor">
-            <summary>
-            <para>Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Services.Communication.ServiceException"/> class.</para>
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceException.#ctor(System.String,System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Services.Communication.ServiceException"/> class with appropriate message
-            </summary>
-            <param name="actualExceptionType">the ActualExceptionType of exception thrown</param>
-            <param name="message">The error message that explains the reason for this exception
-            </param>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.ServiceException.ActualExceptionType">
-             <summary>
-            The ActualExceptionType is the type of actual exception thrown
-             </summary>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Services.ServiceNameFormat">
-            <summary>
-            This class provides the logic for deriving the names of various items within the manifest from the code. 
-            It is used by framework components when names are not specified in the API and the framework types have
-            to default it to a meaningful name derived from the service type.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.ServiceNameFormat.GetEndpointName(System.Type)">
-            <summary>
-            Gets the default endpoint resource name for the given service type
-            </summary>
-            <param name="serviceInterfaceType">Service interface type name.</param>
-            <returns>The name of the endpoint resource.</returns>
-            <remarks>
-            <list type="bullet">
-                <item>
-                    If the type name is <code>IMyService</code>, this method returns <code>MyServiceEndpoint</code> as the name of the endpoint resource.
-                </item>
-                <item>
-                    If the type name is <code>Foo</code>, this method returns <code>FooServiceEndpoint</code> as the name of the endpoint resource.
-                </item>
-            </list>
-            </remarks>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver">
-            <summary>
-            <para>
-            Defines the interface for the Service partition resolver.
-            Service resolution is the process of looking up the set of endpoints for the replicas in a partition. A service partition resolver
-            implements the logic for service resolution.
-            </para>
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver.ResolveAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
-            <summary>
-            Resolves a partition of the specified service with specified back-off/retry settings on retry-able errors.
-            </summary>
-            <param name="serviceUri">Name of the service instance to resolve.</param>
-            <param name="partitionKey">
-            <para>
-            <see cref="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey">Key</see> that determines the target partition of the service instance. The <see cref="T:System.Fabric.ServicePartitionKind">partitioning scheme</see>
-            specified in the key should match the partitioning scheme used to create the service instance.
-            </para>
-            </param>
-            <param name="resolveTimeoutPerTry">The time out per resolve try.</param>
-            <param name="maxRetryBackoffInterval">
-            The interval to back-off before retrying the resolution after a failure due to retry-able exception.
-            </param>
-            <param name="cancellationToken">
-            <para>
-            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
-            </para>
-            </param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents the outstanding service resolution operation. The result from
-            the Task is the <see cref="T:System.Fabric.ResolvedServicePartition"/> object, that contains the information
-            about the resolved service partition including the service endpoints.
-            </returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver.ResolveAsync(System.Fabric.ResolvedServicePartition,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
-            <summary>
-            <para>
-            Re-resolves a previously resolved partition of the specified service with specified back-off/retry settings 
-            on retry-able errors. This method overload is used in cases where the client knows that the resolved service partition that it has is no longer valid.
-            </para>
-            </summary>
-            <param name="previousRsp">The resolved service partition that the client got from the earlier invocation of the ResolveAsync() method.</param>
-            <param name="resolveTimeoutPerTry">The time out per resolve try.</param>
-            <param name="maxRetryBackoffInterval">
-            The interval to back-off before retrying the resolution after a failure due to retry-able exception.
-            </param>
-            <param name="cancellationToken">
-            <para>
-            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
-            </para>
-            </param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding service resolution operation. The result from
-            the Task is the <see cref="T:System.Fabric.ResolvedServicePartition"/> object, that contains the information
-            about the resolved service partition including the service endpoints.
-            </returns>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey">
-            <summary>
-            Defines a key to address a service partition.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.Singleton">
-            <summary>
-            Returns a ServicePartitionKey that indicates a singleton partition.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.#ctor">
-            <summary>
-            Instantiates a ServicePartitionKey for singleton partitioned service.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.#ctor(System.Int64)">
-            <summary>
-            Instantiates a ServicePartitionKey for uniform int64 partitioned service.
-            </summary>
-            <param name="partitionKey">Value of the int64 partition key</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.#ctor(System.String)">
-            <summary>
-            Instantiates a ServicePartitionKey for named partitioned services.
-            </summary>
-            <param name="partitionKey">Value of the named partition key</param>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.Kind">
-            <summary>
-            Kind of the partition this key applies to.
-            </summary>
-            <value>Partition kind</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.Value">
-            <summary>
-            The value of the partition key. This value can be casted to the right type based on the value of the Kind property.
-            </summary>
-            <value>Partition key</value>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Services.Client.CreateFabricClientDelegate">
-            <summary>
-            Represents a delegate to create a FabricClient object.
-            </summary>
-            <returns>FabricClient</returns>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver">
-            <summary>
-            <para>
-            Implements the Service partition resolver class that uses the <see cref="T:System.Fabric.FabricClient">FabricClient's </see> <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/> method for service resolution
-            and implements a back-off/retry mechanism on errors from that method.
-            </para>
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.DefaultResolveTimeout">
-            <summary>
-            The default resolve timeout per try used by the ResolveAsync method of <see cref="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver"/> when it is
-            invoked without explicitly specifying the resolveTimeoutPerTry argument. The default value is 30 seconds.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.DefaultMaxRetryBackoffInterval">
-            <summary>
-            The default maximum back-off time used by ServicePartitionResolver's ResolveAsync method before retrying, when it is
-            invoked without explicitly specifying the maxRetryBackoffInterval argument. The default value is 5 seconds.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(Microsoft.ServiceFabric.Services.Client.CreateFabricClientDelegate,Microsoft.ServiceFabric.Services.Client.CreateFabricClientDelegate)">
-            <summary>
-            <para>
-            Instantiates a ServicePartionResolver, invoking the first delegate to get the <see cref="T:System.Fabric.FabricClient">FabricClient.</see>.
-            During partition resolution if FabricClient object gets disposed and second delegate is provided,
-            it uses the second delegate to get the FabricClient again. The second delegate provides a way to specify
-            an alternate way to get or create FabricClient if FabricClient created with first delegate get disposed.
-            </para>
-            </summary>
-            <param name="createFabricClient">Delegate to create the fabric client.</param>
-            <param name="recreateFabricClient">Delegate to re-create the fabric client.</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(Microsoft.ServiceFabric.Services.Client.CreateFabricClientDelegate)">
-            <summary>
-            Instantiates a ServicePartitionResolver, invoking the given delegate to instantiate FabricClient.
-            </summary>
-            <param name="createFabricClient">Delegate to create fabric client.</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(System.String[])">
-            <summary>
-            Instantiates a ServicePartitionResolver, uses the given connectionEndpoints to create a new instance of the FabricClient.
-            </summary>
-            <param name="connectionEndpoints">Array of management endpoints of the cluster.</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(System.Fabric.FabricClientSettings,System.String[])">
-            <summary>
-            Instantiates a ServicePartitionResolver, uses the given FabricClient Settings and the connectionEndpoints to create
-            a new instance of FabricClient.
-            </summary>
-            <param name="settings">Fabric client Settings.</param>
-            <param name="connectionEndpoints">Array of management endpoints of the cluster.</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(System.Fabric.SecurityCredentials,System.String[])">
-            <summary>
-            Instantiates a ServicePartitionResolver, uses the given security credentials and the connectionEndpoints to create
-            a new instance of FabricClient.
-            </summary>
-            <param name="credential">Security credentials for the fabric client.</param>
-            <param name="connectionEndpoints">Array of management endpoints of the cluster.</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(System.Fabric.SecurityCredentials,System.Fabric.FabricClientSettings,System.String[])">
-            <summary>
-            Instantiates a ServicePartitionResolver, uses the given security credentials, FabricClient Settings and the connectionEndpoints
-            to create a new instance of FabricClient.
-            </summary>
-            <param name="credential">Security credentials for the fabric client.</param>
-            <param name="settings">Fabric client Settings.</param>
-            <param name="connectionEndpoints">Array of management endpoints of the cluster.</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,System.Threading.CancellationToken)">
-            <summary>
-            <para>
-            Resolves a partition of the specified service by invoking FabricClient's
-            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method. This uses the default settings for
-            <see cref="F:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.DefaultResolveTimeout">timeout</see> and <see cref="F:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.DefaultMaxRetryBackoffInterval">back-off retry</see> intervals.
-            </para>
-            </summary>
-            <param name="serviceUri">Name of the service instance to resolve.</param>
-            <param name="partitionKey">
-            <para>
-            <see cref="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey">Key</see> that determines the target partition of the service instance. The <see cref="T:System.Fabric.ServicePartitionKind">partitioning scheme</see>
-            specified in the key should match the partitioning scheme used to create the service instance.
-            </para>
-            </param>
-            <param name="cancellationToken">
-            <para>
-            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
-            </para>
-            </param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result from
-            the task is the <see cref="T:System.Fabric.ResolvedServicePartition"/> object, that contains the information
-            about the resolved service partition including the service endpoints.
-            </returns>
-            <exception cref="T:System.Fabric.FabricServiceNotFoundException"> 
-            <para>
-            This method can throw a FabricServiceNotFoundExcepion if there is no service instance in the cluster matching the specified serviceUri.
-            </para>
-            </exception>
-            <exception cref="T:System.Fabric.FabricException"> 
-            <para>
-            This method can throw a FabricException if the scheme specified in the ServicePartitionKey doesn't match the scheme used to create the service instance.
-            See also <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/">Errors and Exceptions</see> for handling common FabricClient failures.
-            </para>
-            </exception>
-            <remarks>
-            <para>
-            This method retries on all transient exceptions. For cases where you want to limit the max execution time of this method, you should create a <see href="https://docs.microsoft.com/en-us/dotnet/core/api/system.threading.cancellationtokensource#System_Threading_CancellationTokenSource__ctor_System_TimeSpan_">cancellation token associated with that max execution time</see>
-            and pass that cancellation token to this method.
-            </para>
-            </remarks>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
-            <summary>
-            Resolves a partition of the specified service by invoking FabricClient's
-            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/> method with the given timeout and back-off/retry on retry-able errors.
-            </summary>
-            <param name="serviceUri">Name of the service instance to resolve.</param>
-            <param name="partitionKey">
-            <para>
-            <see cref="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey">Key</see> that determines the target partition of the service instance. The <see cref="T:System.Fabric.ServicePartitionKind">partitioning scheme</see>
-            specified in the key should match the partitioning scheme used to create the service instance.
-            </para>
-            </param>
-            <param name="resolveTimeoutPerTry">The timeout passed to FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method.</param>
-            <param name="maxRetryBackoffInterval">
-            <para>
-            The max interval to back-off before retrying when FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method fails with a retry-able exception. 
-            The actual back off interval is a random time interval which is less than or equal to the specified maxRetryBackoffInterval.
-            </para>
-            </param>
-            <param name="cancellationToken">
-            <para>
-            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
-            </para>
-            </param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result from
-            the task is the <see cref="T:System.Fabric.ResolvedServicePartition"/> object, that contains the information
-            about the resolved service partition including the service endpoints.
-            </returns>
-            <exception cref="T:System.Fabric.FabricServiceNotFoundException"> 
-            <para>
-            This method can throw a FabricServiceNotFoundExcepion if there is no service instance in the cluster matching the specified serviceUri.
-            </para>
-            </exception>
-            <exception cref="T:System.Fabric.FabricException"> 
-            <para>
-            This can throw a FabricException if the scheme specified in the ServicePartitionKey doesn't match the scheme used to create the service instance.
-            See also <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/">Errors and Exceptions</see> for more information.
-            </para>
-            </exception>
-            <remarks>
-            <para>
-            This method retries on all transient exceptions. For cases where you want to limit the max execution time of this method, you should create a <see href="https://docs.microsoft.com/en-us/dotnet/core/api/system.threading.cancellationtokensource#System_Threading_CancellationTokenSource__ctor_System_TimeSpan_">cancellation token associated with that max execution time</see>
-            and pass that cancellation token to this method.
-            </para>
-            </remarks>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Fabric.ResolvedServicePartition,System.Threading.CancellationToken)">
-            <summary>
-            Resolves a partition of the specified service by invoking FabricClient's
-            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method with back-off/retry on retry-able errors. This takes in 
-            the resolved service partition that was got via an earlier invocation of the ResolveAsync() method. 
-            This method overload is used in cases where the client knows that the resolved service partition that it has is no longer valid.
-            </summary>
-            <param name="previousRsp">The resolved service partition that the client got from the earlier invocation of the ResolveAsync() method.</param>
-            <param name="cancellationToken">
-            <para>
-            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
-            </para>
-            </param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result from
-            the task is the <see cref="T:System.Fabric.ResolvedServicePartition"/> object, that contains the information
-            about the resolved service partition including the service endpoints.
-            </returns>
-            <exception cref="T:System.Fabric.FabricServiceNotFoundException"> 
-            <para>
-            This method can throw a FabricServiceNotFoundExcepion if the service which was resolved previously is no longer present in the cluster.
-            </para>
-            </exception>
-            <remarks>
-            <para>
-            This method retries on all transient exceptions. For cases where you want to limit the max execution time of this method, you should create a <see href="https://docs.microsoft.com/en-us/dotnet/core/api/system.threading.cancellationtokensource#System_Threading_CancellationTokenSource__ctor_System_TimeSpan_">cancellation token associated with that max execution time</see>
-            and pass that cancellation token to this method.
-            </para>
-            </remarks>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Fabric.ResolvedServicePartition,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
-            <summary>
-            Resolves a partition of the specified service by invoking FabricClient's
-            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method with back-off/retry on retry-able errors. This takes in 
-            the resolved service partition that was got via an earlier invocation of the ResolveAsync() method. 
-            This method overload is used in cases where the client knows that the resolved service partition that it has is no longer valid.
-            </summary>
-            <param name="previousRsp">The resolved service partition that the client got from the earlier invocation of the ResolveAsync() method.</param>
-            <param name="resolveTimeoutPerTry">The timeout passed to FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method </param>
-            <param name="maxRetryBackoffInterval">
-            <para>
-            The max interval to back-off before retrying when FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)"/>method fails with a retry-able exception. 
-            The actual back off interval is a random time interval which is less than or equal to the specified maxRetryBackoffInterval.
-            </para>
-            </param>
-            <param name="cancellationToken">
-            <para>
-            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
-            </para>
-            </param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result from
-            the task is the <see cref="T:System.Fabric.ResolvedServicePartition"/> object, that contains the information
-            about the resolved service partition including the service endpoints.
-            </returns>
-            <exception cref="T:System.Fabric.FabricServiceNotFoundException"> 
-            <para>
-            This method can throw a FabricServiceNotFoundExcepion if the service which was resolved previously is no longer present in the cluster.
-            </para>
-            </exception>
-            <remarks>
-            <para>
-            This method retries on all transient exceptions. For cases where you want to limit the max execution time of this method, you should create a <see href="https://docs.microsoft.com/en-us/dotnet/core/api/system.threading.cancellationtokensource#System_Threading_CancellationTokenSource__ctor_System_TimeSpan_">cancellation token associated with that max execution time</see>
-            and pass that cancellation token to this method.
-            </para>
-            </remarks>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.SetDefault(Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver)">
-            <summary>
-            Updates the default ServicePartitionResolver.
-            </summary>
-            <param name="defaultServiceResolver">The new default value</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.GetDefault">
-            <summary>
-            Gets the default ServicePartitionResolver.
-            <remarks>
-            <para>
-            The default service partition resolver instance uses the local <see href="https://docs.microsoft.com/en-us/dotnet/api/system.fabric.fabricclient#System_Fabric_FabricClient__ctor">fabric client</see>.
-            If you are using the ServicePartitionResolver to resolve services that are running on a remote cluster, the recommended practice is to create a ServicePartitionResolver using the appropriate endpoints or FabricClient and then update
-            the default ServicePartitionResolver.
-            </para>
-            </remarks>
-            </summary>
-            <returns>Default <see cref="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver"/></returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Common.IdUtil.HashCombine(System.Int32,System.Int32)">
-            <summary>
-            This is how VB Anonymous Types combine hash values for fields.
-            </summary>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection">
-            <summary>
-            This class represents the endpoints of a Reliable service. Each endpoint has a listener name and the address of that listener.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.#ctor">
-            <summary>
-            Instantiates an empty ServiceEndpointsCollection
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.#ctor(System.String,System.String)">
-            <summary>
-            Instantiates the ServiceEndpointsCollection with a single endpoint, identified by the listener name.
-            </summary>
-            <param name="listenerName">Listener name of the endpoint</param>
-            <param name="endpointAddress">Address of the endpoint</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.AddEndpoints(Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection)">
-            <summary>
-            Adds the endpoints in the input EndpointsCollection class to the EndpointsCollection.
-            </summary>
-            <param name="newEndpoints">input EndpointsCollection</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.AddEndpoint(System.String,System.String)">
-            <summary>
-            Adds an endpoint to the EndpointsCollection
-            </summary>
-            <param name="listenerName">Listener name of the endpoint</param>
-            <param name="endpointAddress">Address of the endpoint</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.TryGetFirstEndpointAddress(System.String@)">
-            <summary>
-            Gets the first endpoint address in the EndpointsCollection
-            </summary>
-            <param name="endpointAddress">First endpoint in the EndpointsCollection</param>
-            <returns>True if there is at-least one endpoint in the EndpointsCollection, false otherwise</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.TryGetEndpointAddress(System.String,System.String@)">
-            <summary>
-            Gets the endpoint identified by the listener name.
-            </summary>
-            <param name="listenerName">Listener name</param>
-            <param name="endpointAddress">Address of the endpoint if an endpoint with that listener name exists.</param>
-            <returns>True if an endpoint with the listener name exists, False otherwise</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.TryParseEndpointsString(System.String,Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection@)">
-            <summary>
-            Constructs an EndpointsCollection from a string version of the endpoints. String form of EndpointsCollection is of the form
-            {"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}
-            </summary>
-            <param name="endpointsString">string form of endpointsCollection</param>
-            <param name="serviceEndpoints">ServiceEndpointCollection object if the string can be parsed to a valid ServiceEndpointCollection object</param>
-            <returns>True if the string can be parsed to a valid EndpointsCollection, False otherwise</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.ToString">
-            <summary>
-            Converts the endpointsCollection to a JSON string of the form 
-            {"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}
-            </summary>
-            <returns>String form of the endpointsCollection</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.ToReadOnlyDictionary">
-            <summary>
-            Returns a ReadOnlyDictionary of the endpointsCollection.
-            </summary>
-            <returns>EndpointsCollection as a ReadOnlyDictionary</returns>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientEventArgs">
             <summary>
             Specifies the arguments for the communication client connected/disconnected events handler.
@@ -642,69 +174,23 @@
             </summary>
             <typeparam name="TCommunicationClient">The type of communication client</typeparam>
         </member>
-        <member name="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1">
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.ServiceResolver">
             <summary>
-            Defines the interface that must be implemented to provide a factory for communication clients to talk to a service fabric service.
+            Gets the ServicePartitionResolver used by the client factory for resolving the service endpoint.
             </summary>
-            <typeparam name="TCommunicationClient">Type of communication client</typeparam>
+            <value>ServicePartitionResolver</value>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1.GetClientAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector,System.String,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.ExceptionHandlers">
             <summary>
-            Resolves a partition of the specified service containing one or more communication listeners and returns a client to communicate 
-            to the endpoint corresponding to the given listenerName. 
-            
-            The endpoint of the service is of the form - {"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}
+            Gets the custom exception handlers for handling exceptions on the client to service communication channel.
             </summary>
-            <param name="serviceUri">Uri of the service to resolve</param>
-            <param name="partitionKey">Key that identifies the partition to resolve</param>
-            <param name="targetReplicaSelector">Specifies which replica in the partition identified by the partition key, the client should connect to</param>
-            <param name="listenerName">Specifies which listener in the endpoint of the chosen replica, to which the client should connect to</param>
-            <param name="retrySettings">Specifies the retry policy that should be used for exceptions that occur when creating the client.</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
-            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient"/>) object.
-            </returns>
+            <value>List of Exception handlers</value>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1.GetClientAsync(System.Fabric.ResolvedServicePartition,Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector,System.String,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.TraceId">
             <summary>
-            Re-resolves a partition of the specified service containing one or more communication listeners and returns a client to communicate 
-            to the endpoint corresponding to the given listenerName. 
-            
-            The endpoint of the service is of the form - {"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}
+            Gets the diagnostics trace identifier for this component.
             </summary>
-            <param name="previousRsp">Previous ResolvedServicePartition value</param>
-            <param name="targetReplicaSelector">Specifies which replica in the partition identified by the partition key, the client should connect to</param>
-            <param name="listenerName">Specifies which listener in the endpoint of the chosen replica, to which the client should connect to</param>
-            <param name="retrySettings">Specifies the retry policy that should be used for exceptions that occur when creating the client.</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
-            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient"/>) object.
-            </returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1.ReportOperationExceptionAsync(`0,Microsoft.ServiceFabric.Services.Communication.Client.ExceptionInformation,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
-            <summary>
-            Handles the exceptions that occur in the CommunicationClient when sending a message to the Service
-            </summary>
-            <param name="client">Communication client</param>
-            <param name="exceptionInformation">Information about exception that happened while communicating with the service.</param>
-            <param name="retrySettings">Specifies the retry policy that should be used for handling the reported exception.</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
-            a <see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.OperationRetryControl"/> object that provides information on retry policy for this exception.
-            </returns>
-        </member>
-        <member name="E:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1.ClientConnected">
-            <summary>
-            Event handler that is fired when the Communication client connects to the service endpoint.
-            </summary>
-        </member>
-        <member name="E:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1.ClientDisconnected">
-            <summary>
-            Event handler that is fired when the Communication client disconnects from the service endpoint.
-            </summary>
+            <value>Trace identifier</value>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.#ctor(Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver,System.Collections.Generic.IEnumerable{Microsoft.ServiceFabric.Services.Communication.Client.IExceptionHandler},System.String)">
             <summary>
@@ -713,6 +199,16 @@
             <param name="servicePartitionResolver">Optional ServicePartitionResolver</param>
             <param name="exceptionHandlers">Optional Custom exception handlers for the exceptions on the Client to Service communication channel</param>
             <param name="traceId">Identifier to use in diagnostics traces from this component </param>
+        </member>
+        <member name="E:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.ClientConnected">
+            <summary>
+            Event handler that is fired when the Communication client connects to the service endpoint.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.ClientDisconnected">
+            <summary>
+            Event handler that is fired when the Communication client disconnects from the service endpoint.
+            </summary>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.GetClientAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector,System.String,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
             <summary>
@@ -729,7 +225,7 @@
             <param name="cancellationToken">Cancellation token</param>
             <returns>
             A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
-            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient"/>) object.
+            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient" />) object.
             </returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.GetClientAsync(System.Fabric.ResolvedServicePartition,Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector,System.String,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
@@ -743,7 +239,7 @@
             <param name="cancellationToken">Cancellation token</param>
             <returns>
             A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
-            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient"/>) object.
+            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient" />) object.
             </returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.ReportOperationExceptionAsync(`0,Microsoft.ServiceFabric.Services.Communication.Client.ExceptionInformation,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
@@ -756,7 +252,7 @@
             <param name="cancellationToken">Cancellation token</param>
             <returns>
             A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
-            a <see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.OperationRetryControl"/> object that determines
+            a <see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.OperationRetryControl" /> object that determines
             how the retry policy for this exception.
             </returns>
         </member>
@@ -790,34 +286,6 @@
             </summary>
             <param name="client">Communication client</param>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.ServiceResolver">
-            <summary>
-            Gets the ServicePartitionResolver used by the client factory for resolving the service endpoint.
-            </summary>
-            <value>ServicePartitionResolver</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.ExceptionHandlers">
-            <summary>
-            Gets the custom exception handlers for handling exceptions on the client to service communication channel.
-            </summary>
-            <value>List of Exception handlers</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.TraceId">
-            <summary>
-            Gets the diagnostics trace identifier for this component.
-            </summary>
-            <value>Trace identifier</value>
-        </member>
-        <member name="E:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.ClientConnected">
-            <summary>
-            Event handler that is fired when the Communication client connects to the service endpoint.
-            </summary>
-        </member>
-        <member name="E:Microsoft.ServiceFabric.Services.Communication.Client.CommunicationClientFactoryBase`1.ClientDisconnected">
-            <summary>
-            Event handler that is fired when the Communication client disconnects from the service endpoint.
-            </summary>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingResult">
             <summary>
             Specifies the base class for the result from handling an exception 
@@ -828,6 +296,40 @@
             <summary>
             Specifies the exception handling result when the request from client to service can be retried
             </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingRetryResult.IsTransient">
+            <summary>
+            Transient retriable exceptions are those where the communication channel from client
+            to service still exists.
+            Non transient retriable exceptions are those where we need to re-resolve the service endpoint
+            before we retry.
+            </summary>
+            <value>
+            true indicates that this is a transient retriable exception.
+            false indicates that this is a non transient retriable exception.
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingRetryResult.ExceptionId">
+            <summary>
+            String that uniquely identifies the exception type.
+            </summary>
+            <value>
+            Unique id for this exception. 
+            This id is used to keep track of the number of times this exception is retried
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingRetryResult.MaxRetryCount">
+            <summary>
+            Maximum number of times this exception type needs to be retried before giving up.
+            The default value is int.MaxValue
+            </summary>
+            <value>Max retry count</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingRetryResult.RetryDelay">
+            <summary>
+            The operation should be retried after this delay.
+            </summary>
+            <value>Time delay after which the operation should be retried</value>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingRetryResult.#ctor(System.Exception,System.Boolean,System.TimeSpan,System.Int32)">
             <summary>
@@ -874,40 +376,6 @@
             <param name="retrySettings">The retrySettings from which the interval to wait before retrying is figured out.</param>
             <param name="maxRetryCount">The maximum number of times the exception identified by the exceptionId parameter needs to be retried for.</param>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingRetryResult.IsTransient">
-            <summary>
-            Transient retriable exceptions are those where the communication channel from client
-            to service still exists.
-            Non transient retriable exceptions are those where we need to re-resolve the service endpoint
-            before we retry.
-            </summary>
-            <value>
-            true indicates that this is a transient retriable exception.
-            false indicates that this is a non transient retriable exception.
-            </value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingRetryResult.ExceptionId">
-            <summary>
-            String that uniquely identifies the exception type.
-            </summary>
-            <value>
-            Unique id for this exception. 
-            This id is used to keep track of the number of times this exception is retried
-            </value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingRetryResult.MaxRetryCount">
-            <summary>
-            Maximum number of times this exception type needs to be retried before giving up.
-            The default value is int.MaxValue
-            </summary>
-            <value>Max retry count</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingRetryResult.RetryDelay">
-            <summary>
-            The operation should be retried after this delay.
-            </summary>
-            <value>Time delay after which the operation should be retried</value>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Client.ExceptionHandlingThrowResult">
             <summary>
             Specifies the exception handling result when the request from client to service cannot be retried
@@ -928,7 +396,7 @@
             <summary>
             Gets or Sets the Resolved service partition which was used when this client was created.
             </summary>
-            <value><see cref="T:System.Fabric.ResolvedServicePartition"/> object</value>
+            <value><see cref="T:System.Fabric.ResolvedServicePartition" /> object</value>
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient.ListenerName">
             <summary>
@@ -941,7 +409,71 @@
             <summary>
             Gets or Sets the service endpoint to which the client is connected to.
             </summary>
-            <value><see cref="T:System.Fabric.ResolvedServiceEndpoint"/></value>
+            <value><see cref="T:System.Fabric.ResolvedServiceEndpoint" /></value>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1">
+            <summary>
+            Defines the interface that must be implemented to provide a factory for communication clients to talk to a service fabric service.
+            </summary>
+            <typeparam name="TCommunicationClient">Type of communication client</typeparam>
+        </member>
+        <member name="E:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1.ClientConnected">
+            <summary>
+            Event handler that is fired when the Communication client connects to the service endpoint.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1.ClientDisconnected">
+            <summary>
+            Event handler that is fired when the Communication client disconnects from the service endpoint.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1.GetClientAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector,System.String,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
+            <summary>
+            Resolves a partition of the specified service containing one or more communication listeners and returns a client to communicate 
+            to the endpoint corresponding to the given listenerName. 
+            
+            The endpoint of the service is of the form - {"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}
+            </summary>
+            <param name="serviceUri">Uri of the service to resolve</param>
+            <param name="partitionKey">Key that identifies the partition to resolve</param>
+            <param name="targetReplicaSelector">Specifies which replica in the partition identified by the partition key, the client should connect to</param>
+            <param name="listenerName">Specifies which listener in the endpoint of the chosen replica, to which the client should connect to</param>
+            <param name="retrySettings">Specifies the retry policy that should be used for exceptions that occur when creating the client.</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
+            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient" />) object.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1.GetClientAsync(System.Fabric.ResolvedServicePartition,Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector,System.String,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
+            <summary>
+            Re-resolves a partition of the specified service containing one or more communication listeners and returns a client to communicate 
+            to the endpoint corresponding to the given listenerName. 
+            
+            The endpoint of the service is of the form - {"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}
+            </summary>
+            <param name="previousRsp">Previous ResolvedServicePartition value</param>
+            <param name="targetReplicaSelector">Specifies which replica in the partition identified by the partition key, the client should connect to</param>
+            <param name="listenerName">Specifies which listener in the endpoint of the chosen replica, to which the client should connect to</param>
+            <param name="retrySettings">Specifies the retry policy that should be used for exceptions that occur when creating the client.</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
+            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient" />) object.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClientFactory`1.ReportOperationExceptionAsync(`0,Microsoft.ServiceFabric.Services.Communication.Client.ExceptionInformation,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
+            <summary>
+            Handles the exceptions that occur in the CommunicationClient when sending a message to the Service
+            </summary>
+            <param name="client">Communication client</param>
+            <param name="exceptionInformation">Information about exception that happened while communicating with the service.</param>
+            <param name="retrySettings">Specifies the retry policy that should be used for handling the reported exception.</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
+            a <see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.OperationRetryControl" /> object that provides information on retry policy for this exception.
+            </returns>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Client.IExceptionHandler">
             <summary>
@@ -962,13 +494,6 @@
             Defines the interface for the client that can communicate with replicas of a particular service partition.
             </summary>
             <typeparam name="TCommunicationClient">Type of ICommunicationClient</typeparam>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.IServicePartitionClient`1.TryGetLastResolvedServicePartition(System.Fabric.ResolvedServicePartition@)">
-            <summary>
-            Gets the resolved service partition that was set on the client.
-            </summary>
-            <param name="resolvedServicePartition">previous ResolvedServicePartition</param>
-            <returns>true if a ResolvedServicePartition was set</returns>
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.IServicePartitionClient`1.ServiceUri">
             <summary>
@@ -999,6 +524,13 @@
             Gets the communication client factory
             </summary>
             <value>Communication client factory</value>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.IServicePartitionClient`1.TryGetLastResolvedServicePartition(System.Fabric.ResolvedServicePartition@)">
+            <summary>
+            Gets the resolved service partition that was set on the client.
+            </summary>
+            <param name="resolvedServicePartition">previous ResolvedServicePartition</param>
+            <returns>true if a ResolvedServicePartition was set</returns>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Client.OperationRetryControl">
             <summary>
@@ -1069,6 +601,36 @@
             <param name="targetReplicaSelector">Target replica information</param>
             <param name="listenerName">Listener in the replica to which the client should connect to</param>
             <param name="retrySettings">Retry policy for exceptions seen during communication</param>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ServicePartitionClient`1.Factory">
+            <summary>
+            Gets the communication client factory
+            </summary>
+            <value>Communication client factory</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ServicePartitionClient`1.ServiceUri">
+            <summary>
+            Gets the name of the service
+            </summary>
+            <value>Name of the service</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ServicePartitionClient`1.PartitionKey">
+            <summary>
+            Gets the partition key.
+            </summary>
+            <value>Partition key</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ServicePartitionClient`1.TargetReplicaSelector">
+            <summary>
+            Gets the information about which replica in the partition the client should connect to.
+            </summary>
+            <value>A <see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector"/></value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ServicePartitionClient`1.ListenerName">
+            <summary>
+            Gets the name of the listener in the replica to which the client should connect to.
+            </summary>
+            <value>Listener name</value>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Communication.Client.ServicePartitionClient`1.TryGetLastResolvedServicePartition(System.Fabric.ResolvedServicePartition@)">
             <summary>
@@ -1151,35 +713,96 @@
             <param name="func">Function being invoked</param>
             <param name="doNotRetryExceptionTypes">Exceptions for which the service partition client should not retry</param>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ServicePartitionClient`1.Factory">
+        <member name="T:Microsoft.ServiceFabric.Services.Communication.ServiceException">
             <summary>
-            Gets the communication client factory
+            Provides an information about an exception from the service. This exception is thrown when the actual
+            exception from the service cannot be serialized for transferring to client.
             </summary>
-            <value>Communication client factory</value>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ServicePartitionClient`1.ServiceUri">
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceException.#ctor">
             <summary>
-            Gets the name of the service
+            <para>Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Services.Communication.ServiceException" /> class.</para>
             </summary>
-            <value>Name of the service</value>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ServicePartitionClient`1.PartitionKey">
-            <summary>
-            Gets the partition key.
-            </summary>
-            <value>Partition key</value>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.ServiceException.ActualExceptionType">
+             <summary>
+            The ActualExceptionType is the type of actual exception thrown
+             </summary>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ServicePartitionClient`1.TargetReplicaSelector">
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceException.#ctor(System.String,System.String)">
             <summary>
-            Gets the information about which replica in the partition the client should connect to.
+            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Services.Communication.ServiceException" /> class with appropriate message
             </summary>
-            <value>A <see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector"/></value>
+            <param name="actualExceptionType">the ActualExceptionType of exception thrown</param>
+            <param name="message">The error message that explains the reason for this exception
+            </param>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Client.ServicePartitionClient`1.ListenerName">
+        <member name="T:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection">
             <summary>
-            Gets the name of the listener in the replica to which the client should connect to.
+            This class represents the endpoints of a Reliable service. Each endpoint has a listener name and the address of that listener.
             </summary>
-            <value>Listener name</value>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.#ctor">
+            <summary>
+            Instantiates an empty ServiceEndpointsCollection
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.#ctor(System.String,System.String)">
+            <summary>
+            Instantiates the ServiceEndpointsCollection with a single endpoint, identified by the listener name.
+            </summary>
+            <param name="listenerName">Listener name of the endpoint</param>
+            <param name="endpointAddress">Address of the endpoint</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.AddEndpoints(Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection)">
+            <summary>
+            Adds the endpoints in the input EndpointsCollection class to the EndpointsCollection.
+            </summary>
+            <param name="newEndpoints">input EndpointsCollection</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.AddEndpoint(System.String,System.String)">
+            <summary>
+            Adds an endpoint to the EndpointsCollection
+            </summary>
+            <param name="listenerName">Listener name of the endpoint</param>
+            <param name="endpointAddress">Address of the endpoint</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.TryGetFirstEndpointAddress(System.String@)">
+            <summary>
+            Gets the first endpoint address in the EndpointsCollection
+            </summary>
+            <param name="endpointAddress">First endpoint in the EndpointsCollection</param>
+            <returns>True if there is at-least one endpoint in the EndpointsCollection, false otherwise</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.TryGetEndpointAddress(System.String,System.String@)">
+            <summary>
+            Gets the endpoint identified by the listener name.
+            </summary>
+            <param name="listenerName">Listener name</param>
+            <param name="endpointAddress">Address of the endpoint if an endpoint with that listener name exists.</param>
+            <returns>True if an endpoint with the listener name exists, False otherwise</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.TryParseEndpointsString(System.String,Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection@)">
+            <summary>
+            Constructs an EndpointsCollection from a string version of the endpoints. String form of EndpointsCollection is of the form
+            {"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}
+            </summary>
+            <param name="endpointsString">string form of endpointsCollection</param>
+            <param name="serviceEndpoints">ServiceEndpointCollection object if the string can be parsed to a valid ServiceEndpointCollection object</param>
+            <returns>True if the string can be parsed to a valid EndpointsCollection, False otherwise</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.ToString">
+            <summary>
+            Converts the endpointsCollection to a JSON string of the form 
+            {"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}
+            </summary>
+            <returns>String form of the endpointsCollection</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.ServiceEndpointCollection.ToReadOnlyDictionary">
+            <summary>
+            Returns a ReadOnlyDictionary of the endpointsCollection.
+            </summary>
+            <returns>EndpointsCollection as a ReadOnlyDictionary</returns>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Runtime.ICommunicationListener">
             <summary>
@@ -1232,13 +855,6 @@
             <para>The default name of the Service instance listener.</para>
             </value>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.Runtime.ServiceInstanceListener.#ctor(System.Func{System.Fabric.StatelessServiceContext,Microsoft.ServiceFabric.Services.Communication.Runtime.ICommunicationListener},System.String)">
-            <summary>
-            Initializes a new instance of ServiceInstanceListener.
-            </summary>
-            <param name="createCommunicationListener">Factory method for creating the communication listener.</param>
-            <param name="name">Name of the communication listener. This parameter is optional if the Stateless Service has only one communication listener. If it is not given, the Name is set to DefaultName.</param>
-        </member>
         <member name="P:Microsoft.ServiceFabric.Services.Communication.Runtime.ServiceInstanceListener.Name">
             <summary>
             <para>Gets the name of the communication listener.</para>
@@ -1258,6 +874,13 @@
             <para>The factory method takes in a <see cref="T:System.Fabric.StatelessServiceContext"/> and returns communication listener implementing <see cref="T:Microsoft.ServiceFabric.Services.Communication.Runtime.ICommunicationListener"/>.</para>
             </remarks>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.Runtime.ServiceInstanceListener.#ctor(System.Func{System.Fabric.StatelessServiceContext,Microsoft.ServiceFabric.Services.Communication.Runtime.ICommunicationListener},System.String)">
+            <summary>
+            Initializes a new instance of ServiceInstanceListener.
+            </summary>
+            <param name="createCommunicationListener">Factory method for creating the communication listener.</param>
+            <param name="name">Name of the communication listener. This parameter is optional if the Stateless Service has only one communication listener. If it is not given, the Name is set to DefaultName.</param>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Runtime.ServiceReplicaListener">
             <summary>
             Represents the communication listener and its properties for a Stateful Service replica.
@@ -1271,14 +894,6 @@
             <value>
             <para>The default name of the Service replica listener.</para>
             </value>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.Runtime.ServiceReplicaListener.#ctor(System.Func{System.Fabric.StatefulServiceContext,Microsoft.ServiceFabric.Services.Communication.Runtime.ICommunicationListener},System.String,System.Boolean)">
-            <summary>
-            Creates the ServiceReplicaListener
-            </summary>
-            <param name="createCommunicationListener">Factory method for creating the communication listener</param>
-            <param name="name">Name of the communication listener. This parameter is optional, if the service has only one communication listener</param>
-            <param name="listenOnSecondary">Specifies if the communication listener needs to be opened when the replica becomes Active secondary. THis parameter is optional</param>
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.Communication.Runtime.ServiceReplicaListener.Name">
             <summary>
@@ -1315,18 +930,27 @@
             <para>The factory method takes in a <see cref="T:System.Fabric.StatefulServiceContext"/> and returns communication listener implementing <see cref="T:Microsoft.ServiceFabric.Services.Communication.Runtime.ICommunicationListener"/>.</para>
             </remarks>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.Runtime.ServiceReplicaListener.#ctor(System.Func{System.Fabric.StatefulServiceContext,Microsoft.ServiceFabric.Services.Communication.Runtime.ICommunicationListener},System.String,System.Boolean)">
+            <summary>
+            Creates the ServiceReplicaListener
+            </summary>
+            <param name="createCommunicationListener">Factory method for creating the communication listener</param>
+            <param name="name">Name of the communication listener. This parameter is optional, if the service has only one communication listener</param>
+            <param name="listenOnSecondary">Specifies if the communication listener needs to be opened when the replica becomes Active secondary. THis parameter is optional</param>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Runtime.ServiceRuntime">
             <summary>
-            Static class that provides methods to resister reliable services with Service Fabric runtime.
+            Static class that provides methods to register reliable services with Service Fabric runtime.
             </summary>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.ServiceRuntime.RegisterServiceAsync(System.String,System.Func{System.Fabric.StatelessServiceContext,Microsoft.ServiceFabric.Services.Runtime.StatelessService},System.TimeSpan,System.Threading.CancellationToken)">
             <summary>
             Registers a reliable stateless service with Service Fabric runtime.
             </summary>
-            <param name="serviceTypeName">ServiceTypeName as provied in service manifest.</param>
+            <param name="serviceTypeName">The service type name as provied in service manifest.</param>
             <param name="serviceFactory">A factory method to create stateless service objects.</param>
             <param name="timeout">Timeout for the register operation.</param>
+            <para>Default timeout for this operation is taken from ServiceFactoryRegistrationTimeout in Hosting section of the cluster manifest. Default value for ServiceFactoryRegistrationTimeout is 120 seconds.</para>
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <returns>
             A task that represents the asynchronous register operation.
@@ -1336,9 +960,10 @@
             <summary>
             Registers a reliable stateful service with Service Fabric runtime.
             </summary>
-            <param name="serviceTypeName">ServiceTypeName as provied in service manifest.</param>
+            <param name="serviceTypeName">The service type name as provied in service manifest.</param>
             <param name="serviceFactory">A factory method to create stateful service objects.</param>
             <param name="timeout">Timeout for the register operation.</param>
+            <para>Default timeout for this operation is taken from ServiceFactoryRegistrationTimeout in Hosting section of the cluster manifest. Default value for ServiceFactoryRegistrationTimeout is 120 seconds.</para>
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <returns>
             A task that represents the asynchronous register operation.
@@ -1351,6 +976,32 @@
             Derive from this class to implement a Microsoft Service Fabric based stateful reliable service.
             </summary>
         </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Runtime.StatefulService.StateManager">
+            <summary>
+            Gets this replica's <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>.
+            </summary>
+            <value>The <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/> of the replica.</value>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulService.#ctor(System.Fabric.StatefulServiceContext)">
+            <summary>
+            Creates a new <see cref="T:Microsoft.ServiceFabric.Services.Runtime.StatefulService"/> with default <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>: <see cref="T:Microsoft.ServiceFabric.Data.ReliableStateManager"/>.
+            </summary>
+            <param name="serviceContext">
+            A <see cref="T:System.Fabric.StatefulServiceContext"/> describes the stateful service context, which it provides information like replica ID, partition ID, and service name.
+            </param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulService.#ctor(System.Fabric.StatefulServiceContext,Microsoft.ServiceFabric.Data.IReliableStateManagerReplica)">
+            <summary>
+            Creates a new stateful service. 
+            Override this method to create a new stateful service with non-default state manager replica.
+            </summary>
+            <param name="serviceContext">
+            A <see cref="T:System.Fabric.StatefulServiceContext"/> describes the stateful service context, which it provides information like replica ID, partition ID, and service name.
+            </param>
+            <param name="reliableStateManagerReplica">
+            A <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManagerReplica"/> represents a reliable state provider replica.
+            </param>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase">
             <summary>
             Represents base class for Microsoft Service Fabric based stateful reliable service.
@@ -1358,14 +1009,24 @@
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.#ctor(System.Fabric.StatefulServiceContext,Microsoft.ServiceFabric.Data.IStateProviderReplica)">
             <summary>
-            Creates a new StatefulService.
+            Creates a new stateful service.
             </summary>
             <param name="serviceContext">
-            A <see cref="T:System.Fabric.StatefulServiceContext"/> that describes the service context.
+            A <see cref="T:System.Fabric.StatefulServiceContext"/> describes the service context, which it provides information like replica ID, partition ID, and service name.
             </param>
             <param name="stateProviderReplica">
-            A <see cref="T:Microsoft.ServiceFabric.Data.IStateProviderReplica"/> that represents a reliable state provider replica.
+            A <see cref="T:Microsoft.ServiceFabric.Data.IStateProviderReplica"/> represents a reliable state provider replica.
             </param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.Context">
+            <summary>
+            Gets the service context that this stateful service is operating under.
+            It provides information like replica ID, partition ID, service name etc.
+            </summary>
+            <value>
+            A <see cref="T:System.Fabric.StatefulServiceContext"/> describes the service context, which it provides information like replica ID, partition ID, and service name.
+            </value>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.GetAddresses">
             <summary>
@@ -1377,18 +1038,35 @@
             (ListenerName, Endpoint) key-value pair.
             </returns>
         </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.Partition">
+            <summary>
+            Service partition to which current service replica belongs. 
+            </summary>
+            <value>
+            An <see cref="T:System.Fabric.IStatefulServicePartition"/> that represents the 
+            partition to which this service replica belongs.
+            </value>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.CreateServiceReplicaListeners">
             <summary>
-            Override this method to supply the communication listeners for the service replica. The endpoints returned by the communication listener's
+            Override this method to supply the communication listeners for the service replica. The endpoints returned by the communication listener
             are stored as a JSON string of ListenerName, Endpoint string pairs like 
-            {"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}
+            <code>{"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}</code>
+            <para>
+            For information about Reliable Services life cycle please see
+            https://docs.microsoft.com/azure/service-fabric/service-fabric-reliable-services-lifecycle
+            </para>
             </summary>
-            <returns>List of ServiceReplicaListeners</returns>
+            <returns>List of <see cref="T:Microsoft.ServiceFabric.Services.Communication.Runtime.ServiceReplicaListener"/> </returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.OnOpenAsync(System.Fabric.ReplicaOpenMode,System.Threading.CancellationToken)">
             <summary>
-            This method is called as the final step of opening the service.
+            This method is called when the replica is being opened and it is the final step of opening the service.
             Override this method to be notified that Open has completed for this replica's internal components.
+            <para>
+            For information about Reliable Services life cycle please see
+            https://docs.microsoft.com/azure/service-fabric/service-fabric-reliable-services-lifecycle
+            </para>
             </summary>
             <param name="openMode"><see cref="T:System.Fabric.ReplicaOpenMode"/> for this service replica.</param>
             <param name="cancellationToken">Cancellation token to monitor for cancellation requests.</param>
@@ -1398,8 +1076,12 @@
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.OnChangeRoleAsync(System.Fabric.ReplicaRole,System.Threading.CancellationToken)">
             <summary>
-            This method is called as the final step before completing <see cref="M:System.Fabric.IStatefulServiceReplica.ChangeRoleAsync(System.Fabric.ReplicaRole,System.Threading.CancellationToken)"/>.
+            This method is called when role of the replica is changing and it is the final step before completing <see cref="M:System.Fabric.IStatefulServiceReplica.ChangeRoleAsync(System.Fabric.ReplicaRole,System.Threading.CancellationToken)"/>.
             Override this method to be notified that ChangeRole has completed for this replica's internal components.
+            <para>
+            For information about Reliable Services life cycle please see
+            https://docs.microsoft.com/azure/service-fabric/service-fabric-reliable-services-lifecycle
+            </para>
             </summary>
             <param name="newRole">New <see cref="T:System.Fabric.ReplicaRole"/> for this service replica.</param>
             <param name="cancellationToken">Cancellation token to monitor for cancellation requests.</param>
@@ -1409,18 +1091,80 @@
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)">
             <summary>
-            Services that want to implement a processing loop which runs when it is primary and has write status,
-            just override this method with their logic.
+            This method is implemented as a processing loop and will only be called when the replica is primary with write status.
+            Override this method with the application logic. 
+            <para>
+            For information about Reliable Services life cycle please see
+            https://docs.microsoft.com/azure/service-fabric/service-fabric-reliable-services-lifecycle
+            </para>
             </summary>
             <param name="cancellationToken">Cancellation token to monitor for cancellation requests.</param>
             <returns>
             A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation.
             </returns>
+            <remarks>
+            Please ensure you follow these guidelines when overriding <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/>:
+            <list type="bullet">
+                <item>
+                    <description>
+                    Make sure <paramref name="cancellationToken"/> passed to <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/> is honored and once 
+                    it has been signaled, <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/> exits gracefully as soon as possible. Please note that
+                    if <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/> has finished its intended work, it does not need to wait for 
+                    <paramref name="cancellationToken"/> to be signaled and can return gracefully.
+                    </description>
+                </item>
+                <item>
+                    <description>
+                    Service Fabric runtime does not handle all exception(s) escaping from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/>. If an unhandled
+                    exception escapes from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/>, then Service Fabric runtime takes following action(s):
+                    <list type="bullet">
+                        <item>
+                            <description>
+                            If a <see cref="T:System.Fabric.FabricException"/> (or one of its derived exception) escapes from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/>, 
+                            Service Fabric runtime will restart this service replica. A health warning will be appear in Service Fabric
+                            Explorer containing details about unhandled exception.
+                            </description>
+                        </item>
+                        <item>
+                            <description>
+                            If an <see cref="T:System.OperationCanceledException"/> escapes from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/> and Service Fabric runtime
+                            has requested cancellation by signaling <paramref name="cancellationToken"/> passed to <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/>,
+                            Service Fabric runtime handles this exception and considers it as graceful completion of <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/>.
+                            </description>
+                        </item>
+                        <item>
+                            <description>
+                            If an <see cref="T:System.OperationCanceledException"/> escapes from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/> and Service Fabric runtime
+                            has NOT requested cancellation by signaling <paramref name="cancellationToken"/> passed to <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/>,
+                            the process that is hosting this service replica is brought down. This will impact all other service replicas 
+                            that are hosted by the same process. The details about unhandled exceptions can be viewed in Windows Event Viewer.
+                            </description>
+                        </item>
+                        <item>
+                            <description>
+                            If an exception of any other type escapes from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/> then the process that is hosting this
+                            service replica is brought down. This will impact all other service replicas that are hosted by the
+                            same process. The details about unhandled exceptions can be viewed in Windows Event Viewer.
+                            </description>
+                        </item>
+                    </list>
+                    </description>
+                </item>
+            </list>
+            <para>
+            Failing to conform to these guidelines can cause fail-over, reconfiguration or upgrade of your service to get stuck
+            and can impact availability of your service.
+            </para>
+            </remarks>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.OnCloseAsync(System.Threading.CancellationToken)">
             <summary>
-            This method is called as the final step of closing the service.
+            This method is called as the final step of closing the service gracefully.
             Override this method to be notified that Close has completed for this replica's internal components.
+            <para>
+            For information about Reliable Services life cycle please see
+            https://docs.microsoft.com/azure/service-fabric/service-fabric-reliable-services-lifecycle
+            </para>
             </summary>
             <param name="cancellationToken">Cancellation token to monitor for cancellation requests.</param>
             <returns>
@@ -1429,8 +1173,12 @@
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.OnAbort">
             <summary>
-            Notification that the service is being aborted.  RunAsync MAY be running concurrently
-            with the execution of this method, as cancellation is not awaited on the abort path.
+            Notification that the service is being aborted. RunAsync MAY be running concurrently
+            with the execution of this method, as cancellation is not awaited on the abort path. 
+            <para>
+            For information about Reliable Services life cycle please see
+            https://docs.microsoft.com/azure/service-fabric/service-fabric-reliable-services-lifecycle
+            </para>
             </summary>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.OnDataLossAsync(Microsoft.ServiceFabric.Data.RestoreContext,System.Threading.CancellationToken)">
@@ -1465,7 +1213,7 @@
             </summary>
             <param name="backupDescription">A <see cref="T:Microsoft.ServiceFabric.Data.BackupDescription"/> describing the backup request.</param>
             <param name="timeout">The timeout for this operation.</param>
-            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <param name="cancellationToken">The cancellation token is used to monitor for cancellation requests.</param>
             <returns>Task that represents the asynchronous backup operation.</returns>
             <remarks>
             Boolean returned by the backupCallback indicate whether the service was able to successfully move the backup folder to an external location.
@@ -1483,54 +1231,15 @@
             True indicates that the state has been restored.
             </returns>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.Context">
-            <summary>
-            Gets the service context that this stateful service is operating under. It provides
-            information like ReplicaId, PartitionId, ServiceName etc.
-            </summary>
-            <value>
-            A <see cref="T:System.Fabric.StatefulServiceContext"/> that describes the service context.
-            </value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.Partition">
-            <summary>
-            Service partition to which current service replica belongs. 
-            </summary>
-            <value>
-            An <see cref="T:System.Fabric.IStatefulServicePartition"/> that represents the 
-            partition to which this service replica belongs.
-            </value>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulService.#ctor(System.Fabric.StatefulServiceContext)">
-            <summary>
-            Creates a new <see cref="T:Microsoft.ServiceFabric.Services.Runtime.StatefulService"/> with default <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>: <see cref="T:Microsoft.ServiceFabric.Data.ReliableStateManager"/>.
-            </summary>
-            <param name="serviceContext">
-            A <see cref="T:System.Fabric.StatefulServiceContext"/> that describes the service context.
-            </param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulService.#ctor(System.Fabric.StatefulServiceContext,Microsoft.ServiceFabric.Data.IReliableStateManagerReplica)">
-            <summary>
-            Creates a new StatefulService. 
-            Override this to create a new StatefulService with non-default state manager replica.
-            </summary>
-            <param name="serviceContext">
-            A <see cref="T:System.Fabric.StatefulServiceContext"/> that describes the service context.
-            </param>
-            <param name="reliableStateManagerReplica">
-            A <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManagerReplica"/> that represents a reliable state provider replica.
-            </param>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Runtime.StatefulService.StateManager">
-            <summary>
-            Gets this replica's <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/>.
-            </summary>
-            <value>The <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/> of the replica.</value>
-        </member>
         <member name="F:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceReplicaAdapter.executeRunAsyncTask">
             <summary>
             This task wraps the actual RunAsync task. All the exceptions
             escaping from actual RunAsync are handled inside the task itself.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceReplicaAdapter.Test_CommunicationListeners">
+            <summary>
+            This is exposed only for testing use
             </summary>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceReplicaAdapter.ExecuteRunAsync(System.Threading.CancellationToken)">
@@ -1548,11 +1257,6 @@
             
             </summary>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceReplicaAdapter.Test_CommunicationListeners">
-            <summary>
-            This is exposed only for testing use
-            </summary>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Runtime.StatelessService">
             <summary>
             Represents Microsoft Service Fabric based stateless reliable service base class. 
@@ -1566,6 +1270,7 @@
             <param name="serviceContext">
             A <see cref="T:System.Fabric.StatelessServiceContext"/> that describes the service context.
             </param>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.GetAddresses">
             <summary>
@@ -1576,50 +1281,6 @@
             An <see cref="T:System.Collections.Generic.IReadOnlyDictionary`2"/> containing list of addresses as
             (ListenerName, Endpoint) key-value pair.
             </returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.CreateServiceInstanceListeners">
-            <summary>
-            Override this method to supply the communication listeners for the service instance. The endpoints returned by the communication listener's
-            are stored as a JSON string of ListenerName, Endpoint string pairs like 
-            {"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}
-            </summary>
-            <returns>List of ServiceInstanceListeners</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.OnOpenAsync(System.Threading.CancellationToken)">
-            <summary>
-            This method is called as the final step of opening the service.
-            Override this method to be notified that Open has completed for this instance's internal components.
-            </summary>
-            <param name="cancellationToken">Cancellation token to monitor for cancellation requests.</param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation.
-            </returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)">
-            <summary>
-            Services that want to implement a background task which runs when it is opened,
-            just override this method with their logic.
-            </summary>
-            <param name="cancellationToken">Cancellation token to monitor for cancellation requests.</param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation.
-            </returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.OnCloseAsync(System.Threading.CancellationToken)">
-            <summary>
-            This method is called as the final step of closing the service.
-            Override this method to be notified that Close has completed for this instance's internal components.
-            </summary>
-            <param name="cancellationToken">Cancellation token provided to monitor for cancellation requests.</param>
-            <returns>
-            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation.
-            </returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.OnAbort">
-            <summary>
-            Notification that the service is being aborted.  RunAsync MAY be running concurrently
-            with the execution of this method, as cancellation is not awaited on the abort path.
-            </summary>
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.Runtime.StatelessService.Context">
             <summary>
@@ -1639,6 +1300,124 @@
             partition to which this service replica belongs.
             </value>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.CreateServiceInstanceListeners">
+            <summary>
+            Override this method to supply the communication listeners for the service instance. The endpoints returned by the communication listener's
+            are stored as a JSON string of ListenerName, Endpoint string pairs like 
+            {"Endpoints":{"Listener1":"Endpoint1","Listener2":"Endpoint2" ...}}
+            <para>
+            For information about Reliable Services life cycle please see
+            https://docs.microsoft.com/azure/service-fabric/service-fabric-reliable-services-lifecycle
+            </para>
+            </summary>
+            <returns>List of ServiceInstanceListeners</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.OnOpenAsync(System.Threading.CancellationToken)">
+            <summary>
+            This method is called as the final step of opening the service.
+            Override this method to be notified that Open has completed for this instance's internal components.
+            <para>
+            For information about Reliable Services life cycle please see
+            https://docs.microsoft.com/azure/service-fabric/service-fabric-reliable-services-lifecycle
+            </para>
+            </summary>
+            <param name="cancellationToken">Cancellation token to monitor for cancellation requests.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)">
+            <summary>
+            Services that want to implement a background task, which runs when the service comes up,
+            should override this method with their logic.
+            <para>
+            For information about Reliable Services life cycle please see
+            https://docs.microsoft.com/azure/service-fabric/service-fabric-reliable-services-lifecycle
+            </para>
+            </summary>
+            <param name="cancellationToken">Cancellation token to monitor for cancellation requests.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation.
+            </returns>
+            <remarks>
+            Please ensure you follow these guidelines when overriding <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/>:
+            <list type="bullet">
+                <item>
+                    <description>
+                    Make sure <paramref name="cancellationToken"/> passed to <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/> is honored and once 
+                    it has been signaled, <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/> exits gracefully as soon as possible. Please note that
+                    if <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/> has finished its intended work, it does not need to wait for 
+                    <paramref name="cancellationToken"/> to be signaled and can return gracefully.
+                    </description>
+                </item>
+                <item>
+                    <description>
+                    Service Fabric runtime does not handle all exception(s) escaping from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/>. If an unhandled
+                    exception escapes from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/>, then Service Fabric runtime takes following action(s):
+                    <list type="bullet">
+                        <item>
+                            <description>
+                            If a <see cref="T:System.Fabric.FabricException"/> (or one of its derived exception) escapes from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/>, 
+                            Service Fabric runtime will drop this service instance and a new instance will be created. A health warning
+                            will be appear in Service Fabric Explorer containing details about unhandled exception.
+                            </description>
+                        </item>
+                        <item>
+                            <description>
+                            If an <see cref="T:System.OperationCanceledException"/> escapes from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/> and Service Fabric runtime
+                            has requested cancellation by signaling <paramref name="cancellationToken"/> passed to <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/>,
+                            Service Fabric runtime handles this exception and considers it as graceful completion of <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/>.
+                            </description>
+                        </item>
+                        <item>
+                            <description>
+                            If an <see cref="T:System.OperationCanceledException"/> escapes from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/> and Service Fabric runtime
+                            has NOT requested cancellation by signaling <paramref name="cancellationToken"/> passed to <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/>,
+                            the process that is hosting this service instance is brought down. This will impact all other service instances 
+                            that are hosted by the same process. The details about unhandled exceptions can be viewed in Windows Event Viewer.
+                            </description>
+                        </item>
+                        <item>
+                            <description>
+                            If an exception of any other type escapes from <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.RunAsync(System.Threading.CancellationToken)"/> then the process that is hosting this
+                            service instance is brought down. This will impact all other service instances that are hosted by the
+                            same process. The details about unhandled exceptions can be viewed in Windows Event Viewer.
+                            </description>
+                        </item>
+                    </list>
+                    </description>
+                </item>
+            </list>
+            <para>
+            Failing to conform to these guidelines can cause fail-over, reconfiguration or upgrade of your service to get stuck
+            and can impact availability of your service.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.OnCloseAsync(System.Threading.CancellationToken)">
+            <summary>
+            This method is called as the final step of closing the service.
+            Override this method to be notified that Close has completed for this instance's internal components.
+            <para>
+            For information about Reliable Services life cycle please see
+            https://docs.microsoft.com/azure/service-fabric/service-fabric-reliable-services-lifecycle
+            </para>
+            </summary>
+            <param name="cancellationToken">Cancellation token provided to monitor for cancellation requests.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Runtime.StatelessService.OnAbort">
+            <summary>
+            Notification that the service is being aborted.  RunAsync MAY be running concurrently
+            with the execution of this method, as cancellation is not awaited on the abort path.
+            <para>
+            For information about Reliable Services life cycle please see
+            https://docs.microsoft.com/azure/service-fabric/service-fabric-reliable-services-lifecycle
+            </para>
+            </summary>
+        </member>
         <member name="F:Microsoft.ServiceFabric.Services.Runtime.StatelessServiceInstanceAdapter.executeRunAsyncTask">
             <summary>
             This task wraps the actual RunAsync task. All the exceptions
@@ -1657,6 +1436,398 @@
             1) When replica is being closed.
             2) When replica is being aborted.
             
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Services.ServiceEventSource">
+            <summary>
+            Reliable Services event source collected by Service Fabric runtime diagnostics system.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Services.ServiceEventSource.Instance">
+            <summary>
+            Gets instance of <see cref="T:Microsoft.ServiceFabric.Services.ServiceEventSource"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.ServiceEventSource.#ctor">
+            <summary>
+            Prevents a default instance of the <see cref="T:Microsoft.ServiceFabric.Services.ServiceEventSource" /> class from being created.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Services.ServiceNameFormat">
+            <summary>
+            This class provides the logic for deriving the names of various items within the manifest from the code. 
+            It is used by framework components when names are not specified in the API and the framework types have
+            to default it to a meaningful name derived from the service type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.ServiceNameFormat.GetEndpointName(System.Type)">
+            <summary>
+            Gets the default endpoint resource name for the given service type
+            </summary>
+            <param name="serviceInterfaceType">Service interface type name.</param>
+            <returns>The name of the endpoint resource.</returns>
+            <remarks>
+            <list type="bullet">
+                <item>
+                    If the type name is <code>IMyService</code>, this method returns <code>MyServiceEndpoint</code> as the name of the endpoint resource.
+                </item>
+                <item>
+                    If the type name is <code>Foo</code>, this method returns <code>FooServiceEndpoint</code> as the name of the endpoint resource.
+                </item>
+            </list>
+            </remarks>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver">
+            <summary>
+            <para>
+            Defines the interface for the Service partition resolver.
+            Service resolution is the process of looking up the set of endpoints for the replicas in a partition. A service partition resolver
+            implements the logic for service resolution.
+            </para>
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver.ResolveAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Resolves a partition of the specified service with specified back-off/retry settings on retry-able errors.
+            </summary>
+            <param name="serviceUri">Name of the service instance to resolve.</param>
+            <param name="partitionKey">
+            <para>
+            <see cref="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey">Key</see> that determines the target partition of the service instance. The <see cref="T:System.Fabric.ServicePartitionKind">partitioning scheme</see>
+            specified in the key should match the partitioning scheme used to create the service instance.
+            </para>
+            </param>
+            <param name="resolveTimeoutPerTry">The time out per resolve try.</param>
+            <param name="maxRetryBackoffInterval">
+            The interval to back-off before retrying the resolution after a failure due to retry-able exception.
+            </param>
+            <param name="cancellationToken">
+            <para>
+            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
+            </para>
+            </param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents the outstanding service resolution operation. The result from
+            the Task is the <see cref="T:System.Fabric.ResolvedServicePartition" /> object, that contains the information
+            about the resolved service partition including the service endpoints.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver.ResolveAsync(System.Fabric.ResolvedServicePartition,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            <para>
+            Re-resolves a previously resolved partition of the specified service with specified back-off/retry settings 
+            on retry-able errors. This method overload is used in cases where the client knows that the resolved service partition that it has is no longer valid.
+            </para>
+            </summary>
+            <param name="previousRsp">The resolved service partition that the client got from the earlier invocation of the ResolveAsync() method.</param>
+            <param name="resolveTimeoutPerTry">The time out per resolve try.</param>
+            <param name="maxRetryBackoffInterval">
+            The interval to back-off before retrying the resolution after a failure due to retry-able exception.
+            </param>
+            <param name="cancellationToken">
+            <para>
+            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
+            </para>
+            </param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding service resolution operation. The result from
+            the Task is the <see cref="T:System.Fabric.ResolvedServicePartition" /> object, that contains the information
+            about the resolved service partition including the service endpoints.
+            </returns>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey">
+            <summary>
+            Defines a key to address a service partition.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.Singleton">
+            <summary>
+            Returns a ServicePartitionKey that indicates a singleton partition.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.#ctor">
+            <summary>
+            Instantiates a ServicePartitionKey for singleton partitioned service.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.#ctor(System.Int64)">
+            <summary>
+            Instantiates a ServicePartitionKey for uniform int64 partitioned service.
+            </summary>
+            <param name="partitionKey">Value of the int64 partition key</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.#ctor(System.String)">
+            <summary>
+            Instantiates a ServicePartitionKey for named partitioned services.
+            </summary>
+            <param name="partitionKey">Value of the named partition key</param>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.Kind">
+            <summary>
+            Kind of the partition this key applies to.
+            </summary>
+            <value>Partition kind</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey.Value">
+            <summary>
+            The value of the partition key. This value can be casted to the right type based on the value of the Kind property.
+            </summary>
+            <value>Partition key</value>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Client.CreateFabricClientDelegate">
+            <summary>
+            Represents a delegate to create a FabricClient object.
+            </summary>
+            <returns>FabricClient</returns>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver">
+            <summary>
+            <para>
+            Implements the Service partition resolver class that uses the <see cref="T:System.Fabric.FabricClient">FabricClient's </see> <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)" /> method for service resolution
+            and implements a back-off/retry mechanism on errors from that method.
+            </para>
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.DefaultResolveTimeout">
+            <summary>
+            The default resolve timeout per try used by the ResolveAsync method of <see cref="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver"/> when it is
+            invoked without explicitly specifying the resolveTimeoutPerTry argument. The default value is 30 seconds.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.DefaultMaxRetryBackoffInterval">
+            <summary>
+            The default maximum back-off time used by ServicePartitionResolver's ResolveAsync method before retrying, when it is
+            invoked without explicitly specifying the maxRetryBackoffInterval argument. The default value is 5 seconds.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(Microsoft.ServiceFabric.Services.Client.CreateFabricClientDelegate,Microsoft.ServiceFabric.Services.Client.CreateFabricClientDelegate)">
+            <summary>
+            <para>
+            Instantiates a ServicePartionResolver, invoking the first delegate to get the <see cref="T:System.Fabric.FabricClient">FabricClient.</see>.
+            During partition resolution if FabricClient object gets disposed and second delegate is provided,
+            it uses the second delegate to get the FabricClient again. The second delegate provides a way to specify
+            an alternate way to get or create FabricClient if FabricClient created with first delegate get disposed.
+            </para>
+            </summary>
+            <param name="createFabricClient">Delegate to create the fabric client.</param>
+            <param name="recreateFabricClient">Delegate to re-create the fabric client.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(Microsoft.ServiceFabric.Services.Client.CreateFabricClientDelegate)">
+            <summary>
+            Instantiates a ServicePartitionResolver, invoking the given delegate to instantiate FabricClient.
+            </summary>
+            <param name="createFabricClient">Delegate to create fabric client.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(System.String[])">
+            <summary>
+            Instantiates a ServicePartitionResolver, uses the given connectionEndpoints to create a new instance of the FabricClient.
+            </summary>
+            <param name="connectionEndpoints">Array of management endpoints of the cluster.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(System.Fabric.FabricClientSettings,System.String[])">
+            <summary>
+            Instantiates a ServicePartitionResolver, uses the given FabricClient Settings and the connectionEndpoints to create
+            a new instance of FabricClient.
+            </summary>
+            <param name="settings">Fabric client Settings.</param>
+            <param name="connectionEndpoints">Array of management endpoints of the cluster.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(System.Fabric.SecurityCredentials,System.String[])">
+            <summary>
+            Instantiates a ServicePartitionResolver, uses the given security credentials and the connectionEndpoints to create
+            a new instance of FabricClient.
+            </summary>
+            <param name="credential">Security credentials for the fabric client.</param>
+            <param name="connectionEndpoints">Array of management endpoints of the cluster.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.#ctor(System.Fabric.SecurityCredentials,System.Fabric.FabricClientSettings,System.String[])">
+            <summary>
+            Instantiates a ServicePartitionResolver, uses the given security credentials, FabricClient Settings and the connectionEndpoints
+            to create a new instance of FabricClient.
+            </summary>
+            <param name="credential">Security credentials for the fabric client.</param>
+            <param name="settings">Fabric client Settings.</param>
+            <param name="connectionEndpoints">Array of management endpoints of the cluster.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,System.Threading.CancellationToken)">
+            <summary>
+            <para>
+            Resolves a partition of the specified service by invoking FabricClient's
+            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)" />method. This uses the default settings for
+            <see cref="F:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.DefaultResolveTimeout">timeout</see> and <see cref="F:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.DefaultMaxRetryBackoffInterval">back-off retry</see> intervals.
+            </para>
+            </summary>
+            <param name="serviceUri">Name of the service instance to resolve.</param>
+            <param name="partitionKey">
+            <para>
+            <see cref="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey">Key</see> that determines the target partition of the service instance. The <see cref="T:System.Fabric.ServicePartitionKind">partitioning scheme</see>
+            specified in the key should match the partitioning scheme used to create the service instance.
+            </para>
+            </param>
+            <param name="cancellationToken">
+            <para>
+            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
+            </para>
+            </param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result from
+            the task is the <see cref="T:System.Fabric.ResolvedServicePartition" /> object, that contains the information
+            about the resolved service partition including the service endpoints.
+            </returns>
+            <exception cref="T:System.Fabric.FabricServiceNotFoundException"> 
+            <para>
+            This method can throw a FabricServiceNotFoundExcepion if there is no service instance in the cluster matching the specified serviceUri.
+            </para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException"> 
+            <para>
+            This method can throw a FabricException if the scheme specified in the ServicePartitionKey doesn't match the scheme used to create the service instance.
+            See also <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/">Errors and Exceptions</see> for handling common FabricClient failures.
+            </para>
+            </exception>
+            <remarks>
+            <para>
+            This method retries on all transient exceptions. For cases where you want to limit the max execution time of this method, you should create a <see href="https://docs.microsoft.com/en-us/dotnet/core/api/system.threading.cancellationtokensource#System_Threading_CancellationTokenSource__ctor_System_TimeSpan_">cancellation token associated with that max execution time</see>
+            and pass that cancellation token to this method.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Uri,Microsoft.ServiceFabric.Services.Client.ServicePartitionKey,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Resolves a partition of the specified service by invoking FabricClient's
+            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)" /> method with the given timeout and back-off/retry on retry-able errors.
+            </summary>
+            <param name="serviceUri">Name of the service instance to resolve.</param>
+            <param name="partitionKey">
+            <para>
+            <see cref="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionKey">Key</see> that determines the target partition of the service instance. The <see cref="T:System.Fabric.ServicePartitionKind">partitioning scheme</see>
+            specified in the key should match the partitioning scheme used to create the service instance.
+            </para>
+            </param>
+            <param name="resolveTimeoutPerTry">The timeout passed to FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)" />method.</param>
+            <param name="maxRetryBackoffInterval">
+            <para>
+            The max interval to back-off before retrying when FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)" />method fails with a retry-able exception. 
+            The actual back off interval is a random time interval which is less than or equal to the specified maxRetryBackoffInterval.
+            </para>
+            </param>
+            <param name="cancellationToken">
+            <para>
+            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
+            </para>
+            </param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result from
+            the task is the <see cref="T:System.Fabric.ResolvedServicePartition" /> object, that contains the information
+            about the resolved service partition including the service endpoints.
+            </returns>
+            <exception cref="T:System.Fabric.FabricServiceNotFoundException"> 
+            <para>
+            This method can throw a FabricServiceNotFoundExcepion if there is no service instance in the cluster matching the specified serviceUri.
+            </para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException"> 
+            <para>
+            This can throw a FabricException if the scheme specified in the ServicePartitionKey doesn't match the scheme used to create the service instance.
+            See also <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/">Errors and Exceptions</see> for more information.
+            </para>
+            </exception>
+            <remarks>
+            <para>
+            This method retries on all transient exceptions. For cases where you want to limit the max execution time of this method, you should create a <see href="https://docs.microsoft.com/en-us/dotnet/core/api/system.threading.cancellationtokensource#System_Threading_CancellationTokenSource__ctor_System_TimeSpan_">cancellation token associated with that max execution time</see>
+            and pass that cancellation token to this method.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Fabric.ResolvedServicePartition,System.Threading.CancellationToken)">
+            <summary>
+            Resolves a partition of the specified service by invoking FabricClient's
+            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)" />method with back-off/retry on retry-able errors. This takes in 
+            the resolved service partition that was got via an earlier invocation of the ResolveAsync() method. 
+            This method overload is used in cases where the client knows that the resolved service partition that it has is no longer valid.
+            </summary>
+            <param name="previousRsp">The resolved service partition that the client got from the earlier invocation of the ResolveAsync() method.</param>
+            <param name="cancellationToken">
+            <para>
+            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
+            </para>
+            </param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result from
+            the task is the <see cref="T:System.Fabric.ResolvedServicePartition" /> object, that contains the information
+            about the resolved service partition including the service endpoints.
+            </returns>
+            <exception cref="T:System.Fabric.FabricServiceNotFoundException"> 
+            <para>
+            This method can throw a FabricServiceNotFoundExcepion if the service which was resolved previously is no longer present in the cluster.
+            </para>
+            </exception>
+            <remarks>
+            <para>
+            This method retries on all transient exceptions. For cases where you want to limit the max execution time of this method, you should create a <see href="https://docs.microsoft.com/en-us/dotnet/core/api/system.threading.cancellationtokensource#System_Threading_CancellationTokenSource__ctor_System_TimeSpan_">cancellation token associated with that max execution time</see>
+            and pass that cancellation token to this method.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.ResolveAsync(System.Fabric.ResolvedServicePartition,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Resolves a partition of the specified service by invoking FabricClient's
+            <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)" />method with back-off/retry on retry-able errors. This takes in 
+            the resolved service partition that was got via an earlier invocation of the ResolveAsync() method. 
+            This method overload is used in cases where the client knows that the resolved service partition that it has is no longer valid.
+            </summary>
+            <param name="previousRsp">The resolved service partition that the client got from the earlier invocation of the ResolveAsync() method.</param>
+            <param name="resolveTimeoutPerTry">The timeout passed to FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)" />method </param>
+            <param name="maxRetryBackoffInterval">
+            <para>
+            The max interval to back-off before retrying when FabricClient's <see cref="M:System.Fabric.FabricClient.ServiceManagementClient.ResolveServicePartitionAsync(System.Uri)" />method fails with a retry-able exception. 
+            The actual back off interval is a random time interval which is less than or equal to the specified maxRetryBackoffInterval.
+            </para>
+            </param>
+            <param name="cancellationToken">
+            <para>
+            The CancellationToken that this operation is observing. It is used to notify the operation that it should be canceled.
+            </para>
+            </param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result from
+            the task is the <see cref="T:System.Fabric.ResolvedServicePartition" /> object, that contains the information
+            about the resolved service partition including the service endpoints.
+            </returns>
+            <exception cref="T:System.Fabric.FabricServiceNotFoundException"> 
+            <para>
+            This method can throw a FabricServiceNotFoundExcepion if the service which was resolved previously is no longer present in the cluster.
+            </para>
+            </exception>
+            <remarks>
+            <para>
+            This method retries on all transient exceptions. For cases where you want to limit the max execution time of this method, you should create a <see href="https://docs.microsoft.com/en-us/dotnet/core/api/system.threading.cancellationtokensource#System_Threading_CancellationTokenSource__ctor_System_TimeSpan_">cancellation token associated with that max execution time</see>
+            and pass that cancellation token to this method.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.SetDefault(Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver)">
+            <summary>
+            Updates the default ServicePartitionResolver.
+            </summary>
+            <param name="defaultServiceResolver">The new default value</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.GetDefault">
+            <summary>
+            Gets the default ServicePartitionResolver.
+            <remarks>
+            <para>
+            The default service partition resolver instance uses the local <see href="https://docs.microsoft.com/en-us/dotnet/api/system.fabric.fabricclient#System_Fabric_FabricClient__ctor">fabric client</see>.
+            If you are using the ServicePartitionResolver to resolve services that are running on a remote cluster, the recommended practice is to create a ServicePartitionResolver using the appropriate endpoints or FabricClient and then update
+            the default ServicePartitionResolver.
+            </para>
+            </remarks>
+            </summary>
+            <returns>Default <see cref="T:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver"/></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Common.IdUtil.HashCombine(System.Int32,System.Int32)">
+            <summary>
+            This is how VB Anonymous Types combine hash values for fields.
             </summary>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.SR">

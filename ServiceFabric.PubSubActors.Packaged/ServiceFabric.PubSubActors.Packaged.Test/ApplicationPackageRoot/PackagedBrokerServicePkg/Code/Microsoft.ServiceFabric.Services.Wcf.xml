@@ -90,60 +90,12 @@
             <param name="result">Result of the exception handling</param>
             <returns>true if the exception is handled, false otherwise</returns>
         </member>
-        <member name="T:Microsoft.ServiceFabric.Services.Communication.Wcf.WcfUtility">
-            <summary>
-            Utility class for creating default bindings for WCF communication.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.Wcf.WcfUtility.CreateTcpListenerBinding(System.Int64,System.TimeSpan,System.TimeSpan)">
-            <summary>
-                Creates a TCP listener binding with no security for WCF communication.
-            </summary>
-            <param name="maxMessageSize">
-                Maximum size of the message in bytes. 
-                If the value is not specified or it is less than or equals to zero,
-                a default value of 4,194,304 bytes (4 MB) is used.
-            </param>
-            <param name="openTimeout">
-                Timeout for opening the connection. 
-                If the value is not specified, the default value of 5 seconds is used.
-            </param>
-            <param name="closeTimeout">
-                Time to wait for messages to drain on the connections before aborting the connection. 
-                If the value is not specified, the default value of 5 seconds is used.
-            </param>
-            <returns>A <see cref="T:System.ServiceModel.Channels.Binding"/> to use with <see cref="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime.WcfCommunicationListener`1"/>.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.Wcf.WcfUtility.CreateTcpClientBinding(System.Int64,System.TimeSpan,System.TimeSpan)">
-            <summary>
-                Creates a TCP client binding with no security for WCF communication.
-            </summary>
-            <param name="maxMessageSize">
-                Maximum size of the message in bytes. 
-                If the value is not specified or it is less than or equals to zero,
-                a default value of 4,194,304 bytes (4 MB) is used.
-            </param>
-            <param name="openTimeout">
-                Timeout for opening the connection. 
-                If the value is not specified, the default value of 5 seconds is used.
-            </param>
-            <param name="closeTimeout">
-                Time to wait for messages to drain on the connections before aborting the connection. 
-                If the value is not specified, the default value of 5 seconds is used.
-            </param>
-            <returns>A <see cref="T:System.ServiceModel.Channels.Binding"/> to use with <see cref="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClientFactory`1"/>.</returns>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClient`1">
             <summary>
             A WCF client created by <see cref="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClientFactory`1"/> to communicate 
             with a Service Fabric service using <see cref="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime.WcfCommunicationListener`1"/>.
             </summary>
             <typeparam name="TServiceContract">WCF service contract</typeparam>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClient`1.Finalize">
-            <summary>
-            Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
-            </summary>
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClient`1.ResolvedServicePartition">
             <summary>
@@ -171,6 +123,11 @@
             Gets the WCF channel for the specified contract that this communication client uses.
             </summary>
             <value>The WCF channel for the specified contract that this communication client uses.</value>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClient`1.Finalize">
+            <summary>
+            Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
+            </summary>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClientFactory`1">
             <summary>
@@ -286,7 +243,7 @@
             </param>
             <param name="endpointResourceName">
                 The name of the endpoint resource defined in the service manifest that should be used to create the address for the listener. 
-                If the endpointResourceName is not specified or it is null, it's name is derived from the WCF service contract type using
+                If the endpointResourceName is not specified or it is null, its name is derived from the WCF service contract type using
                 <see cref="M:Microsoft.ServiceFabric.Services.ServiceNameFormat.GetEndpointName(System.Type)"/> method.
                 If matching endpoint resource is not found in the service manifest, a default endpoint resource definition with port zero is used.
             </param>
@@ -307,11 +264,26 @@
                 created using <see cref="M:Microsoft.ServiceFabric.Services.Communication.Wcf.WcfUtility.CreateTcpListenerBinding(System.Int64,System.TimeSpan,System.TimeSpan)"/> method.
             </param>
             <param name="address">
-                The listen address for the WCF endpoint. if the address is not specified or it is null, a default address is created by 
+                The listen address for the WCF endpoint. If the address is not specified or it is null, a default address is created by 
                 looking up the endpoint resource from the service manifest. The endpoint resource name is derived from the WCF 
                 service contract type using <see cref="M:Microsoft.ServiceFabric.Services.ServiceNameFormat.GetEndpointName(System.Type)"/> method.
                 If matching endpoint resource is not found in the service manifest, a default endpoint resource definition with port zero is used.
             </param>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime.WcfCommunicationListener`1.ServiceHost">
+            <summary>
+                Gets the <see cref="T:System.ServiceModel.ServiceHost"/> used by this listener to host the 
+                WCF service implementation.
+            </summary>
+            <value>
+                A <see cref="T:System.ServiceModel.ServiceHost"/> used by this listener to host the 
+                WCF service implementation.
+            </value>
+            <remarks>
+                The service host is created by the listener in its constructor. Before this communication
+                listener is opened by the runtime via <see cref="M:Microsoft.ServiceFabric.Services.Communication.Runtime.ICommunicationListener.OpenAsync(System.Threading.CancellationToken)"/> method,
+                the service host can be customized by accessing it via this property.
+            </remarks>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime.WcfCommunicationListener`1.Microsoft#ServiceFabric#Services#Communication#Runtime#ICommunicationListener#OpenAsync(System.Threading.CancellationToken)">
             <summary>
@@ -342,20 +314,48 @@
             (including close) should be canceled when this method is called.
             </summary>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime.WcfCommunicationListener`1.ServiceHost">
+        <member name="T:Microsoft.ServiceFabric.Services.Communication.Wcf.WcfUtility">
             <summary>
-                Gets the <see cref="T:System.ServiceModel.ServiceHost"/> used by this listener to host the 
-                WCF service implementation.
+            Utility class for creating default bindings for WCF communication.
             </summary>
-            <value>
-                A <see cref="T:System.ServiceModel.ServiceHost"/> used by this listener to host the 
-                WCF service implementation.
-            </value>
-            <remarks>
-                The service host is created by the listener in it's constructor. Before this communication
-                listener is opened by the runtime via <see cref="M:Microsoft.ServiceFabric.Services.Communication.Runtime.ICommunicationListener.OpenAsync(System.Threading.CancellationToken)"/> method,
-                the service host can be customized by accessing it via this property.
-            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.Wcf.WcfUtility.CreateTcpListenerBinding(System.Int64,System.TimeSpan,System.TimeSpan)">
+            <summary>
+                Creates a TCP listener binding with no security for WCF communication.
+            </summary>
+            <param name="maxMessageSize">
+                Maximum size of the message in bytes. 
+                If the value is not specified or it is less than or equals to zero,
+                a default value of 4,194,304 bytes (4 MB) is used.
+            </param>
+            <param name="openTimeout">
+                Timeout for opening the connection. 
+                If the value is not specified, the default value of 5 seconds is used.
+            </param>
+            <param name="closeTimeout">
+                Time to wait for messages to drain on the connections before aborting the connection. 
+                If the value is not specified, the default value of 5 seconds is used.
+            </param>
+            <returns>A <see cref="T:System.ServiceModel.Channels.Binding"/> to use with <see cref="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime.WcfCommunicationListener`1"/>.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Services.Communication.Wcf.WcfUtility.CreateTcpClientBinding(System.Int64,System.TimeSpan,System.TimeSpan)">
+            <summary>
+                Creates a TCP client binding with no security for WCF communication.
+            </summary>
+            <param name="maxMessageSize">
+                Maximum size of the message in bytes. 
+                If the value is not specified or it is less than or equals to zero,
+                a default value of 4,194,304 bytes (4 MB) is used.
+            </param>
+            <param name="openTimeout">
+                Timeout for opening the connection. 
+                If the value is not specified, the default value of 5 seconds is used.
+            </param>
+            <param name="closeTimeout">
+                Time to wait for messages to drain on the connections before aborting the connection. 
+                If the value is not specified, the default value of 5 seconds is used.
+            </param>
+            <returns>A <see cref="T:System.ServiceModel.Channels.Binding"/> to use with <see cref="T:Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClientFactory`1"/>.</returns>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Remoting.Wcf.IServiceRemotingCallbackContract">
             <summary>
@@ -409,6 +409,30 @@
             to set WCF transport as the default service remoting transport provider in the assembly.
             </summary>
         </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Remoting.Wcf.WcfServiceRemotingProviderAttribute.MaxMessageSize">
+            <summary>
+                Gets or Sets the max message size that can be transferred over remoting.
+            </summary>
+            <value>
+                The max message size that can be transferred over remoting
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Remoting.Wcf.WcfServiceRemotingProviderAttribute.OpenTimeoutInMilliSeconds">
+            <summary>
+                Gets or Sets the timeout in milliseconds for opening the connection from client side and waiting for the listener to open on the service side.
+            </summary>
+            <value>
+                The timeout in milliseconds for opening the connection from client side and waiting for the listener to open on the service side.
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Remoting.Wcf.WcfServiceRemotingProviderAttribute.CloseTimeoutInMilliSeconds">
+            <summary>
+                Gets or Sets the timeout in milliseconds to wait before closing the connection to let existing messages drain.
+            </summary>
+            <value>
+                The timeout in milliseconds to wait before closing the connection to let existing messages drain.
+            </value>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Services.Remoting.Wcf.WcfServiceRemotingProviderAttribute.CreateServiceRemotingListener(System.Fabric.ServiceContext,Microsoft.ServiceFabric.Services.Remoting.IService)">
             <summary>
                 Creates a service remoting listener for remoting the service interface.
@@ -436,35 +460,11 @@
                 A <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Wcf.Client.WcfServiceRemotingClientFactory"/>.
             </returns>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Remoting.Wcf.WcfServiceRemotingProviderAttribute.MaxMessageSize">
-            <summary>
-                Gets or Sets the max message size that can be transferred over remoting.
-            </summary>
-            <value>
-                The max message size that can be transferred over remoting
-            </value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Remoting.Wcf.WcfServiceRemotingProviderAttribute.OpenTimeoutInMilliSeconds">
-            <summary>
-                Gets or Sets the timeout in milliseconds for opening the connection from client side and waiting for the listener to open on the service side.
-            </summary>
-            <value>
-                The timeout in milliseconds for opening the connection from client side and waiting for the listener to open on the service side.
-            </value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Remoting.Wcf.WcfServiceRemotingProviderAttribute.CloseTimeoutInMilliSeconds">
-            <summary>
-                Gets or Sets the timeout in milliseconds to wait before closing the connection to let existing messages drain.
-            </summary>
-            <value>
-                The timeout in milliseconds to wait before closing the connection to let existing messages drain.
-            </value>
-        </member>
         <member name="P:Microsoft.ServiceFabric.Services.Remoting.Wcf.Client.WcfServiceRemotingClient.ResolvedServicePartition">
             <summary>
             Gets or Sets the Resolved service partition which was used when this client was created.
             </summary>
-            <value><see cref="T:System.Fabric.ResolvedServicePartition"/> object</value>
+            <value><see cref="T:System.Fabric.ResolvedServicePartition" /> object</value>
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.Remoting.Wcf.Client.WcfServiceRemotingClient.ListenerName">
             <summary>
@@ -476,7 +476,7 @@
             <summary>
             Gets or Sets the service endpoint to which the client is connected to.
             </summary>
-            <value><see cref="T:System.Fabric.ResolvedServiceEndpoint"/></value>
+            <value><see cref="T:System.Fabric.ResolvedServiceEndpoint" /></value>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Remoting.Wcf.Client.WcfServiceRemotingClientFactory">
             <summary>
@@ -484,6 +484,16 @@
             Windows Communication Foundation to create <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClient"/> to communicate with stateless
             and stateful services over interfaces that are remoted via 
             <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Wcf.Runtime.WcfServiceRemotingListener"/>.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ServiceFabric.Services.Remoting.Wcf.Client.WcfServiceRemotingClientFactory.ClientConnected">
+            <summary>
+            Event handler that is fired when a client is connected to the service endpoint.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ServiceFabric.Services.Remoting.Wcf.Client.WcfServiceRemotingClientFactory.ClientDisconnected">
+            <summary>
+            Event handler that is fired when a client is disconnected from the service endpoint.
             </summary>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Remoting.Wcf.Client.WcfServiceRemotingClientFactory.#ctor(System.ServiceModel.Channels.Binding,Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient,System.Collections.Generic.IEnumerable{Microsoft.ServiceFabric.Services.Communication.Client.IExceptionHandler},Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver,System.String,System.Func{System.ServiceModel.Channels.Binding,System.Collections.Generic.IEnumerable{Microsoft.ServiceFabric.Services.Communication.Client.IExceptionHandler},Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver,System.String,Microsoft.ServiceFabric.Services.Remoting.Wcf.IServiceRemotingCallbackContract,Microsoft.ServiceFabric.Services.Communication.Wcf.Client.WcfCommunicationClientFactory{Microsoft.ServiceFabric.Services.Remoting.Wcf.IServiceRemotingContract}})">
@@ -533,7 +543,7 @@
             <param name="cancellationToken">Cancellation token</param>
             <returns>
             A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
-            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient"/>) object.
+            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient" />) object.
             </returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Remoting.Wcf.Client.WcfServiceRemotingClientFactory.Microsoft#ServiceFabric#Services#Communication#Client#ICommunicationClientFactory{Microsoft#ServiceFabric#Services#Remoting#Client#IServiceRemotingClient}#GetClientAsync(System.Fabric.ResolvedServicePartition,Microsoft.ServiceFabric.Services.Communication.Client.TargetReplicaSelector,System.String,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
@@ -550,7 +560,7 @@
             <param name="cancellationToken">Cancellation token</param>
             <returns>
             A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
-            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient"/>) object.
+            the CommunicationClient(<see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.ICommunicationClient" />) object.
             </returns>
         </member>
         <member name="M:Microsoft.ServiceFabric.Services.Remoting.Wcf.Client.WcfServiceRemotingClientFactory.Microsoft#ServiceFabric#Services#Communication#Client#ICommunicationClientFactory{Microsoft#ServiceFabric#Services#Remoting#Client#IServiceRemotingClient}#ReportOperationExceptionAsync(Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClient,Microsoft.ServiceFabric.Services.Communication.Client.ExceptionInformation,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings,System.Threading.CancellationToken)">
@@ -563,18 +573,8 @@
             <param name="cancellationToken">Cancellation token</param>
             <returns>
             A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. The result of the Task is
-            a <see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.OperationRetryControl"/> object that provides information on retry policy for this exception.
+            a <see cref="T:Microsoft.ServiceFabric.Services.Communication.Client.OperationRetryControl" /> object that provides information on retry policy for this exception.
             </returns>
-        </member>
-        <member name="E:Microsoft.ServiceFabric.Services.Remoting.Wcf.Client.WcfServiceRemotingClientFactory.ClientConnected">
-            <summary>
-            Event handler that is fired when a client is connected to the service endpoint.
-            </summary>
-        </member>
-        <member name="E:Microsoft.ServiceFabric.Services.Remoting.Wcf.Client.WcfServiceRemotingClientFactory.ClientDisconnected">
-            <summary>
-            Event handler that is fired when a client is disconnected from the service endpoint.
-            </summary>
         </member>
         <member name="T:Microsoft.ServiceFabric.Services.Remoting.Wcf.Runtime.WcfServiceRemotingListener">
             <summary>
@@ -629,6 +629,21 @@
             address is created using the default endpoint resource named "ServiceEndpoint" defined in the service manifest. 
             </param>
         </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Remoting.Wcf.Runtime.WcfServiceRemotingListener.ServiceHost">
+            <summary>
+                Gets the <see cref="T:System.ServiceModel.ServiceHost"/> used by this listener to host the 
+                WCF service implementation.
+            </summary>
+            <value>
+                A <see cref="T:System.ServiceModel.ServiceHost"/> used by this listener to host the 
+                WCF service implementation.
+            </value>
+            <remarks>
+                The service host is created by the listener in it's constructor. Before this communication
+                listener is opened by the runtime via <see cref="M:Microsoft.ServiceFabric.Services.Communication.Runtime.ICommunicationListener.OpenAsync(System.Threading.CancellationToken)"/> method,
+                the service host can be customized by accessing it via this property.
+            </remarks>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Services.Remoting.Wcf.Runtime.WcfServiceRemotingListener.Microsoft#ServiceFabric#Services#Communication#Runtime#ICommunicationListener#OpenAsync(System.Threading.CancellationToken)">
             <summary>
             This method causes the communication listener to be opened. Once the Open
@@ -658,21 +673,6 @@
             (including close) should be canceled when this method is called.
             </summary>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Services.Remoting.Wcf.Runtime.WcfServiceRemotingListener.ServiceHost">
-            <summary>
-                Gets the <see cref="T:System.ServiceModel.ServiceHost"/> used by this listener to host the 
-                WCF service implementation.
-            </summary>
-            <value>
-                A <see cref="T:System.ServiceModel.ServiceHost"/> used by this listener to host the 
-                WCF service implementation.
-            </value>
-            <remarks>
-                The service host is created by the listener in it's constructor. Before this communication
-                listener is opened by the runtime via <see cref="M:Microsoft.ServiceFabric.Services.Communication.Runtime.ICommunicationListener.OpenAsync(System.Threading.CancellationToken)"/> method,
-                the service host can be customized by accessing it via this property.
-            </remarks>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Services.Wcf.SR">
             <summary>
               A strongly-typed resource class, for looking up localized strings, etc.
@@ -692,6 +692,11 @@
         <member name="P:Microsoft.ServiceFabric.Services.Wcf.SR.ErrorCommunicationClientOpenTimeout">
             <summary>
               Looks up a localized string similar to Communication client open didn’t complete within the open timeout &apos;{0}&apos;.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Services.Wcf.SR.ErrorDeserializationFailure">
+            <summary>
+              Looks up a localized string similar to Failed to deserialize and get remote exception  {0}.
             </summary>
         </member>
         <member name="P:Microsoft.ServiceFabric.Services.Wcf.SR.ErrorExceptionSerializationFailed1">

@@ -1,0 +1,559 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.ServiceFabric.Preview</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription">
+            <summary>
+            <para>Describes a compose application to be created by using 
+            System.Fabric.FabricClient.ApplicationManagementClient.CreateComposeApplicationAsync(Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription) .</para>
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription.#ctor(System.Uri,System.String)">
+            <summary>
+            <para>Instantiates an instance of <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription" /> with the application instance name, and the path to the compose files.</para>
+            </summary>
+            <param name="applicationName">
+            <para>URI of the application instance name.</para>
+            </param>
+            <param name="composeFilePath">
+            <para>Path to the compose file.</para>
+            </param>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription.ApplicationName">
+            <summary>
+            <para>Gets the URI name of the application instance.</para>
+            </summary>
+            <value>
+            <para>The application name.</para>
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription.ComposeFilePath">
+            <summary>
+            <para>Gets the path to the compose file.</para>
+            </summary>
+            <value>
+            <para>The compose file path.</para>
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription.ContainerRegistryUserName">
+            <summary>
+            <para>Gets the container registry user name.</para>
+            </summary>
+            <value>
+            <para>The container registry user name.</para>
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription.ContainerRegistryPassword">
+            <summary>
+            <para>Gets the container registry password.</para>
+            </summary>
+            <value>
+            <para>The container registry user password.</para>
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription.IsRegistryPasswordEncrypted">
+            <summary>
+            <para>Gets if the registry password specified is encrypted or not.</para>
+            </summary>
+            <value>
+            <para>True if the registry password is encrypted. False otherwise.</para>
+            </value>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription">
+            <summary>
+            <para>Represents the query input used by System.Fabric.FabricClient.ApplicationManagementClient.GetComposeApplicationStatusPagedListAsync(Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription) .</para>
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription.#ctor">
+            <summary>
+            <para>Instantiates an instance of <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription" /> class.</para>
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription.ApplicationNameFilter">
+            <summary>
+            <para>Gets or sets the URI name of compose application to query for.</para>
+            </summary>
+            <value>
+            <para>The URI name of compose application to query for.</para>
+            </value>
+            <remarks>
+            <para> If ApplicationNameFilter is not specified, all compose applications are returned.</para>
+            </remarks>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription.ContinuationToken">
+            <summary>
+            <para>Gets or sets the token that can be used by queries to get the next page.</para>
+            </summary>
+            <value>
+            <para>The token that can be used by queries to get the next page.</para>
+            </value>
+            <remarks>
+            <para>ContinuationToken is received by a previous query.</para>
+            </remarks>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription.MaxResults">
+            <summary>
+            Gets or sets the max number of Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusResultItems that can be returned per page.
+            </summary>
+            <remarks>
+            <para>
+            If this value is not set, it is not used to limit the number of returned Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusResultItems.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatus">
+            <summary>
+            Specifies the status of the compose application.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatus.Invalid">
+            <summary>
+            Invalid.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatus.Provisioning">
+            <summary>
+            The application type is being provisioned at background.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatus.Creating">
+            <summary>
+            The application is being created at background.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatus.Created">
+            <summary>
+            The docker compose application has been successfully created.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatus.Unprovisioning">
+            <summary>
+            The application type is being unprovisioned at background..
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatus.Deleting">
+            <summary>
+            The application is being deleted at background.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatus.Failed">
+            <summary>
+            Creation or deletion was terminated due to persistent failures.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusList">
+            <summary>
+            <para>Represents the list of <see cref="T:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusResultItem" /> retrieved by calling 
+            System.Fabric.FabricClient.ApplicationManagementClient.GetComposeApplicationStatusPagedListAsync(Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription).</para>
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusList.#ctor">
+            <summary>
+            <para>Creates a docker compose application list. </para>
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusResultItem">
+            <summary>
+            <para>Describes a compose application status result item which is characterized by application name, compose application status
+            , and status details.</para>
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusResultItem.ApplicationName">
+            <summary>
+            <para>Gets the name of the application as a URI.</para>
+            </summary>
+            <value>
+            <para>The name of the application.</para>
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusResultItem.ComposeApplicationStatus">
+            <summary>
+            <para>Gets the status of the compose application as <see cref="P:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusResultItem.ComposeApplicationStatus" />.</para>
+            </summary>
+            <value>
+            <para>The status of the compose application.</para>
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusResultItem.StatusDetails">
+            <summary>
+            <para>Gets the status details of compose application including failure message. </para>
+            </summary>
+            <value>
+            <para>The status details of compose application including failure message.</para>
+            </value>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Preview.Client.Extensions">
+            <summary>
+            Extension methods for FabricClient.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Extensions.CreateComposeApplicationAsync(System.Fabric.FabricClient.ApplicationManagementClient,Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription)">
+            <summary>
+              <para>Creates and instantiates the Service Fabric compose application described by the compose application description.</para>
+            </summary>
+            <param name="composeApplicationDescription">
+            <para>The <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription"/> that describes the compose application to be created.</para>
+            </param>
+            <param name="client"><see cref="T:System.Fabric.FabricClient"/> object.</param>
+            <returns>
+              <para>A <see cref="T:System.Threading.Tasks.Task" /> representing the operation.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+              <para>The <see cref="T:System.Fabric.FabricClient" /> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient" /> 
+              object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient" /> object.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ImageBuilderValidationError" />: The create application request is not valid with respect to the provisioned manifests for the requested application type.</para>
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.InvalidNameUri" />: The application name is not a valid Naming URI.</para>
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.CorruptedImageStoreObjectFound" />: A corrupted file was encountered on the image store.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricElementAlreadyExistsException">
+              <para><see cref="F:System.Fabric.FabricErrorCode.ComposeApplicationAlreadyExists" />: The compose application has already been created.</para>
+              <para><see cref="F:System.Fabric.FabricErrorCode.ApplicationAlreadyExists" />: The application has already been created so that compose application can not be created using the same name. </para>
+            </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              <para>There was an error accessing a file on the Image Store.</para>
+            </exception>
+            <exception cref="T:System.IO.FileNotFoundException">
+              <para>A required file was not found .</para>
+            </exception>
+            <exception cref="T:System.IO.PathTooLongException">
+              <para>A path to an Image Store file/directory was too long.</para>
+            </exception>
+            <exception cref="T:System.IO.IOException">
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ImageStoreIOException" />: There was an IO error communicating with the Image Store.</para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+              <para>The request timed out but may have already been accepted for processing by the system.</para>
+            </exception>
+            <exception cref="T:System.OperationCanceledException">
+              <para>The request was canceled before the timeout expired but may have already been accepted for processing by the system.</para>
+            </exception>
+            <exception cref="T:System.ArgumentException">
+              <para>
+                The parameters specified via the <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription"/> are incorrect.
+              </para>
+            </exception>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Extensions.CreateComposeApplicationAsync(System.Fabric.FabricClient.ApplicationManagementClient,Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription,System.TimeSpan)">
+            <summary>
+              <para>Creates and instantiates the Service Fabric compose application described by the compose application description.</para>
+            </summary>
+            <param name="composeApplicationDescription">
+            <para>The <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription"/> that describes the compose application to be created.</para>
+            </param>
+            <param name="client"><see cref="T:System.Fabric.FabricClient"/> object.</param>
+            <param name="timeout">
+            <para>Defines the maximum amount of time the system will allow this operation to continue before returning <see cref="T:System.TimeoutException" />.</para>
+            </param>
+            <returns>
+              <para>A <see cref="T:System.Threading.Tasks.Task" /> representing the operation.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+              <para>The <see cref="T:System.Fabric.FabricClient" /> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient" /> 
+              object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient" /> object.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ImageBuilderValidationError" />: The create application request is not valid with respect to the provisioned manifests for the requested application type.</para>
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.InvalidNameUri" />: The application name is not a valid Naming URI.</para>
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.CorruptedImageStoreObjectFound" />: A corrupted file was encountered on the image store.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricElementAlreadyExistsException">
+              <para><see cref="F:System.Fabric.FabricErrorCode.ComposeApplicationAlreadyExists" />: The compose application has already been created.</para>
+              <para><see cref="F:System.Fabric.FabricErrorCode.ApplicationAlreadyExists" />: The application has already been created so that compose application can not be created using the same name. </para>
+            </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              <para>There was an error accessing a file on the Image Store.</para>
+            </exception>
+            <exception cref="T:System.IO.FileNotFoundException">
+              <para>A required file was not found on the Image Store.</para>
+            </exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException">
+              <para>A required directory was not found on the Image Store.</para>
+            </exception>
+            <exception cref="T:System.IO.PathTooLongException">
+              <para>A path to an Image Store file/directory was too long.</para>
+            </exception>
+            <exception cref="T:System.IO.IOException">
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ImageStoreIOException" />: There was an IO error communicating with the Image Store.</para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+              <para>The request timed out but may have already been accepted for processing by the system.</para>
+            </exception>
+            <exception cref="T:System.OperationCanceledException">
+              <para>The request was canceled before the timeout expired but may have already been accepted for processing by the system.</para>
+            </exception>
+            <exception cref="T:System.ArgumentException">
+              <para>
+                The parameters specified via the <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription"/> are incorrect.
+              </para>
+            </exception>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Extensions.CreateComposeApplicationAsync(System.Fabric.FabricClient.ApplicationManagementClient,Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+              <para>Creates and instantiates the Service Fabric compose application described by the compose application description.</para>
+            </summary>
+            <param name="composeApplicationDescription">
+            <para>The <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription"/> that describes the compose application to be created.</para>
+            </param>
+            <param name="client"><see cref="T:System.Fabric.FabricClient"/> object.</param>
+            <param name="timeout">
+            <para>Defines the maximum amount of time the system will allow this operation to continue before returning <see cref="T:System.TimeoutException" />.</para>
+            </param>
+            <param name="cancellationToken">
+            <para>The CancellationToken that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
+            </param>
+            <returns>
+              <para>A <see cref="T:System.Threading.Tasks.Task" /> representing the operation.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+              <para>The <see cref="T:System.Fabric.FabricClient" /> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient" /> 
+              object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient" /> object.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ImageBuilderValidationError" />: The create application request is not valid with respect to the provisioned manifests for the requested application type.</para>
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.InvalidNameUri" />: The application name is not a valid Naming URI.</para>
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.CorruptedImageStoreObjectFound" />: A corrupted file was encountered on the image store.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricElementAlreadyExistsException">
+              <para><see cref="F:System.Fabric.FabricErrorCode.ComposeApplicationAlreadyExists" />: The compose application has already been created.</para>
+              <para><see cref="F:System.Fabric.FabricErrorCode.ApplicationAlreadyExists" />: The application has already been created so that compose application can not be created using the same name. </para>
+            </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+              <para>There was an error accessing a file on the Image Store.</para>
+            </exception>
+            <exception cref="T:System.IO.FileNotFoundException">
+              <para>A required file was not found on the Image Store.</para>
+            </exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException">
+              <para>A required directory was not found on the Image Store.</para>
+            </exception>
+            <exception cref="T:System.IO.PathTooLongException">
+              <para>A path to an Image Store file/directory was too long.</para>
+            </exception>
+            <exception cref="T:System.IO.IOException">
+              <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ImageStoreIOException" />: There was an IO error communicating with the Image Store.</para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+              <para>The request timed out but may have already been accepted for processing by the system.</para>
+            </exception>
+            <exception cref="T:System.OperationCanceledException">
+              <para>The request was canceled before the timeout expired but may have already been accepted for processing by the system.</para>
+            </exception>
+            <exception cref="T:System.ArgumentException">
+              <para>
+                The parameters specified via the <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationDescription"/> are incorrect.
+              </para>
+            </exception>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Extensions.GetComposeApplicationStatusPagedListAsync(System.Fabric.FabricClient.QueryClient,Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription)">
+            <summary>
+            <para>Gets the status of compose applications created that match filters specified in query description (if any).
+            If the compose applications do not fit in a page, one page of results is returned as well as a continuation token which can be used to get the next page.</para>
+            </summary>
+            <param name="composeApplicationQueryDescription">
+            <para>The <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription" /> that determines which compose applications should be queried.</para>
+            </param>
+            <param name="client"><see cref="T:System.Fabric.FabricClient"/> object.</param>
+            <returns>
+            <para>A <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous query operation.
+            The value of TResult parameter is an <see cref="T:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusList" /> that represents the list of compose applications that respect the filters in the <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription" /> and fit the page.
+            If the provided query description has no matching compose applications, it will return a list of 0 entries.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>
+                See <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+            <para>
+                See <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+            <para>
+                See also <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Extensions.GetComposeApplicationStatusPagedListAsync(System.Fabric.FabricClient.QueryClient,Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription,System.TimeSpan)">
+            <summary>
+            <para>Gets the status of compose applications created that match filters specified in query description (if any).
+            If the compose applications do not fit in a page, one page of results is returned as well as a continuation token which can be used to get the next page.</para>
+            </summary>
+            <param name="composeApplicationQueryDescription">
+            <para>The <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription" /> that determines which compose applications should be queried.</para>
+            </param>
+            <param name="client"><see cref="T:System.Fabric.FabricClient"/> object.</param>
+            <param name="timeout">
+            <para>Defines the maximum amount of time the system will allow this operation to continue before returning <see cref="T:System.TimeoutException" />.</para>
+            </param>
+            <returns>
+            <para>A <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous query operation.
+            The value of TResult parameter is an <see cref="T:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusList" /> that represents the list of compose applications that respect the filters in the <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription" /> and fit the page.
+            If the provided query description has no matching compose applications, it will return a list of 0 entries.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>
+                See <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+            <para>
+                See <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+            <para>
+                See also <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Extensions.GetComposeApplicationStatusPagedListAsync(System.Fabric.FabricClient.QueryClient,Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            <para>Gets the status of compose applications created that match filters specified in query description (if any).
+            If the compose applications do not fit in a page, one page of results is returned as well as a continuation token which can be used to get the next page.</para>
+            </summary>
+            <param name="composeApplicationQueryDescription">
+            <para>The <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription" /> that determines which compose applications should be queried.</para>
+            </param>
+            <param name="client"><see cref="T:System.Fabric.FabricClient"/> object.</param>
+            <param name="timeout">
+            <para>Defines the maximum amount of time the system will allow this operation to continue before returning <see cref="T:System.TimeoutException" />.</para>
+            </param>
+            <param name="cancellationToken">
+            <para>The CancellationToken that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
+            </param>
+            <returns>
+            <para>A <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous query operation.
+            The value of TResult parameter is an <see cref="T:Microsoft.ServiceFabric.Preview.Client.Query.ComposeApplicationStatusList" /> that represents the list of compose applications that respect the filters in the <see cref="T:Microsoft.ServiceFabric.Preview.Client.Description.ComposeApplicationStatusQueryDescription" /> and fit the page.
+            If the provided query description has no matching compose applications, it will return a list of 0 entries.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>
+                See <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+            <para>
+                See <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricException">
+            <para>
+                See also <see href="https://azure.microsoft.com/documentation/articles/service-fabric-errors-and-exceptions/"/> for handling common FabricClient failures.</para>
+            </exception>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Extensions.DeleteComposeApplicationAsync(System.Fabric.FabricClient.ApplicationManagementClient,System.Uri)">
+            <summary>
+            <para>Deletes the compose application instance from the cluster.</para>
+            </summary>
+            <param name="client"><see cref="T:System.Fabric.FabricClient"/> object.</param>
+            <param name="applicationName">
+            <para>The URI of the application instance name.</para>
+            </param>
+            <returns>
+              <para>A <see cref="T:System.Threading.Tasks.Task" /> representing the operation.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>The <see cref="T:System.Fabric.FabricClient" /> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient" /> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient" /> object.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricElementNotFoundException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ComposeApplicationNotFound" />: The application does not exist.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricTransientException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ApplicationUpgradeInProgress" />: The application is being upgraded. </para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+            <para>The request timed out but may have already been accepted for processing by the system.</para>
+            </exception>
+            <exception cref="T:System.OperationCanceledException">
+            <para>The request was canceled before the timeout expired but may have already been accepted for processing by the system.</para>
+            </exception>
+            <remarks>
+            <para>All application state will be lost and cannot be recovered after the application is deleted.</para>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Extensions.DeleteComposeApplicationAsync(System.Fabric.FabricClient.ApplicationManagementClient,System.Uri,System.TimeSpan)">
+            <summary>
+            <para>Deletes the application instance from the cluster.</para>
+            </summary>
+            <param name="client"><see cref="T:System.Fabric.FabricClient"/> object.</param>
+            <param name="applicationName">
+            <para>The URI of the application instance name.</para>
+            </param>
+            <param name="timeout">
+            <para>Defines the maximum amount of time the system will allow this operation to continue before returning System.TimeoutException.</para>
+            </param>
+            <returns>
+              <para>A <see cref="T:System.Threading.Tasks.Task" /> representing the operation.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>The <see cref="T:System.Fabric.FabricClient" /> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient" /> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient" /> object.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricElementNotFoundException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ApplicationNotFound" />: The application does not exist.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricTransientException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ApplicationUpgradeInProgress" />: The application is being upgraded. </para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+            <para>The request timed out but may have already been accepted for processing by the system.</para>
+            </exception>
+            <exception cref="T:System.OperationCanceledException">
+            <para>The request was canceled before the timeout expired but may have already been accepted for processing by the system.</para>
+            </exception>
+            <remarks>
+            <para>All application state will be lost and cannot be recovered after the application is deleted.</para>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Preview.Client.Extensions.DeleteComposeApplicationAsync(System.Fabric.FabricClient.ApplicationManagementClient,System.Uri,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            <para>Deletes the application instance from the cluster.</para>
+            </summary>
+            <param name="client"><see cref="T:System.Fabric.FabricClient"/> object.</param>
+            <param name="applicationName">
+            <para>The URI of the application instance name.</para>
+            </param>
+            <param name="timeout">
+            <para>Defines the maximum amount of time the system will allow this operation to continue before returning System.TimeoutException.</para>
+            </param>
+            <param name="cancellationToken">
+            <para>The <see cref="T:System.Threading.CancellationToken" /> that the operation is observing. It can be used to propagate notification that the operation should be canceled.</para>
+            </param>
+            <returns>
+              <para>A <see cref="T:System.Threading.Tasks.Task" /> representing the operation.</para>
+            </returns>
+            <exception cref="T:System.Fabric.FabricObjectClosedException">
+            <para>The <see cref="T:System.Fabric.FabricClient" /> object is in a closed state. Dispose of the <see cref="T:System.Fabric.FabricClient" /> object you are using and instantiate a new <see cref="T:System.Fabric.FabricClient" /> object.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricElementNotFoundException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ApplicationNotFound" />: The application does not exist.</para>
+            </exception>
+            <exception cref="T:System.Fabric.FabricTransientException">
+            <para>
+                <see cref="F:System.Fabric.FabricErrorCode.ApplicationUpgradeInProgress" />: The application is being upgraded. </para>
+            </exception>
+            <exception cref="T:System.TimeoutException">
+            <para>The request timed out but may have already been accepted for processing by the system.</para>
+            </exception>
+            <exception cref="T:System.OperationCanceledException">
+            <para>The request was canceled before the timeout expired but may have already been accepted for processing by the system.</para>
+            </exception>
+            <remarks>
+            <para>All application state will be lost and cannot be recovered after the application is deleted.</para>
+            </remarks>
+        </member>
+    </members>
+</doc>

@@ -42,7 +42,7 @@
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.ActorExtensions.GetActorId``1(``0)">
             <summary>
-            Gets <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> for the actor./&gt;
+            Gets <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> for the actor./>
             </summary>
             <typeparam name="TIActor">Actor interface type.</typeparam>
             <param name="actor">Actor object to get ActorId for.</param>
@@ -77,6 +77,12 @@
             Initializes a new instance of ActorId class with Id value of type <see cref="T:System.String"/>.
             </summary>
             <param name="id">Value for actor id.</param>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.ActorId.Kind">
+            <summary>
+            Gets the <see cref="T:Microsoft.ServiceFabric.Actors.ActorIdKind"/> for the ActorId.
+            </summary>
+            <value><see cref="T:Microsoft.ServiceFabric.Actors.ActorIdKind"/> for the ActorId.</value>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.ActorId.GetLongId">
             <summary>
@@ -182,12 +188,6 @@
             <param name="y">The second actorId to compare, or null. </param>
             <returns>true if the id or <see cref="T:Microsoft.ServiceFabric.Actors.ActorIdKind"/> is different for both objects; otherwise, true.</returns>
         </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.ActorId.Kind">
-            <summary>
-            Gets the <see cref="T:Microsoft.ServiceFabric.Actors.ActorIdKind"/> for the ActorId.
-            </summary>
-            <value><see cref="T:Microsoft.ServiceFabric.Actors.ActorIdKind"/> for the ActorId.</value>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.ActorIdKind">
             <summary>
             Specifies the type of the ID value for an <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/>.
@@ -208,6 +208,21 @@
             Represents ID value of type <see cref="T:System.String"/>.
             </summary>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.ActorEventSource">
+            <summary>
+            Actor Framework event source collected by Service Fabric runtime diagnostics system.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Actors.ActorEventSource.Instance">
+            <summary>
+            Gets instance of <see cref="T:Microsoft.ServiceFabric.Actors.ActorEventSource"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.ActorEventSource.#ctor">
+            <summary>
+            Prevents a default instance of the <see cref="T:Microsoft.ServiceFabric.Actors.ActorEventSource" /> class from being created.
+            </summary>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Client.IActorServicePartitionClient">
             <summary>
             Defines the interface for the client that communicate with an actor within a service partition.
@@ -216,6 +231,413 @@
         <member name="P:Microsoft.ServiceFabric.Actors.Client.IActorServicePartitionClient.ActorId">
             <summary>
             Gets the id of the actor this client communicates with.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Client.ActorProxy">
+            <summary>
+            Provides the base implementation for the proxy to the remote actor objects implementing <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> interfaces.
+            The proxy object can be used used for client-to-actor and actor-to-actor communication.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxy.#ctor">
+            <summary>
+            Initializes a new instance of the ActorProxy class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Client.ActorProxy.Microsoft#ServiceFabric#Actors#Client#IActorProxy#ActorId">
+            <summary>
+            Gets <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> associated with the proxy object.
+            </summary>
+            <value><see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> associated with the proxy object.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Client.ActorProxy.Microsoft#ServiceFabric#Actors#Client#IActorProxy#ActorServicePartitionClient">
+            <summary>
+            Gets the <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorServicePartitionClient"/> interface that this proxy is using to communicate with the actor.
+            </summary>
+            <value><see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorServicePartitionClient"/> that this proxy is using to communicate with the actor.</value>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxy.Create``1(Microsoft.ServiceFabric.Actors.ActorId,System.String,System.String,System.String)">
+            <summary>
+            Creates a proxy to the actor object that implements an actor interface.
+            </summary>
+            <typeparam name="TActorInterface">
+            The actor interface implemented by the remote actor object. 
+            The returned proxy object will implement this interface.
+            </typeparam>
+            <param name="actorId">The actor ID of the proxy actor object. Methods called on this proxy will result in requests 
+            being sent to the actor with this ID.</param>
+            <param name="applicationName">
+            The name of the Service Fabric application that contains the actor service hosting the actor objects.
+            This parameter can be null if the client is running as part of that same Service Fabric application. For more information, see Remarks. 
+            </param>
+            <param name="serviceName">
+            The name of the Service Fabric service as configured by <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/> on the actor implementation.
+            By default, the name of the service is derived from the name of the actor interface. However, <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/>
+            is required when an actor implements more than one actor interface or an actor interface derives from another actor interface since
+            the service name cannot be determined automatically.
+            </param>
+            <param name="listenerName">
+            By default an actor service has only one listener for clients to connect to and communicate with.
+            However, it is possible to configure an actor service with more than one listener. This parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
+            <remarks><para>The applicationName parameter can be null if the client is running as part of the same Service Fabric
+            application as the actor service it intends to communicate with. In this case, the application name is determined from
+            <see cref="T:System.Fabric.CodePackageActivationContext"/>, and is obtained by calling the 
+            <see cref="P:System.Fabric.CodePackageActivationContext.ApplicationName"/> property.</para>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxy.Create``1(Microsoft.ServiceFabric.Actors.ActorId,System.Uri,System.String)">
+            <summary>
+            Creates a proxy to the actor object that implements an actor interface.
+            </summary>
+            <typeparam name="TActorInterface">
+            The actor interface implemented by the remote actor object. 
+            The returned proxy object will implement this interface.
+            </typeparam>
+            <param name="serviceUri">Uri of the actor service.</param>
+            <param name="actorId">Actor Id of the proxy actor object. Methods called on this proxy will result in requests 
+            being sent to the actor with this id.</param>
+            <param name="listenerName">
+            By default an actor service has only one listener for clients to connect to and communicate with.
+            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Client.ActorProxyEventExtensions">
+            <summary>
+            Contains extension methods related to actor events.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyEventExtensions.SubscribeAsync``1(Microsoft.ServiceFabric.Actors.IActorEventPublisher,``0)">
+            <summary>
+            Subscribe to a published actor event.
+            </summary>
+            <typeparam name="TEvent">The type of the event interface.</typeparam>
+            <param name="actorProxy">The actor that publishes the event.</param>
+            <param name="subscriber">The subscriber that receives the events.</param>
+            <returns>A task that represents the asynchronous operation of subscribing to a published actor event..</returns>
+            <exception cref="T:System.ArgumentException">
+            <para>When actorProxy is not of type <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorProxy"/></para>.
+            </exception>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyEventExtensions.SubscribeAsync``1(Microsoft.ServiceFabric.Actors.IActorEventPublisher,``0,System.TimeSpan)">
+            <summary>
+            Subscribe to a published actor event.
+            </summary>
+            <typeparam name="TEvent">The type of the event interface.</typeparam>
+            <param name="actorProxy">The actor that publishes the event.</param>
+            <param name="subscriber">The subscriber that receives the events.</param>
+            <param name="resubscriptionInterval">The time between re-subscription attempts.</param>
+            <returns>A task that represents the asynchronous operation of subscribing to a published actor event.</returns>
+            <exception cref="T:System.ArgumentException">
+            <para>When actorProxy is not of type <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorProxy"/></para>.
+            </exception>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyEventExtensions.UnsubscribeAsync``1(Microsoft.ServiceFabric.Actors.IActorEventPublisher,``0)">
+            <summary>
+            Unsubscribe from a published actor event.
+            </summary>
+            <typeparam name="TEvent">The type of the event interface.</typeparam>
+            <param name="actorProxy">The actor that publishes the event.</param>
+            <param name="subscriber">The subscriber that receives the event.</param>
+            <returns>A task that represents the asynchronous operation of un-subscribing from a published actor event..</returns>
+            <exception cref="T:System.ArgumentException">
+            <para>When actorProxy is not of type <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorProxy"/></para>.
+            <para>When TEvent doesn't implement <see cref="T:Microsoft.ServiceFabric.Actors.IActorEvents"/></para>
+            </exception>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory">
+            <summary>
+            Factory class to create a proxy to the remote actor objects.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.#ctor(System.Func{Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient,Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClientFactory},Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory"/> class.
+            </summary>
+            <param name="createServiceRemotingClientFactory">Factory method to create remoting communication client factory.</param>
+            <param name="retrySettings">Retry settings for the remote object calls  made by proxy.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.CreateActorProxy``1(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
+            <summary>
+            Creates a proxy to the actor object that implements an actor interface.
+            </summary>
+            <typeparam name="TActorInterface">
+            The actor interface implemented by the remote actor object. 
+            The returned proxy object will implement this interface.
+            </typeparam>
+            <param name="serviceUri">Uri of the actor service.</param>
+            <param name="actorId">Actor Id of the proxy actor object. Methods called on this proxy will result in requests 
+            being sent to the actor with this id.</param>
+            <param name="listenerName">
+            By default an actor service has only one listener for clients to connect to and communicate with.
+            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.CreateActorProxy``1(Microsoft.ServiceFabric.Actors.ActorId,System.String,System.String,System.String)">
+            <summary>
+            Creates a proxy to the actor object that implements an actor interface.
+            </summary>
+            <typeparam name="TActorInterface">
+            The actor interface implemented by the remote actor object. 
+            The returned proxy object will implement this interface.
+            </typeparam>
+            <param name="actorId">Actor Id of the proxy actor object. Methods called on this proxy will result in requests 
+            being sent to the actor with this id.</param>
+            <param name="applicationName">
+            Name of the Service Fabric application that contains the actor service hosting the actor objects.
+            This parameter can be null if the client is running as part of that same Service Fabric application. For more information, see Remarks. 
+            </param>
+            <param name="serviceName">
+            Name of the Service Fabric service as configured by <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/> on the actor implementation.
+            By default, the name of the service is derived from the name of the actor interface. However <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/>
+            is required when an actor implements more than one actor interfaces or an actor interface derives from another actor interface as the determination of the 
+            serviceName cannot be made automatically.
+            </param>
+            <param name="listenerName">
+            By default an actor service has only one listener for clients to connect to and communicate with.
+            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.CreateActorServiceProxy``1(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
+            <summary>
+            Create a proxy to the actor service that is hosting the specified actor id and implementing specified type of the service interface.
+            </summary>
+            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
+            <param name="serviceUri">Uri of the actor service to connect to.</param>
+            <param name="actorId">Id of the actor. The created proxy will be connected to the partition of the actor service hosting actor with this id.</param>
+            <param name="listenerName">
+            By default an actor service has only one listener for clients to connect to and communicate with.
+            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.CreateActorServiceProxy``1(System.Uri,System.Int64,System.String)">
+            <summary>
+            Create a proxy to the actor service that is hosting the specified actor id and implementing specified type of the service interface.
+            </summary>
+            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
+            <param name="serviceUri">Uri of the actor service to connect to.</param>
+            <param name="partitionKey">The key of the actor service partition to connect to.</param>
+            <param name="listenerName">
+            By default an actor service has only one listener for clients to connect to and communicate with.
+            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.CreateServiceRemotingClientFactory(Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient)">
+            <summary>
+            Creates service remoting client factory.
+            </summary>
+            <param name="callbackClient">Callback from the remoting listener to the client.</param>
+            <returns>Created service remoting client factory as <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClientFactory"/></returns>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Client.ActorServicePartitionClient">
+            <summary>
+            Specifies the Service partition client for Actor communication
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServicePartitionClient.#ctor(Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClientFactory,System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings)">
+            <summary>
+            Instantiates a Partition client for a singleton partitioned service with the given name.
+            </summary>
+            <param name="remotingClientFactory">Remoting client factory</param>
+            <param name="serviceUri">Actor service name</param>
+            <param name="actorId">Actor id</param>
+            <param name="listenerName">
+            By default an actor service has only one listener for clients to connect to and communicate with.
+            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
+            </param>
+            <param name="retrySettings">Retry settings for the remote calls made by the partition client.</param>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Client.ActorServicePartitionClient.ActorId">
+            <summary>
+            Actor id. Actor id is used to identify the partition of the service that this actor
+            belongs to.
+            </summary>
+            <value>actor id</value>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy">
+            <summary>
+            Proxy used by clients to interact with the actor service running in a Service Fabric cluster
+            and perform actor service level operations.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy.Create``1(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
+            <summary>
+            Creates a proxy to the actor service that is hosting the specified type of actor and implementing the specified type of the service interface.
+            </summary>
+            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
+            <param name="serviceUri">The URI of the actor service to connect to.</param>
+            <param name="actorId">The ID of the actor. The created proxy will be connected to the partition of the actor service hosting the actor with this ID.</param>
+            <param name="listenerName">
+            By default, an actor service has only one listener for clients to connect to and communicate with.
+            However, it is possible to configure an actor service with more than one listener. This parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy.Create``1(System.Uri,System.Int64,System.String)">
+            <summary>
+            Creates a proxy to the actor service that is hosting the specified type of actor and implementing the specified type of the service interface.
+            </summary>
+            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
+            <param name="serviceUri">The URI of the actor service to connect to.</param>
+            <param name="partitionKey">The key of the actor service partition to connect to.</param>
+            <param name="listenerName">
+            By default, an actor service has only one listener for clients to connect to and communicate with.
+            However, it is possible to configure an actor service with more than one listener. This parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy.Create(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
+            <summary>
+            Creates a proxy to the actor service that is hosting the specified type of actor and implementing the specified type of the service interface.
+            </summary>
+            <param name="serviceUri">The URI of the actor service to connect to.</param>
+            <param name="actorId">The ID of the actor. The created proxy will be connected to the partition of the actor service hosting the actor with this ID.</param>
+            <param name="listenerName">
+            By default, an actor service has only one listener for clients to connect to and communicate with.
+            However, it is possible to configure an actor service with more than one listener. This parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and <see cref="T:Microsoft.ServiceFabric.Actors.IActorService"/> interfaces.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy.Create(System.Uri,System.Int64,System.String)">
+            <summary>
+            Creates a proxy to the actor service that is hosting the specified type of actor and implementing the specified type of the service interface.
+            </summary>
+            <param name="serviceUri">The URI of the actor service to connect to.</param>
+            <param name="partitionKey">The key of the actor service partition to connect to.</param>
+            <param name="listenerName">
+            By default, an actor service has only one listener for clients to connect to and communicate with.
+            However, it is possible to configure an actor service with more than one listener. This parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and <see cref="T:Microsoft.ServiceFabric.Actors.IActorService"/> interfaces.</returns>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy">
+            <summary>
+            Provides the interface for implementation of proxy access for actor service.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Client.IActorProxy.ActorId">
+            <summary>
+            Gets <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> associated with the proxy object.
+            </summary>
+            <value><see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> associated with the proxy object.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Client.IActorProxy.ActorServicePartitionClient">
+            <summary>
+            Gets <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorServicePartitionClient"/> that this proxy is using to communicate with the actor.
+            </summary>
+            <value><see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorServicePartitionClient"/> that this proxy is using to communicate with the actor.</value>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Client.IActorProxyFactory">
+            <summary>
+            Defines the interface containing methods to create actor proxy factory class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.IActorProxyFactory.CreateActorProxy``1(Microsoft.ServiceFabric.Actors.ActorId,System.String,System.String,System.String)">
+            <summary>
+            Creates a proxy to the actor object that implements an actor interface.
+            </summary>
+            <typeparam name="TActorInterface">
+            The actor interface implemented by the remote actor object. 
+            The returned proxy object will implement this interface.
+            </typeparam>
+            <param name="actorId">Actor Id of the proxy actor object. Methods called on this proxy will result in requests 
+            being sent to the actor with this id.</param>
+            <param name="applicationName">
+            Name of the Service Fabric application that contains the actor service hosting the actor objects.
+            This parameter can be null if the client is running as part of that same Service Fabric application. For more information, see Remarks. 
+            </param>
+            <param name="serviceName">
+            Name of the Service Fabric service as configured by <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/> on the actor implementation.
+            By default, the name of the service is derived from the name of the actor interface. However <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/>
+            is required when an actor implements more than one actor interfaces or an actor interface derives from another actor interface as the determination of the 
+            serviceName cannot be made automatically.
+            </param>
+            <param name="listenerName">
+            By default an actor service has only one listener for clients to connect to and communicate with.
+            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.IActorProxyFactory.CreateActorProxy``1(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
+            <summary>
+            Creates a proxy to the actor object that implements an actor interface.
+            </summary>
+            <typeparam name="TActorInterface">
+            The actor interface implemented by the remote actor object. 
+            The returned proxy object will implement this interface.
+            </typeparam>
+            <param name="serviceUri">Uri of the actor service.</param>
+            <param name="actorId">Actor Id of the proxy actor object. Methods called on this proxy will result in requests 
+            being sent to the actor with this id.</param>
+            <param name="listenerName">
+            By default an actor service has only one listener for clients to connect to and communicate with.
+            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.IActorProxyFactory.CreateActorServiceProxy``1(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
+            <summary>
+            Create a proxy to the actor service that is hosting the specified actor id and implementing specified type of the service interface.
+            </summary>
+            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
+            <param name="serviceUri">Uri of the actor service to connect to.</param>
+            <param name="actorId">Id of the actor. The created proxy will be connected to the partition of the actor service hosting actor with this id.</param>
+            <param name="listenerName">
+            By default an actor service has only one listener for clients to connect to and communicate with.
+            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Client.IActorProxyFactory.CreateActorServiceProxy``1(System.Uri,System.Int64,System.String)">
+            <summary>
+            Create a proxy to the actor service that is hosting the specified actor id and implementing specified type of the service interface.
+            </summary>
+            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
+            <param name="serviceUri">Uri of the actor service to connect to.</param>
+            <param name="partitionKey">The key of the actor service partition to connect to.</param>
+            <param name="listenerName">
+            By default an actor service has only one listener for clients to connect to and communicate with.
+            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
+            </param>
+            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteEvent(System.Int32,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Implement WriteEvent overload to match our reconfiguration events. If this overload is
+            not implemented, the standard WriteEvent overload method in the base class that accepts
+            an object array as argument gets used and it is not very efficient. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteEvent(System.Int32,System.String,System.String,System.Int32,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Implement WriteEvent overload to match our activation/deactivation events. If this overload is
+            not implemented, the standard WriteEvent overload method in the base class that accepts an
+            object array as argument gets used and it is not very efficient. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteEvent(System.Int32,System.Int64,System.String,System.String,System.Int32,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Implement WriteEvent overload to match our actor metric events. If this overload is not 
+            implemented, the standard WriteEvent overload method in the base class that accepts an
+            object array as argument gets used and it is not very efficient. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteActorMethodEvent(System.Int32,System.String,System.Int64,System.String,System.String,System.String,System.String,System.Int32,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Implement our own method to write the event. If we called WriteEvent directly instead of
+            implementing this method, then the standard WriteEvent overload method in the base class
+            that accepts an object array as argument gets used and it is not very efficient.
             </summary>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Generator.ActorNameFormat">
@@ -411,6 +833,17 @@
             <param name="appPrefix">Prefix to be used for the application name.</param>
             <returns>Application name.</returns>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Generator.XmlSerializationUtility.InsertXmlComments``1(System.String,``0)">
+            <summary>
+            Inserts Xml Comments from existingContent to xml obtained by serializing the object of type T.
+            Exception while inserting comments are ignored and content without comments is returned.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Generator.XmlSerializationUtility.InsertXmlComments(System.String,System.String)">
+            <summary>
+            Inserts Xml Comments from Xml content with comments into Xml content without comments.
+            </summary>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.ActorReference">
             <summary>
             Encapsulation of a reference to an actor for serialization.
@@ -420,6 +853,24 @@
             <summary>
             Initializes a new instance of the ActorReference class.
             </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.ActorReference.ServiceUri">
+            <summary>
+            Gets Uri of the actor service that hosts the actor in service fabric cluster.
+            </summary>
+            <value>Service Uri which hosts the actor in service fabric cluster.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.ActorReference.ActorId">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> of the actor.
+            </summary>
+            <value><see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> of the actor.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.ActorReference.ListenerName">
+            <summary>
+            Gets or sets the name of the listener in the actor service to use when communicating with the actor service.
+            </summary>
+            <value>The name of the listener</value>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.ActorReference.Bind(System.Type)">
             <summary>
@@ -439,24 +890,6 @@
             <param name="actor">Actor object to get <see cref="T:Microsoft.ServiceFabric.Actors.ActorReference"/> for.</param>
             <returns><see cref="T:Microsoft.ServiceFabric.Actors.ActorReference"/> object for the actor.</returns>
             <remarks>A null value is returned if actor is passed as null.</remarks>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.ActorReference.ServiceUri">
-            <summary>
-            Gets Uri of the actor service that hosts the actor in service fabric cluster.
-            </summary>
-            <value>Service Uri which hosts the actor in service fabric cluster.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.ActorReference.ActorId">
-            <summary>
-            Gets or sets the <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> of the actor.
-            </summary>
-            <value><see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> of the actor.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.ActorReference.ListenerName">
-            <summary>
-            Gets or sets the name of the listener in the actor service to use when communicating with the actor service.
-            </summary>
-            <value>The name of the listener</value>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.CRC64">
             <summary>
@@ -628,423 +1061,6 @@
             <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown. </param>
             <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
         </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Client.ActorProxy">
-            <summary>
-            Provides the base implementation for the proxy to the remote actor objects implementing IActor interfaces.
-            </summary>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy">
-            <summary>
-            Provides the interface for implementation of proxy access for actor service.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Client.IActorProxy.ActorId">
-            <summary>
-            Gets <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> associated with the proxy object.
-            </summary>
-            <value><see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> associated with the proxy object.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Client.IActorProxy.ActorServicePartitionClient">
-            <summary>
-            Gets <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorServicePartitionClient"/> that this proxy is using to communicate with the actor.
-            </summary>
-            <value><see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorServicePartitionClient"/> that this proxy is using to communicate with the actor.</value>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxy.#ctor">
-            <summary>
-            Initializes a new instance of the ActorProxy class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxy.Create``1(Microsoft.ServiceFabric.Actors.ActorId,System.String,System.String,System.String)">
-            <summary>
-            Creates a proxy to the actor object that implements an actor interface.
-            </summary>
-            <typeparam name="TActorInterface">
-            The actor interface implemented by the remote actor object. 
-            The returned proxy object will implement this interface.
-            </typeparam>
-            <param name="actorId">The actor ID of the proxy actor object. Methods called on this proxy will result in requests 
-            being sent to the actor with this ID.</param>
-            <param name="applicationName">
-            The name of the Service Fabric application that contains the actor service hosting the actor objects.
-            This parameter can be null if the client is running as part of that same Service Fabric application. For more information, see Remarks. 
-            </param>
-            <param name="serviceName">
-            The name of the Service Fabric service as configured by <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/> on the actor implementation.
-            By default, the name of the service is derived from the name of the actor interface. However, <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/>
-            is required when an actor implements more than one actor interface or an actor interface derives from another actor interface since
-            the service name cannot be determined automatically.
-            </param>
-            <param name="listenerName">
-            By default an actor service has only one listener for clients to connect to and communicate with.
-            However, it is possible to configure an actor service with more than one listener. This parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
-            <remarks><para>The applicationName parameter can be null if the client is running as part of the same Service Fabric
-            application as the actor service it intends to communicate with. In this case, the application name is determined from
-            <see cref="T:System.Fabric.CodePackageActivationContext"/>, and is obtained by calling the 
-            <see cref="P:System.Fabric.CodePackageActivationContext.ApplicationName"/> property.</para>
-            </remarks>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxy.Create``1(Microsoft.ServiceFabric.Actors.ActorId,System.Uri,System.String)">
-            <summary>
-            Creates a proxy to the actor object that implements an actor interface.
-            </summary>
-            <typeparam name="TActorInterface">
-            The actor interface implemented by the remote actor object. 
-            The returned proxy object will implement this interface.
-            </typeparam>
-            <param name="serviceUri">Uri of the actor service.</param>
-            <param name="actorId">Actor Id of the proxy actor object. Methods called on this proxy will result in requests 
-            being sent to the actor with this id.</param>
-            <param name="listenerName">
-            By default an actor service has only one listener for clients to connect to and communicate with.
-            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Client.ActorProxy.Microsoft#ServiceFabric#Actors#Client#IActorProxy#ActorId">
-            <summary>
-            Gets <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> associated with the proxy object.
-            </summary>
-            <value><see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> associated with the proxy object.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Client.ActorProxy.Microsoft#ServiceFabric#Actors#Client#IActorProxy#ActorServicePartitionClient">
-            <summary>
-            Gets <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorServicePartitionClient"/> that this proxy is using to communicate with the actor.
-            </summary>
-            <value><see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorServicePartitionClient"/> that this proxy is using to communicate with the actor.</value>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Client.ActorProxyEventExtensions">
-            <summary>
-            Contains extension methods related to actor events.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyEventExtensions.SubscribeAsync``1(Microsoft.ServiceFabric.Actors.IActorEventPublisher,``0)">
-            <summary>
-            Subscribe to a published actor event.
-            </summary>
-            <typeparam name="TEvent">The type of the event interface.</typeparam>
-            <param name="actorProxy">The actor that publishes the event.</param>
-            <param name="subscriber">The subscriber that receives the events.</param>
-            <returns>A task that represents the asynchronous operation of subscribing to a published actor event..</returns>
-            <exception cref="T:System.ArgumentException">
-            <para>When actorProxy is not of type <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorProxy"/></para>.
-            </exception>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyEventExtensions.SubscribeAsync``1(Microsoft.ServiceFabric.Actors.IActorEventPublisher,``0,System.TimeSpan)">
-            <summary>
-            Subscribe to a published actor event.
-            </summary>
-            <typeparam name="TEvent">The type of the event interface.</typeparam>
-            <param name="actorProxy">The actor that publishes the event.</param>
-            <param name="subscriber">The subscriber that receives the events.</param>
-            <param name="resubscriptionInterval">The time between re-subscription attempts.</param>
-            <returns>A task that represents the asynchronous operation of subscribing to a published actor event.</returns>
-            <exception cref="T:System.ArgumentException">
-            <para>When actorProxy is not of type <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorProxy"/></para>.
-            </exception>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyEventExtensions.UnsubscribeAsync``1(Microsoft.ServiceFabric.Actors.IActorEventPublisher,``0)">
-            <summary>
-            Unsubscribe from a published actor event.
-            </summary>
-            <typeparam name="TEvent">The type of the event interface.</typeparam>
-            <param name="actorProxy">The actor that publishes the event.</param>
-            <param name="subscriber">The subscriber that receives the event.</param>
-            <returns>A task that represents the asynchronous operation of un-subscribing from a published actor event..</returns>
-            <exception cref="T:System.ArgumentException">
-            <para>When actorProxy is not of type <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorProxy"/></para>.
-            <para>When TEvent doesn't implement <see cref="T:Microsoft.ServiceFabric.Actors.IActorEvents"/></para>
-            </exception>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory">
-            <summary>
-            Factory class to create a proxy to the remote actor objects.
-            </summary>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Client.IActorProxyFactory">
-            <summary>
-            Defines the interface containing methods to create actor proxy factory class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.IActorProxyFactory.CreateActorProxy``1(Microsoft.ServiceFabric.Actors.ActorId,System.String,System.String,System.String)">
-            <summary>
-            Creates a proxy to the actor object that implements an actor interface.
-            </summary>
-            <typeparam name="TActorInterface">
-            The actor interface implemented by the remote actor object. 
-            The returned proxy object will implement this interface.
-            </typeparam>
-            <param name="actorId">Actor Id of the proxy actor object. Methods called on this proxy will result in requests 
-            being sent to the actor with this id.</param>
-            <param name="applicationName">
-            Name of the Service Fabric application that contains the actor service hosting the actor objects.
-            This parameter can be null if the client is running as part of that same Service Fabric application. For more information, see Remarks. 
-            </param>
-            <param name="serviceName">
-            Name of the Service Fabric service as configured by <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/> on the actor implementation.
-            By default, the name of the service is derived from the name of the actor interface. However <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/>
-            is required when an actor implements more than one actor interfaces or an actor interface derives from another actor interface as the determination of the 
-            serviceName cannot be made automatically.
-            </param>
-            <param name="listenerName">
-            By default an actor service has only one listener for clients to connect to and communicate with.
-            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.IActorProxyFactory.CreateActorProxy``1(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
-            <summary>
-            Creates a proxy to the actor object that implements an actor interface.
-            </summary>
-            <typeparam name="TActorInterface">
-            The actor interface implemented by the remote actor object. 
-            The returned proxy object will implement this interface.
-            </typeparam>
-            <param name="serviceUri">Uri of the actor service.</param>
-            <param name="actorId">Actor Id of the proxy actor object. Methods called on this proxy will result in requests 
-            being sent to the actor with this id.</param>
-            <param name="listenerName">
-            By default an actor service has only one listener for clients to connect to and communicate with.
-            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.IActorProxyFactory.CreateActorServiceProxy``1(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
-            <summary>
-            Create a proxy to the actor service that is hosting the specified actor id and implementing specified type of the service interface.
-            </summary>
-            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
-            <param name="serviceUri">Uri of the actor service to connect to.</param>
-            <param name="actorId">Id of the actor. The created proxy will be connected to the partition of the actor service hosting actor with this id.</param>
-            <param name="listenerName">
-            By default an actor service has only one listener for clients to connect to and communicate with.
-            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.IActorProxyFactory.CreateActorServiceProxy``1(System.Uri,System.Int64,System.String)">
-            <summary>
-            Create a proxy to the actor service that is hosting the specified actor id and implementing specified type of the service interface.
-            </summary>
-            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
-            <param name="serviceUri">Uri of the actor service to connect to.</param>
-            <param name="partitionKey">The key of the actor service partition to connect to.</param>
-            <param name="listenerName">
-            By default an actor service has only one listener for clients to connect to and communicate with.
-            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.#ctor(System.Func{Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient,Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClientFactory},Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory"/> class.
-            </summary>
-            <param name="createServiceRemotingClientFactory">Factory method to create remoting communication client factor.y</param>
-            <param name="retrySettings">Retry settings for the remote object calls  made by proxy.</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.CreateActorProxy``1(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
-            <summary>
-            Creates a proxy to the actor object that implements an actor interface.
-            </summary>
-            <typeparam name="TActorInterface">
-            The actor interface implemented by the remote actor object. 
-            The returned proxy object will implement this interface.
-            </typeparam>
-            <param name="serviceUri">Uri of the actor service.</param>
-            <param name="actorId">Actor Id of the proxy actor object. Methods called on this proxy will result in requests 
-            being sent to the actor with this id.</param>
-            <param name="listenerName">
-            By default an actor service has only one listener for clients to connect to and communicate with.
-            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.CreateActorProxy``1(Microsoft.ServiceFabric.Actors.ActorId,System.String,System.String,System.String)">
-            <summary>
-            Creates a proxy to the actor object that implements an actor interface.
-            </summary>
-            <typeparam name="TActorInterface">
-            The actor interface implemented by the remote actor object. 
-            The returned proxy object will implement this interface.
-            </typeparam>
-            <param name="actorId">Actor Id of the proxy actor object. Methods called on this proxy will result in requests 
-            being sent to the actor with this id.</param>
-            <param name="applicationName">
-            Name of the Service Fabric application that contains the actor service hosting the actor objects.
-            This parameter can be null if the client is running as part of that same Service Fabric application. For more information, see Remarks. 
-            </param>
-            <param name="serviceName">
-            Name of the Service Fabric service as configured by <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/> on the actor implementation.
-            By default, the name of the service is derived from the name of the actor interface. However <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/>
-            is required when an actor implements more than one actor interfaces or an actor interface derives from another actor interface as the determination of the 
-            serviceName cannot be made automatically.
-            </param>
-            <param name="listenerName">
-            By default an actor service has only one listener for clients to connect to and communicate with.
-            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>An actor proxy object that implements <see cref="T:Microsoft.ServiceFabric.Actors.Client.IActorProxy"/> and TActorInterface.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.CreateActorServiceProxy``1(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
-            <summary>
-            Create a proxy to the actor service that is hosting the specified actor id and implementing specified type of the service interface.
-            </summary>
-            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
-            <param name="serviceUri">Uri of the actor service to connect to.</param>
-            <param name="actorId">Id of the actor. The created proxy will be connected to the partition of the actor service hosting actor with this id.</param>
-            <param name="listenerName">
-            By default an actor service has only one listener for clients to connect to and communicate with.
-            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.CreateActorServiceProxy``1(System.Uri,System.Int64,System.String)">
-            <summary>
-            Create a proxy to the actor service that is hosting the specified actor id and implementing specified type of the service interface.
-            </summary>
-            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
-            <param name="serviceUri">Uri of the actor service to connect to.</param>
-            <param name="partitionKey">The key of the actor service partition to connect to.</param>
-            <param name="listenerName">
-            By default an actor service has only one listener for clients to connect to and communicate with.
-            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory.CreateServiceRemotingClientFactory(Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient)">
-            <summary>
-            Creates service remoting client factory.
-            </summary>
-            <param name="callbackClient">Callback from the remoting listener to the client.</param>
-            <returns>Created service remoting client factory as <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClientFactory"/></returns>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Client.ActorServicePartitionClient">
-            <summary>
-            Specifies the Service partition client for Actor communication
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServicePartitionClient.#ctor(Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClientFactory,System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String,Microsoft.ServiceFabric.Services.Communication.Client.OperationRetrySettings)">
-            <summary>
-            Instantiates a Partition client for a singleton partitioned service with the given name.
-            </summary>
-            <param name="remotingClientFactory">Remoting client factory</param>
-            <param name="serviceUri">Actor service name</param>
-            <param name="actorId">Actor id</param>
-            <param name="listenerName">
-            By default an actor service has only one listener for clients to connect to and communicate with.
-            However it is possible to configure an actor service with more than one listeners, the listenerName parameter specifies the name of the listener to connect to.
-            </param>
-            <param name="retrySettings">Retry settings for the remote calls made by the partition client..</param>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Client.ActorServicePartitionClient.ActorId">
-            <summary>
-            Actor id. Actor id is used to identify the partition of the service that this actor
-            belongs to.
-            </summary>
-            <value>actor id</value>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy">
-            <summary>
-            Proxy used by clients to interact with the actor service running in a Service Fabric cluster
-            and perform actor service level operations.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy"/> class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy.Create``1(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
-            <summary>
-            Creates a proxy to the actor service that is hosting the specified type of actor and implementing the specified type of the service interface.
-            </summary>
-            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
-            <param name="serviceUri">The URI of the actor service to connect to.</param>
-            <param name="actorId">The ID of the actor. The created proxy will be connected to the partition of the actor service hosting the actor with this ID.</param>
-            <param name="listenerName">
-            By default, an actor service has only one listener for clients to connect to and communicate with.
-            However, it is possible to configure an actor service with more than one listener. This parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy.Create``1(System.Uri,System.Int64,System.String)">
-            <summary>
-            Creates a proxy to the actor service that is hosting the specified type of actor and implementing the specified type of the service interface.
-            </summary>
-            <typeparam name="TServiceInterface">The service interface implemented by the actor service.</typeparam>
-            <param name="serviceUri">The URI of the actor service to connect to.</param>
-            <param name="partitionKey">The key of the actor service partition to connect to.</param>
-            <param name="listenerName">
-            By default, an actor service has only one listener for clients to connect to and communicate with.
-            However, it is possible to configure an actor service with more than one listener. This parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and TServiceInterface.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy.Create(System.Uri,Microsoft.ServiceFabric.Actors.ActorId,System.String)">
-            <summary>
-            Creates a proxy to the actor service that is hosting the specified type of actor and implementing the specified type of the service interface.
-            </summary>
-            <param name="serviceUri">The URI of the actor service to connect to.</param>
-            <param name="actorId">The ID of the actor. The created proxy will be connected to the partition of the actor service hosting the actor with this ID.</param>
-            <param name="listenerName">
-            By default, an actor service has only one listener for clients to connect to and communicate with.
-            However, it is possible to configure an actor service with more than one listener. This parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and <see cref="T:Microsoft.ServiceFabric.Actors.IActorService"/> interfaces.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Client.ActorServiceProxy.Create(System.Uri,System.Int64,System.String)">
-            <summary>
-            Creates a proxy to the actor service that is hosting the specified type of actor and implementing the specified type of the service interface.
-            </summary>
-            <param name="serviceUri">The URI of the actor service to connect to.</param>
-            <param name="partitionKey">The key of the actor service partition to connect to.</param>
-            <param name="listenerName">
-            By default, an actor service has only one listener for clients to connect to and communicate with.
-            However, it is possible to configure an actor service with more than one listener. This parameter specifies the name of the listener to connect to.
-            </param>
-            <returns>A service proxy object that implements <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceProxy"/> and <see cref="T:Microsoft.ServiceFabric.Actors.IActorService"/> interfaces.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteEvent(System.Int32,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
-            <summary>
-            Implement WriteEvent overload to match our reconfiguration events. If this overload is
-            not implemented, the standard WriteEvent overload method in the base class that accepts
-            an object array as argument gets used and it is not very efficient. 
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteEvent(System.Int32,System.String,System.String,System.Int32,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
-            <summary>
-            Implement WriteEvent overload to match our activation/deactivation events. If this overload is
-            not implemented, the standard WriteEvent overload method in the base class that accepts an
-            object array as argument gets used and it is not very efficient. 
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteEvent(System.Int32,System.Int64,System.String,System.String,System.Int32,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
-            <summary>
-            Implement WriteEvent overload to match our actor metric events. If this overload is not 
-            implemented, the standard WriteEvent overload method in the base class that accepts an
-            object array as argument gets used and it is not very efficient. 
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Diagnostics.ActorFrameworkEventSource.WriteActorMethodEvent(System.Int32,System.String,System.Int64,System.String,System.String,System.String,System.String,System.Int32,System.Int64,System.Guid,System.String,System.String,System.String,System.String,System.String)">
-            <summary>
-            Implement our own method to write the event. If we called WriteEvent directly instead of
-            implementing this method, then the standard WriteEvent overload method in the base class
-            that accepts an object array as argument gets used and it is not very efficient.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Generator.XmlSerializationUtility.InsertXmlComments``1(System.String,``0)">
-            <summary>
-            Inserts Xml Comments from existingContent to xml obtained by serializing the object of type T.
-            Exception while inserting comments are ignored and content without comments is returned.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Generator.XmlSerializationUtility.InsertXmlComments(System.String,System.String)">
-            <summary>
-            Inserts Xml Comments from Xml content with comments into Xml content without comments.
-            </summary>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Query.ActorInformation">
             <summary>
             Represents the information about an actor returned by Actor Query method call. 
@@ -1095,16 +1111,6 @@
             </summary>
             <typeparam name="T"><see cref="T:System.Type"/> of the items this query result contains.</typeparam>
         </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Query.PagedResult`1.MaxItemsToReturn">
-            <summary>
-            Max number of items to return in Query Result.
-            Default MessageSize of 4 MB with DataContract serialization can include up to 85000 items when ActorInformation only includes ActorId.
-            Its set to 10000 to allow for custom serialization and future changes in ActorInformation.
-            TODO: Explore allowing optional parameters in ServiceProxy and add optional parameter for itemsToReturn in
-                  IActorService.GetActiveActorsAsync and pass its value to PagedResult.Create(). If allowing optional
-                  parameters is not an option, then allow this value to be changed from configuration. RDBug# 4828118
-            </summary>
-        </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Query.PagedResult`1.#ctor">
             <summary>
             Creates a new instance of <see cref="T:Microsoft.ServiceFabric.Actors.Query.PagedResult`1"/> class.
@@ -1126,6 +1132,13 @@
             <value>ConinutationToken signifying if the method which returned
             the <see cref="T:Microsoft.ServiceFabric.Actors.Query.PagedResult`1"/> 
             needs to called again to get more results </value>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Actors.Query.PagedResult`1.MaxItemsToReturn">
+            <summary>
+            Max number of items to return in Query Result.
+            Default MessageSize of 4 MB with DataContract serialization can include up to 85000 items when ActorInformation only includes ActorId.
+            Its set to 10000 to allow for custom serialization and future changes in ActorInformation.
+            </summary>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.ReminderNotFoundException">
             <summary>
@@ -1250,34 +1263,6 @@
             fabric TCP transport as the default remoting provider for the actors.
             </summary>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingProviderAttribute.CreateServiceRemotingListener(Microsoft.ServiceFabric.Actors.Runtime.ActorService)">
-            <summary>
-                Creates a service remoting listener for remoting the actor interfaces.
-            </summary>
-            <param name="actorService">
-                The implementation of the actor service that hosts the actors whose interfaces
-                needs to be remoted.
-            </param>
-            <returns>
-                A <see cref="T:Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime.FabricTransportServiceRemotingListener"/>
-                as <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Runtime.IServiceRemotingListener"/> 
-                for the specified actor service.
-            </returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingProviderAttribute.CreateServiceRemotingClientFactory(Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient)">
-            <summary>
-                Creates a service remoting client factory to connect to the remoted actor interfaces.
-            </summary>
-            <param name="callbackClient">
-                Client implementation where the callbacks should be dispatched.
-            </param>
-            <returns>
-                A <see cref="T:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingClientFactory"/>
-                as <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClientFactory"/>
-                that can be used with <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory"/> to 
-                generate actor proxy to talk to the actor over remoted actor interface.
-            </returns>
-        </member>
         <member name="P:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingProviderAttribute.MaxMessageSize">
             <summary>
             Gets or Sets the maximum size of the remoting message in bytes.
@@ -1322,6 +1307,34 @@
             </value>
             <remarks>Default Value for ConnectTimeout Timeout is 5 seconds.</remarks>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingProviderAttribute.CreateServiceRemotingListener(Microsoft.ServiceFabric.Actors.Runtime.ActorService)">
+            <summary>
+                Creates a service remoting listener for remoting the actor interfaces.
+            </summary>
+            <param name="actorService">
+                The implementation of the actor service that hosts the actors whose interfaces
+                needs to be remoted.
+            </param>
+            <returns>
+                A <see cref="T:Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime.FabricTransportServiceRemotingListener"/>
+                as <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Runtime.IServiceRemotingListener"/> 
+                for the specified actor service.
+            </returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingProviderAttribute.CreateServiceRemotingClientFactory(Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient)">
+            <summary>
+                Creates a service remoting client factory to connect to the remoted actor interfaces.
+            </summary>
+            <param name="callbackClient">
+                Client implementation where the callbacks should be dispatched.
+            </param>
+            <returns>
+                A <see cref="T:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingClientFactory"/>
+                as <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClientFactory"/>
+                that can be used with <see cref="T:Microsoft.ServiceFabric.Actors.Client.ActorProxyFactory"/> to 
+                generate actor proxy to talk to the actor over remoted actor interface.
+            </returns>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.Runtime.FabricTransportActorServiceRemotingListener">
             <summary>
                 An <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Runtime.IServiceRemotingListener"/> 
@@ -1353,6 +1366,44 @@
             </param>
             <param name="listenerSettings"></param>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingClientFactory">
+            <summary>
+            An <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClientFactory"/> that uses
+            Fabric TCP transport to create <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClient"/> that communicate with 
+            actors over interfaces that are remoted via 
+            <see cref="T:Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime.FabricTransportServiceRemotingListener"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingClientFactory.#ctor(Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient)">
+            <summary>
+            Constructs a fabric transport based actor remoting client factory.
+            </summary>
+            <param name="callbackClient">
+                The callback client that receives the callbacks from the service.
+            </param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingClientFactory.#ctor(Microsoft.ServiceFabric.Services.Remoting.FabricTransport.FabricTransportRemotingSettings,Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient,Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver,System.Collections.Generic.IEnumerable{Microsoft.ServiceFabric.Services.Communication.Client.IExceptionHandler},System.String)">
+            <summary>
+            Constructs a fabric transport based actor remoting client factory.
+            </summary>
+            <param name="fabricTransportRemotingSettings">
+                The settings for the fabric transport. If the settings are not provided or null, default settings 
+                with no security.
+            </param>
+            <param name="callbackClient">
+                The callback client that receives the callbacks from the service.
+            </param>
+            <param name="servicePartitionResolver">
+                Service partition resolver to resolve the service endpoints. If not specified, a default 
+                service partition resolver returned by <see cref="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.GetDefault"/> is used.
+            </param>
+            <param name="exceptionHandlers">
+                Exception handlers to handle the exceptions encountered in communicating with the actor.
+            </param>
+            <param name="traceId">
+                Id to use in diagnostics traces from this component.
+            </param>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Remoting.Runtime.ActorServiceRemotingDispatcher">
             <summary>
             Provides an implementation of <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Runtime.IServiceRemotingMessageHandler"/> that can dispatch
@@ -1377,121 +1428,6 @@
             A <see cref="T:System.Threading.Tasks.Task">Task</see> that represents outstanding operation. 
             The result of the Task is the serialized response body.
             </returns>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType">
-            <summary>
-            Represents the call-type associated with the method invoked by actor runtime.
-            </summary>
-            <remarks>
-            This is provided as part of <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext"/> which is passed as argument to
-            <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.OnPreActorMethodAsync(Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext)"/> and <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.OnPostActorMethodAsync(Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext)"/>.
-            </remarks>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType.ActorInterfaceMethod">
-            <summary>
-            The method invoked is an actor interface method for a given client request.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType.TimerMethod">
-            <summary>
-            The method invoked is a timer callback method.
-            </summary>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType.ReminderMethod">
-            <summary>
-            The method invoked on <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/> interface when a reminder fires.
-            </summary>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext">
-            <summary>
-            An <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext"/> contains information about the method that is invoked by actor runtime and
-            is passed as an argument to <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.OnPreActorMethodAsync(Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext)"/> and <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.OnPostActorMethodAsync(Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext)"/>.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext.MethodName">
-            <summary>
-            Name of the method invoked by actor runtime.
-            </summary>
-            <value>A string representing the name of method.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext.CallType">
-            <summary>
-            Type of call by actor runtime (e.g. actor interface method, timer callback etc.).
-            </summary>
-            <value>
-            An <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType"/> representing the call type.
-            </value>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorReminderState">
-            <summary>
-            Represents internal state of Actor Reminder
-            </summary>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder">
-            <summary>
-            Represents a reminder registered using <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.RegisterReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)"/>.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.Name">
-            <summary>
-            Gets the name of the reminder. The name is unique per actor.
-            </summary>
-            <value>The name of the reminder.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.DueTime">
-            <summary>
-            Gets the time when the reminder is first due to be invoked.
-            </summary>
-            <value>The due time when the reminder is first due to be invoked.</value>
-            <remarks>
-            A value of negative one (-1) milliseconds means the reminder is not invoked. A value of zero (0) means the reminder is invoked immediately after registration.
-            </remarks>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.Period">
-            <summary>
-            Gets the time interval at which the reminder is invoked periodically.
-            </summary>
-            <value>The time interval at which the reminder is invoked periodically.</value>
-            <remarks>
-            The first invocation of the reminder occurs after <see cref="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.DueTime"/>. All subsequent invocations occur at intervals defined by this property.
-            </remarks>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.State">
-            <summary>
-            Gets the user state passed to the reminder invocation.
-            </summary>
-            <value>The user state passed to the reminder invocation.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminderState.RemainingDueTime">
-            <summary>
-            Time when Reminder is next due.
-            </summary>
-            <value>Due time as <see cref="T:System.TimeSpan"/> when the reminder is next due.</value>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException">
-            <summary>
-            This exception indicates that an Actor received the duplicate message while waiting for to acquire 
-            the turn based concurrency lock.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException"/> class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException"/> class with a specified error message.
-            </summary>
-            <param name="message">The error message that explains the reason for the exception.</param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException.#ctor(System.String,System.Exception)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException"/> class with a specified error message and
-            a reference to the inner exception that is the cause of this exception.
-            </summary>
-            <param name="message">The error message that explains the reason for the exception.</param>
-            <param name="inner">The exception that is the cause of the current exception, or a null reference if no inner exception is specified.</param>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Remoting.Client.ActorRemotingExceptionHandler">
             <summary>
@@ -1571,43 +1507,74 @@
             <param name="result">Result of the exception handling</param>
             <returns>true if the exception is handled, false otherwise</returns>
         </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingClientFactory">
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType">
             <summary>
-            An <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClientFactory"/> that uses
-            Fabric TCP transport to create <see cref="T:Microsoft.ServiceFabric.Services.Remoting.Client.IServiceRemotingClient"/> that communicate with 
-            actors over interfaces that are remoted via 
-            <see cref="T:Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime.FabricTransportServiceRemotingListener"/>.
+            Represents the call-type associated with the method invoked by actor runtime.
+            </summary>
+            <remarks>
+            This is provided as part of <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext"/> which is passed as argument to
+            <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.OnPreActorMethodAsync(Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext)"/> and <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.OnPostActorMethodAsync(Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext)"/>.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType.ActorInterfaceMethod">
+            <summary>
+            The method invoked is an actor interface method for a given client request.
             </summary>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingClientFactory.#ctor(Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient)">
+        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType.TimerMethod">
             <summary>
-            Constructs a fabric transport based actor remoting client factory.
+            The method invoked is a timer callback method.
             </summary>
-            <param name="callbackClient">
-                The callback client that receives the callbacks from the service.
-            </param>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Remoting.FabricTransport.FabricTransportActorRemotingClientFactory.#ctor(Microsoft.ServiceFabric.Services.Remoting.FabricTransport.FabricTransportRemotingSettings,Microsoft.ServiceFabric.Services.Remoting.IServiceRemotingCallbackClient,Microsoft.ServiceFabric.Services.Client.IServicePartitionResolver,System.Collections.Generic.IEnumerable{Microsoft.ServiceFabric.Services.Communication.Client.IExceptionHandler},System.String)">
+        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType.ReminderMethod">
             <summary>
-            Constructs a fabric transport based actor remoting client factory.
+            The method invoked on <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/> interface when a reminder fires.
             </summary>
-            <param name="fabricTransportRemotingSettings">
-                The settings for the fabric transport. If the settings are not provided or null, default settings 
-                with no security.
-            </param>
-            <param name="callbackClient">
-                The callback client that receives the callbacks from the service.
-            </param>
-            <param name="servicePartitionResolver">
-                Service partition resolver to resolve the service endpoints. If not specified, a default 
-                service partition resolver returned by <see cref="M:Microsoft.ServiceFabric.Services.Client.ServicePartitionResolver.GetDefault"/> is used.
-            </param>
-            <param name="exceptionHandlers">
-                Exception handlers to handle the exceptions encountered in communicating with the actor.
-            </param>
-            <param name="traceId">
-                Id to use in diagnostics traces from this component.
-            </param>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext">
+            <summary>
+            An <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext"/> contains information about the method that is invoked by actor runtime and
+            is passed as an argument to <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.OnPreActorMethodAsync(Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext)"/> and <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.OnPostActorMethodAsync(Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext)"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext.MethodName">
+            <summary>
+            Name of the method invoked by actor runtime.
+            </summary>
+            <value>A string representing the name of method.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorMethodContext.CallType">
+            <summary>
+            Type of call by actor runtime (e.g. actor interface method, timer callback etc.).
+            </summary>
+            <value>
+            An <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorCallType"/> representing the call type.
+            </value>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException">
+            <summary>
+            This exception indicates that an Actor received the duplicate message while waiting for to acquire 
+            the turn based concurrency lock.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException"/> class with a specified error message.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception.</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.DuplicateMessageException"/> class with a specified error message and
+            a reference to the inner exception that is the cause of this exception.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception.</param>
+            <param name="inner">The exception that is the cause of the current exception, or a null reference if no inner exception is specified.</param>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.Actor">
             <summary>
@@ -1618,6 +1585,34 @@
             provided by the actor state provider <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider"/>.
             </remarks>
             <seealso cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorBase"/>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.Actor.#ctor(Microsoft.ServiceFabric.Actors.Runtime.ActorService,Microsoft.ServiceFabric.Actors.ActorId)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>
+            </summary>
+            <param name="actorService">
+            The <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorService"/> that will host this actor instance.
+            </param>
+            <param name="actorId">
+            The <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> for this actor instance.
+            </param>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.Actor.StateManager">
+            <summary>
+            Gets the state manager for <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>
+            which can be used to get/add/update/remove named states.
+            </summary>
+            <value>
+            An <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateManager"/> which can be used to manage actor state.
+            </value>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.Actor.SaveStateAsync">
+            <summary>
+            Saves all the state changes (add/update/remove) that were made since last call to
+            <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.Actor.SaveStateAsync"/>,
+            to the actor state provider associated with the actor.
+            </summary>
+            <returns>A task that represents the asynchronous save operation.</returns>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorBase">
             <summary>
@@ -1631,6 +1626,32 @@
             <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider"/> for more information.
             </remarks>
             <seealso cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.Id">
+            <summary>
+            Gets the identity of this actor with the actor service.
+            </summary>
+            <value>The <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> for the actor.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.ApplicationName">
+            <summary>
+            Gets the name of the application that contains the actor service that is hosting this actor.
+            </summary>
+            <value>The name of application that contains the actor service that is hosting this actor.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.ServiceUri">
+            <summary>
+            Gets the URI of the actor service that is hosting this actor.
+            </summary>
+            <value>The <see cref="T:System.Uri"/> of the actor service that is hosting this actor.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.ActorService">
+            <summary>
+            Gets the stateful service replica that is hosting the actor.
+            </summary>
+            <value>
+            The <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorService"/> that represents the stateful service replica hosting the actor.
+            </value>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.OnActivateAsync">
             <summary>
@@ -1707,10 +1728,11 @@
             <returns>
             An <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder"/> that represents an actor reminder.
             </returns>
+            <exception cref="T:Microsoft.ServiceFabric.Actors.ReminderNotFoundException">Reminder not found for the actor.</exception>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.UnregisterReminderAsync(Microsoft.ServiceFabric.Actors.Runtime.IActorReminder)">
             <summary>
-            Unregisters a reminder previously registered using <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.RegisterReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)"/>.
+            Unregisters a reminder previously registered using <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.RegisterReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)" />.
             </summary>
             <param name="reminder">The actor reminder to unregister.</param>
             <returns>
@@ -1751,67 +1773,13 @@
             The time interval between reminder invocations after the first invocation. Specify negative one (-1) milliseconds to disable periodic invocation.
             </param>
             <returns>
-            A task that represents the asynchronous registration operation. The result of the task provides information about the registered reminder and is used to unregister the reminder using <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.UnregisterReminderAsync(Microsoft.ServiceFabric.Actors.Runtime.IActorReminder)"/>.
+            A task that represents the asynchronous registration operation. The result of the task provides information about the registered reminder and is used to unregister the reminder using <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.UnregisterReminderAsync(Microsoft.ServiceFabric.Actors.Runtime.IActorReminder)" />.
             </returns>
             <remarks>
             <para>
-            The class deriving from <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorBase"/> must implement <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/> to consume reminder invocations. Multiple reminders can be registered at any time, uniquely identified by <paramref name="reminderName"/>. Existing reminders can also be updated by calling this method again. Reminder invocations are synchronized both with other reminders and other actor method callbacks.
+            The class deriving from <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorBase" /> must implement <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable" /> to consume reminder invocations. Multiple reminders can be registered at any time, uniquely identified by <paramref name="reminderName" />. Existing reminders can also be updated by calling this method again. Reminder invocations are synchronized both with other reminders and other actor method callbacks.
             </para>
             </remarks>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.Id">
-            <summary>
-            Gets the identity of this actor with the actor service.
-            </summary>
-            <value>The <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> for the actor.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.ApplicationName">
-            <summary>
-            Gets the name of the application that contains the actor service that is hosting this actor.
-            </summary>
-            <value>The name of application that contains the actor service that is hosting this actor.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.ServiceUri">
-            <summary>
-            Gets the URI of the actor service that is hosting this actor.
-            </summary>
-            <value>The <see cref="T:System.Uri"/> of the actor service that is hosting this actor.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.ActorService">
-            <summary>
-            Gets the stateful service replica that is hosting the actor.
-            </summary>
-            <value>
-            The <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorService"/> that represents the stateful service replica hosting the actor.
-            </value>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.Actor.#ctor(Microsoft.ServiceFabric.Actors.Runtime.ActorService,Microsoft.ServiceFabric.Actors.ActorId)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>
-            </summary>
-            <param name="actorService">
-            The <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorService"/> that will host this actor instance.
-            </param>
-            <param name="actorId">
-            The <see cref="T:Microsoft.ServiceFabric.Actors.ActorId"/> for this actor instance.
-            </param>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.Actor.SaveStateAsync">
-            <summary>
-            Saves all the state changes (add/update/remove) that were made since last call to
-            <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.Actor.SaveStateAsync"/>,
-            to the actor state provider associated with the actor.
-            </summary>
-            <returns>A task that represents the asynchronous save operation.</returns>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.Actor.StateManager">
-            <summary>
-            Gets the state manager for <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>
-            which can be used to get/add/update/remove named states.
-            </summary>
-            <value>
-            An <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateManager"/> which can be used to manage actor state.
-            </value>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorEventProxy">
             <summary>
@@ -1902,11 +1870,6 @@
             Actor reminder collection.
             </summary>
         </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorReminderCollection">
-            <summary>
-            Captures ActorReminderState for Actors
-            </summary>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorService">
             <summary>
             Represents the base class for Microsoft Service Fabric based reliable actors service.
@@ -1926,6 +1889,32 @@
             <param name="stateManagerFactory">The factory method to create <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateManager"/></param>
             <param name="stateProvider">The state provider to store and access the state of the Actor objects.</param>
             <param name="settings">The settings used to configure the behavior of the Actor service.</param>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorService.ActorTypeInformation">
+            <summary>
+            Gets ActorTypeInformation for actor service.
+            </summary>
+            <value>
+            <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation"/>
+            for the actor hosted by the service replica.
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorService.StateProvider">
+            <summary>
+            Gets a <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider"/> that represents the state provider for the actor service.
+            </summary>
+            <value>
+            <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider"/>
+            representing the state provider for the actor service.
+            </value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorService.Settings">
+            <summary>
+            Gets settings for the actor service. 
+            </summary>
+            <value>
+            Settings for the actor service.
+            </value>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorService.Microsoft#ServiceFabric#Actors#IActorService#DeleteActorAsync(Microsoft.ServiceFabric.Actors.ActorId,System.Threading.CancellationToken)">
             <summary>
@@ -1961,7 +1950,18 @@
             Overrides <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/>.
             </summary>
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-            <returns>A task that represents the asynchronous operation of loading reminders when the replica becomes primary.</returns>
+            <returns>
+            A task that represents the asynchronous operation of loading reminders when the replica becomes primary.
+            </returns>
+            <remarks>
+            If you need to override this method, please make sure to call this method from your overridden method.
+            Also make sure your implementation of overridden method conforms to the guideline specified for
+            <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.RunAsync(System.Threading.CancellationToken)"/>. 
+            <para>
+            Failing to do so can cause failover, reconfiguration or upgrade of your actor service to get stuck and 
+            can impact availibility of your service.
+            </para>
+            </remarks>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorService.OnChangeRoleAsync(System.Fabric.ReplicaRole,System.Threading.CancellationToken)">
             <summary>
@@ -1982,32 +1982,6 @@
             <summary>
             Overrides <see cref="M:Microsoft.ServiceFabric.Services.Runtime.StatefulServiceBase.OnAbort"/>.
             </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorService.ActorTypeInformation">
-            <summary>
-            Gets ActorTypeInformation for actor service.
-            </summary>
-            <value>
-            <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation"/>
-            for the actor hosted by the service replica.
-            </value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorService.StateProvider">
-            <summary>
-            Gets a <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider"/> that represents the state provider for the actor service.
-            </summary>
-            <value>
-            <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider"/>
-            representing the state provider for the actor service.
-            </value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorService.Settings">
-            <summary>
-            Gets settings for the actor service. 
-            </summary>
-            <value>
-            Settings for the actor service.
-            </value>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute">
             <summary>
@@ -2060,6 +2034,12 @@
             </summary>
             <value><see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorConcurrencySettings"/> for the Actor Service.</value>
         </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceSettings.ReminderSettings">
+            <summary>
+            Gets or sets settings to configure behavior of reminders.
+            </summary>
+            <value><see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ReminderSettings"/> for the Actor Service.</value>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorStateChange">
             <summary>
             Represents change to an actor state with a given state name.
@@ -2106,9 +2086,195 @@
             Kind of state change for given actor state name.
             </value>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions">
+            <summary>
+            Contains extension method for Actor types.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions.GetActorInterfaces(System.Type)">
+            <summary>
+            Gets actor interfaces implemented by the actor class.
+            </summary>
+            <param name="type">Type of class implementing actor.</param>
+            <returns>An array containing actor interface which the type implements.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions.GetActorEventInterfaces(System.Type)">
+            <summary>
+            Gets actor event interfaces implemented by the actor class.
+            </summary>
+            <param name="type">Type of class implementing actor.</param>
+            <returns>An array containing actor event interface which the type implements.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions.IsActorInterface(System.Type)">
+            <summary>
+            Checks if an interface type is an actor interface.
+            </summary>
+            <param name="actorInterfaceType">Interface type of the actor.</param>
+            <returns>true, if actorInterfaceType is an interface only implements <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/>
+            or (<see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> and <see cref="T:Microsoft.ServiceFabric.Actors.IActorEventPublisher"/>).</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions.IsActor(System.Type)">
+            <summary>
+            Checks if an actorType is an actor.
+            </summary>
+            <param name="actorType">Type implementing actor.</param>
+            <returns>true, if <see cref="P:System.Type.BaseType"/> of actorType is <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>.</returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions.IsRemindableActor(System.Type)">
+            <summary>
+            Checks if an actor type implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/> interface.
+            </summary>
+            <param name="actorType">Type implementing actor.</param>
+            <returns>true, if <paramref name="actorType"/> implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/> interface.</returns>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation">
+            <summary>
+            Contains information about the type implementing an actor.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.#ctor">
+            <summary>
+            Initializes a new instance of the ActorTypeInformation class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.ImplementationType">
+            <summary>
+            Gets type of the class implementing the actor.
+            </summary>
+            <value><see cref="T:System.Type"/> of the class implementing the actor.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.InterfaceTypes">
+            <summary>
+            Gets the actor interface types which derive from <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> and implemented by actor class.
+            </summary>
+            <value>An enumerator that can be used to iterate through the actor interface type.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.EventInterfaceTypes">
+            <summary>
+            Gets actor event interface which the actor class implements.
+            </summary>
+            <value>An enumerator hat can be used to iterate through the actor event interface which the actor class implements.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.ServiceName">
+            <summary>
+            Gets service name if specified using <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/> for actor class.
+            </summary>
+            <value>Service name if specified using <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/> for actor class, null if attribute is not used.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.IsAbstract">
+            <summary>
+            Gets if class implementing actor is abstract.
+            </summary>
+            <value>true if class implementing actor is abstract, otherwise false.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.IsRemindable">
+            <summary>
+            Gets if the actor class implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/>.
+            </summary>
+            <value>true if actor class implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/>, otherwise false.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.StatePersistence">
+            <summary>
+            Get the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.StatePersistence"/> enum representing type of state persistence for the actor.
+            </summary>
+            <value><see cref="T:Microsoft.ServiceFabric.Actors.Runtime.StatePersistence"/> representing type of state persistence for the actor.</value>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.TryGet(System.Type,Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation@)">
+            <summary>
+            Creates <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation"/> from actorType.
+            </summary>
+            <param name="actorType">Type of class implementing the actor to create ActorTypeInforamtion for.</param>
+            <param name="actorTypeInformation">When this method returns, contains ActorTypeInformation, if the creation of
+            ActorTypeInformation from actorType succeeded, or null if the creation failed.
+            The creation fails if the actorType parameter is null or it does not implement an actor.</param>
+            <returns>true if ActorTypeInformation was successfully created for actorType; otherwise, false.</returns>
+            <remarks>
+            <para>Creation of ActorTypeInformation from actorType will fail when </para> 
+            <para>1. <see cref="P:System.Type.BaseType"/> for actorType is not of type <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>.</para>
+            <para>2. actorType does not implement an interface deriving from <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> and is not marked as abstract.</para>
+            <para>3. actorType implements more than one interface which derives from <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> 
+            but doesn't have <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/>.</para>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.Get(System.Type)">
+            <summary>
+            Creates <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation"/> from actorType.
+            </summary>
+            <param name="actorType">Type of class implementing the actor to create ActorTypeInforamtion for.</param>
+            <returns><see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation"/> created from actorType.</returns>
+            <exception cref="T:System.ArgumentException">
+            <para>When <see cref="P:System.Type.BaseType"/> for actorType is not of type <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>.</para>
+            <para>When actorType does not implement an interface deriving from <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> 
+            and is not marked as abstract.</para>
+            <para>When actorType implements more than one interface which derives from <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> 
+            but doesn't have <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/>.</para>
+            </exception>
+        </member>
+        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ActorUseScope.timerUse">
+            <summary>
+            Signifies if the use is for a timer call.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.DummyActor">
+            <summary>
+            DummyActor object is created in case of Deletion of inactive actor.
+            DummyActor object's ReentrantGuard is used for blocking other calls.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder">
+            <summary>
+            Represents a reminder registered using <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.RegisterReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)" />.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.Name">
+            <summary>
+            Gets the name of the reminder. The name is unique per actor.
+            </summary>
+            <value>The name of the reminder.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.DueTime">
+            <summary>
+            Gets the time when the reminder is first due to be invoked.
+            </summary>
+            <value>The due time when the reminder is first due to be invoked.</value>
+            <remarks>
+            A value of negative one (-1) milliseconds means the reminder is not invoked. A value of zero (0) means the reminder is invoked immediately after registration.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.Period">
+            <summary>
+            Gets the time interval at which the reminder is invoked periodically.
+            </summary>
+            <value>The time interval at which the reminder is invoked periodically.</value>
+            <remarks>
+            The first invocation of the reminder occurs after <see cref="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.DueTime" />. All subsequent invocations occur at intervals defined by this property.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.State">
+            <summary>
+            Gets the user state passed to the reminder invocation.
+            </summary>
+            <value>The user state passed to the reminder invocation.</value>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorReminderCollection">
+            <summary>
+            Captures ActorReminderState for Actors
+            </summary>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorReminderState">
+            <summary>
+            Represents internal state of Actor Reminder
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminderState.RemainingDueTime">
+            <summary>
+            Time when Reminder is next due.
+            </summary>
+            <value>Due time as <see cref="T:System.TimeSpan"/> when the reminder is next due.</value>
+        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateManager">
             <summary>
-            Represents an interface that exposes methods to manage state of an <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>.
+            Represents an interface that exposes methods to manage state of an <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor" />.
             This interface is implemented by<see cref="P:Microsoft.ServiceFabric.Actors.Runtime.Actor.StateManager"/>.
             </summary>
         </member>
@@ -2195,7 +2361,7 @@
             <param name="stateName">Name of the actor state to add.</param>
             <param name="value">Value of the actor state to add.</param>
             <param name="cancellationToken">The token to monitor for cancellation requests.
-            This is optional and defaults to <see cref="P:System.Threading.CancellationToken.None"/></param>
+            This is optional and defaults to <see cref="P:System.Threading.CancellationToken.None" /></param>
             <returns>
             A boolean task that represents the asynchronous add operation. Returns true if the 
             value was successfully added and false if an actor state with the same name already exists.
@@ -2203,7 +2369,7 @@
             <exception cref="T:System.ArgumentNullException">The specified state name is null.
             Provide a valid state name string.</exception>
             <exception cref="T:System.OperationCanceledException">The request was canceled using the specified
-            <paramref name="cancellationToken"/>.</exception>
+            <paramref name="cancellationToken" />.</exception>
             <remarks>
             The type of state value <typeparamref name="T"/> must be 
             <see href="https://msdn.microsoft.com/library/ms731923.aspx">Data Contract</see> serializable.
@@ -2270,7 +2436,7 @@
             <exception cref="T:System.ArgumentNullException"> The specified state name is null.
             Provide a valid state name string.</exception>
             <exception cref="T:System.OperationCanceledException">The request was canceled using the specified
-            <paramref name="cancellationToken"/>.</exception>
+            <paramref name="cancellationToken" />.</exception>
             <remarks>
             The type of state value <typeparamref name="T"/> must be 
             <see href="https://msdn.microsoft.com/library/ms731923.aspx">Data Contract</see> serializable.
@@ -2332,158 +2498,6 @@
             A task that represents the asynchronous save operation.
             </returns>
         </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorTimer">
-            <summary>
-            Represents Timer set on an Actor
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorTimer.DueTime">
-            <summary>
-            Time when timer is first due.
-            </summary>
-            <value>Time as <see cref="T:System.TimeSpan"/> when timer is first due.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorTimer.Period">
-            <summary>
-            Periodic time when timer will be invoked.
-            </summary>
-            <value>Periodic time as <see cref="T:System.TimeSpan"/> when timer will be invoked.</value>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions">
-            <summary>
-            Contains extension method for Actor types.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions.GetActorInterfaces(System.Type)">
-            <summary>
-            Gets actor interfaces implemented by the actor class.
-            </summary>
-            <param name="type">Type of class implementing actor.</param>
-            <returns>An array containing actor interface which the type implements.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions.GetActorEventInterfaces(System.Type)">
-            <summary>
-            Gets actor event interfaces implemented by the actor class.
-            </summary>
-            <param name="type">Type of class implementing actor.</param>
-            <returns>An array containing actor event interface which the type implements.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions.IsActorInterface(System.Type)">
-            <summary>
-            Checks if an interface type is an actor interface.
-            </summary>
-            <param name="actorInterfaceType">Interface type of the actor.</param>
-            <returns>true, if actorInterfaceType is an interface only implements <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/>
-            or (<see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> and <see cref="T:Microsoft.ServiceFabric.Actors.IActorEventPublisher"/>).</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions.IsActor(System.Type)">
-            <summary>
-            Checks if an actorType is an actor.
-            </summary>
-            <param name="actorType">Type implementing actor.</param>
-            <returns>true, if <see cref="P:System.Type.BaseType"/> of actorType is <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>.</returns>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeExtensions.IsRemindableActor(System.Type)">
-            <summary>
-            Checks if an actor type implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/> interface.
-            </summary>
-            <param name="actorType">Type implementing actor.</param>
-            <returns>true, if <paramref name="actorType"/> implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/> interface.</returns>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation">
-            <summary>
-            Contains information about the type implementing an actor.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.#ctor">
-            <summary>
-            Initializes a new instance of the ActorTypeInformation class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.TryGet(System.Type,Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation@)">
-            <summary>
-            Creates <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation"/> from actorType.
-            </summary>
-            <param name="actorType">Type of class implementing the actor to create ActorTypeInforamtion for.</param>
-            <param name="actorTypeInformation">When this method returns, contains ActorTypeInformation, if the creation of
-            ActorTypeInformation from actorType succeeded, or null if the creation failed.
-            The creation fails if the actorType parameter is null or it does not implement an actor.</param>
-            <returns>true if ActorTypeInformation was successfully created for actorType; otherwise, false.</returns>
-            <remarks>
-            <para>Creation of ActorTypeInformation from actorType will fail when </para> 
-            <para>1. <see cref="P:System.Type.BaseType"/> for actorType is not of type <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>.</para>
-            <para>2. actorType does not implement an interface deriving from <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> and is not marked as abstract.</para>
-            <para>3. actorType implements more than one interface which derives from <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> 
-            but doesn't have <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/>.</para>
-            </remarks>
-        </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.Get(System.Type)">
-            <summary>
-            Creates <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation"/> from actorType.
-            </summary>
-            <param name="actorType">Type of class implementing the actor to create ActorTypeInforamtion for.</param>
-            <returns><see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation"/> created from actorType.</returns>
-            <exception cref="T:System.ArgumentException">
-            <para>When <see cref="P:System.Type.BaseType"/> for actorType is not of type <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.Actor"/>.</para>
-            <para>When actorType does not implement an interface deriving from <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> 
-            and is not marked as abstract.</para>
-            <para>When actorType implements more than one interface which derives from <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> 
-            but doesn't have <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/>.</para>
-            </exception>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.ImplementationType">
-            <summary>
-            Gets type of the class implementing the actor.
-            </summary>
-            <value><see cref="T:System.Type"/> of the class implementing the actor.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.InterfaceTypes">
-            <summary>
-            Gets the actor interface types which derive from <see cref="T:Microsoft.ServiceFabric.Actors.IActor"/> and implemented by actor class.
-            </summary>
-            <value>An enumerator that can be used to iterate through the actor interface type.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.EventInterfaceTypes">
-            <summary>
-            Gets actor event interface which the actor class implements.
-            </summary>
-            <value>An enumerator hat can be used to iterate through the actor event interface which the actor class implements.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.ServiceName">
-            <summary>
-            Gets service name if specified using <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/> for actor class.
-            </summary>
-            <value>Service name if specified using <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.ActorServiceAttribute"/> for actor class, null if attribute is not used.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.IsAbstract">
-            <summary>
-            Gets if class implementing actor is abstract.
-            </summary>
-            <value>true if class implementing actor is abstract, otherwise false.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.IsRemindable">
-            <summary>
-            Gets if the actor class implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/>.
-            </summary>
-            <value>true if actor class implements <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable"/>, otherwise false.</value>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation.StatePersistence">
-            <summary>
-            Get the <see cref="T:Microsoft.ServiceFabric.Actors.Runtime.StatePersistence"/> enum representing type of state persistence for the actor.
-            </summary>
-            <value><see cref="T:Microsoft.ServiceFabric.Actors.Runtime.StatePersistence"/> representing type of state persistence for the actor.</value>
-        </member>
-        <member name="F:Microsoft.ServiceFabric.Actors.Runtime.ActorUseScope.timerUse">
-            <summary>
-            Signifies if the use is for a timer call.
-            </summary>
-        </member>
-        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.DummyActor">
-            <summary>
-            DummyActor object is created in case of Deletion of inactive actor.
-            DummyActor object's ReentrantGuard is used for blocking other calls.
-            </summary>
-        </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider">
             <summary>
             Represents the interface that an actor state provider needs to implement for 
@@ -2499,7 +2513,7 @@
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider.ActorActivatedAsync(Microsoft.ServiceFabric.Actors.ActorId,System.Threading.CancellationToken)">
             <summary>
-            This method is invoked as part of the activation process of the actor with the specified actor ID.
+            Invoked as part of the activation process of the actor with the specified actor ID.
             </summary>
             <param name="actorId">ID of the actor that is activated.</param>
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
@@ -2508,7 +2522,7 @@
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider.ReminderCallbackCompletedAsync(Microsoft.ServiceFabric.Actors.ActorId,Microsoft.ServiceFabric.Actors.Runtime.IActorReminder,System.Threading.CancellationToken)">
             <summary>
-            This method is invoked when a reminder fires and finishes executing its callback 
+            Invoked when a reminder fires and finishes executing its callback 
             <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.IRemindable.ReceiveReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)"/> successfully.
             </summary>
             <param name="actorId">ID of the actor which own reminder</param>
@@ -2633,6 +2647,15 @@
             <returns>A task that represents the asynchronous delete operation.</returns>
             <exception cref="T:System.OperationCanceledException">The operation was canceled.</exception>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider.DeleteRemindersAsync(System.Collections.Generic.IReadOnlyDictionary{Microsoft.ServiceFabric.Actors.ActorId,System.Collections.Generic.IReadOnlyCollection{System.String}},System.Threading.CancellationToken)">
+            <summary>
+            Deletes the specified set of reminders.
+            </summary>
+            <param name="reminderNames">The set of reminders to delete.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>A task that represents the asynchronous delete operation.</returns>
+            <exception cref="T:System.OperationCanceledException">The operation was canceled.</exception>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.IActorStateProvider.LoadRemindersAsync(System.Threading.CancellationToken)">
             <summary>
             Loads all the reminders contained in the actor state provider.
@@ -2644,6 +2667,23 @@
             </returns>
             <exception cref="T:System.OperationCanceledException">The operation was canceled.</exception>
         </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IActorTimer">
+            <summary>
+            Represents Timer set on an Actor
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorTimer.DueTime">
+            <summary>
+            Time when timer is first due.
+            </summary>
+            <value>Time as <see cref="T:System.TimeSpan"/> when timer is first due.</value>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.IActorTimer.Period">
+            <summary>
+            Periodic time when timer will be invoked.
+            </summary>
+            <value>Periodic time as <see cref="T:System.TimeSpan"/> when timer will be invoked.</value>
+        </member>
         <member name="F:Microsoft.ServiceFabric.Actors.Runtime.IdleObjectGcHandle.collectEarly">
             <summary>
             Signals that object can be collected early rather than waiting until idleCount ==maxIdleCount
@@ -2651,7 +2691,7 @@
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.IRemindable">
             <summary>
-            Interface that actors must implement to consume reminders registered using <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.RegisterReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)"/>.
+            Interface that actors must implement to consume reminders registered using <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.ActorBase.RegisterReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)" />.
             </summary>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.IRemindable.ReceiveReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)">
@@ -2664,7 +2704,7 @@
             <param name="period">Invocation period provided during registration.</param>
             <returns>A task that represents the asynchronous operation performed by this callback.</returns>
             <remarks>
-            <para>The state of this actor is saved by the actor runtime upon completion of the task returned by this method. If an error occurs while saving the state, then all state cached by this actor's <see cref="P:Microsoft.ServiceFabric.Actors.Runtime.Actor.StateManager"/> will be discarded and reloaded from previously saved state when the next actor method or reminder invocation occurs.
+            <para>The state of this actor is saved by the actor runtime upon completion of the task returned by this method. If an error occurs while saving the state, then all state cached by this actor's <see cref="P:Microsoft.ServiceFabric.Actors.Runtime.Actor.StateManager" /> will be discarded and reloaded from previously saved state when the next actor method or reminder invocation occurs.
             </para>
             </remarks>
         </member>
@@ -2729,6 +2769,14 @@
             is initiated for <paramref name="logTruncationIntervalInMinutes"/>, <see cref="T:System.Fabric.KeyValueStoreReplica"/>
             automatically truncates the logs.
             </remarks>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.OnDataLossAsync">
+            <summary>
+            Function called during suspected data-loss.
+            </summary>
+            <value>
+            A function representing data-loss callback function.
+            </value>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.Microsoft#ServiceFabric#Actors#Runtime#IActorStateProvider#Initialize(Microsoft.ServiceFabric.Actors.Runtime.ActorTypeInformation)">
             <summary>
@@ -2873,6 +2921,15 @@
             <returns>A task that represents the asynchronous delete operation.</returns>
             <exception cref="T:System.OperationCanceledException">The operation was canceled.</exception>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.Microsoft#ServiceFabric#Actors#Runtime#IActorStateProvider#DeleteRemindersAsync(System.Collections.Generic.IReadOnlyDictionary{Microsoft.ServiceFabric.Actors.ActorId,System.Collections.Generic.IReadOnlyCollection{System.String}},System.Threading.CancellationToken)">
+            <summary>
+            Deletes the specified set of reminders.
+            </summary>
+            <param name="reminderNames">The set of reminders to delete.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>A task that represents the asynchronous delete operation.</returns>
+            <exception cref="T:System.OperationCanceledException">The operation was canceled.</exception>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.Microsoft#ServiceFabric#Actors#Runtime#IActorStateProvider#LoadRemindersAsync(System.Threading.CancellationToken)">
             <summary>
             Loads all the reminders contained in the actor state provider.
@@ -2991,19 +3048,11 @@
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <returns>Task that represents the asynchronous restore operation.</returns>
         </member>
-        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.GetStoredActorIds(System.Int32,Microsoft.ServiceFabric.Actors.Query.ContinuationToken,System.Threading.CancellationToken)">
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.GetStoredActorIdsAsync(System.Int32,Microsoft.ServiceFabric.Actors.Query.ContinuationToken,System.Threading.CancellationToken)">
             <summary>
             KVS enumerates its entries in alphabetical order. The implementation of this
             function takes this into account while doing continuation token based enumeration.
             </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.KvsActorStateProvider.OnDataLossAsync">
-            <summary>
-            Function called during suspected data-loss.
-            </summary>
-            <value>
-            A function representing data-loss callback function.
-            </value>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorConcurrencyLock">
             <summary>
@@ -3039,6 +3088,34 @@
             the supplied value.
             </remarks>
             <value>Timeout for the turn based concurrency lock. This can be set to <see cref="F:System.Threading.Timeout.InfiniteTimeSpan"/> to specify waiting forever.</value>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ReminderSettings">
+            <summary>
+            This class provides settings to configure the behavior of reminders. See https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-actors-timers-reminders
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.ReminderSettings.#ctor">
+            <summary>
+            Initializes a new instance of the ReminderSettings class.
+            
+            By default the <see cref="P:Microsoft.ServiceFabric.Actors.Runtime.ReminderSettings.AutoDeleteOneTimeReminders"/> is set to <c>true</c>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.ReminderSettings.AutoDeleteOneTimeReminders">
+            <summary>
+            Gets or sets value indicating if ActorRuntime should automatically delete one-time reminders after
+            they have fired and completed its callback successfully. One-time reminders refer to reminders whose
+            <see cref="P:Microsoft.ServiceFabric.Actors.Runtime.IActorReminder.Period"/> is set to negative value.
+            </summary>
+            <remarks>
+            Note that a reminder is considered to completed successfully only when reminder callback 
+            <see cref="M:Microsoft.ServiceFabric.Actors.Runtime.IRemindable.ReceiveReminderAsync(System.String,System.Byte[],System.TimeSpan,System.TimeSpan)"/> completes successfully.
+            If a failover happens while reminder callback was executing, reminder will fire again on new primary replica.
+            </remarks>
+            <value>
+            The bool value indicating if ActorRuntime should automatically delete a one-time reminders after
+            it has fired and completed its callback successfully.
+            </value>
         </member>
         <member name="T:Microsoft.ServiceFabric.Actors.Runtime.ActorReentrancyMode">
             <summary>
@@ -3089,10 +3166,10 @@
             A <see cref="T:Microsoft.ServiceFabric.Data.ReliableStateManagerConfiguration"/> that describes <see cref="T:Microsoft.ServiceFabric.Data.IReliableStateManager"/> configuration.
             </param>
             <param name="actorStateDictionaryCount">
-            Number of <see cref="T:Microsoft.ServiceFabric.Data.Collections.IReliableDictionary`2"/> across which actor states will be partitioned and stored.
+            Number of <see cref="T:Microsoft.ServiceFabric.Data.Collections.IReliableDictionary2`2"/> across which actor states will be partitioned and stored.
             </param>
             <param name="reminderDictionaryCount">
-            Number of <see cref="T:Microsoft.ServiceFabric.Data.Collections.IReliableDictionary`2"/> across which reminders will be partitioned and stored.
+            Number of <see cref="T:Microsoft.ServiceFabric.Data.Collections.IReliableDictionary2`2"/> across which reminders will be partitioned and stored.
             </param>
             <remarks>
             Values for <paramref name="actorStateDictionaryCount"/> and <paramref name="reminderDictionaryCount"/> can be specified
@@ -3342,6 +3419,15 @@
             <returns>A task that represents the asynchronous delete operation.</returns>
             <exception cref="T:System.OperationCanceledException">The operation was canceled.</exception>
         </member>
+        <member name="M:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider.Microsoft#ServiceFabric#Actors#Runtime#IActorStateProvider#DeleteRemindersAsync(System.Collections.Generic.IReadOnlyDictionary{Microsoft.ServiceFabric.Actors.ActorId,System.Collections.Generic.IReadOnlyCollection{System.String}},System.Threading.CancellationToken)">
+            <summary>
+            Deletes the specified set of reminders.
+            </summary>
+            <param name="reminderNames">The set of reminders to delete.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>A task that represents the asynchronous delete operation.</returns>
+            <exception cref="T:System.OperationCanceledException">The operation was canceled.</exception>
+        </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider.Microsoft#ServiceFabric#Actors#Runtime#IActorStateProvider#LoadRemindersAsync(System.Threading.CancellationToken)">
             <summary>
             Loads all the reminders contained in the actor state provider.
@@ -3352,6 +3438,14 @@
             parameter is a collection of all actor reminders contained in the actor state provider.
             </returns>
             <exception cref="T:System.OperationCanceledException">The operation was canceled.</exception>
+        </member>
+        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider.OnDataLossAsync">
+            <summary>
+            Function called during suspected data-loss.
+            </summary>
+            <value>
+            A function representing data-loss callback function.
+            </value>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider.Microsoft#ServiceFabric#Data#IStateProviderReplica#Initialize(System.Fabric.StatefulServiceInitializationParameters)">
             <summary>
@@ -3461,16 +3555,16 @@
             <para>Obtains context on a Secondary replica after it is created and opened to send context to the Primary replica.</para>
             </summary>
             <returns>
-            <para>Returns <see cref="T:System.Fabric.IOperationDataStream"/>.</para>
+            <para>Returns <see cref="T:System.Fabric.IOperationDataStream" />.</para>
             </returns>
             <remarks>
-            <para>The Primary replica analyzes the context and sends back state via <see cref="M:System.Fabric.IStateProvider.GetCopyState(System.Int64,System.Fabric.IOperationDataStream)"/>.</para>
+            <para>The Primary replica analyzes the context and sends back state via <see cref="M:System.Fabric.IStateProvider.GetCopyState(System.Int64,System.Fabric.IOperationDataStream)" />.</para>
             <para>
-                <see cref="M:System.Fabric.IStateProvider.GetCopyContext"/> is called on newly created, idle Secondary replicas and provides
-                a mechanism to asynchronously establish a bidirectional conversation with the Primary replica. The Secondary replica sends <see cref="T:System.Fabric.OperationData"/>
+                <see cref="M:System.Fabric.IStateProvider.GetCopyContext" /> is called on newly created, idle Secondary replicas and provides
+                a mechanism to asynchronously establish a bidirectional conversation with the Primary replica. The Secondary replica sends <see cref="T:System.Fabric.OperationData" />
                 objects with which the Primary replica can determine the progress of collecting context on the Secondary replica. The Primary replica responds by sending the required state back.
-                See <see cref="M:System.Fabric.IStateProvider.GetCopyState(System.Int64,System.Fabric.IOperationDataStream)"/> at the Primary replica for the other half of the exchange. </para>
-            <para>For in-memory services, the <see cref="M:System.Fabric.IStateProvider.GetCopyContext"/> method is not called, 
+                See <see cref="M:System.Fabric.IStateProvider.GetCopyState(System.Int64,System.Fabric.IOperationDataStream)" /> at the Primary replica for the other half of the exchange. </para>
+            <para>For in-memory services, the <see cref="M:System.Fabric.IStateProvider.GetCopyContext" /> method is not called, 
             as the state of the Secondary replicas is known (they are empty and will require all of the state).</para>
             </remarks>
         </member>
@@ -3479,24 +3573,24 @@
             <para>Obtains state on a Primary replica that is required to build a Secondary replica.</para>
             </summary>
             <param name="upToSequenceNumber">
-            <para>The maximum last sequence number (LSN) that should be placed in the copy stream via the <see cref="M:System.Fabric.IStateReplicator.GetCopyStream"/> method.
-            LSNs greater than this number are delivered to the Secondary replica as a part of the replication stream via the <see cref="M:System.Fabric.IStateReplicator.GetReplicationStream"/> method.</para>
+            <para>The maximum last sequence number (LSN) that should be placed in the copy stream via the <see cref="M:System.Fabric.IStateReplicator.GetCopyStream" /> method.
+            LSNs greater than this number are delivered to the Secondary replica as a part of the replication stream via the <see cref="M:System.Fabric.IStateReplicator.GetReplicationStream" /> method.</para>
             </param>
             <param name="copyContext">
-            <para>An <see cref="T:System.Fabric.IOperationDataStream"/> that contains the <see cref="T:System.Fabric.OperationData"/> objects that are created by the Secondary replica. </para>
+            <para>An <see cref="T:System.Fabric.IOperationDataStream" /> that contains the <see cref="T:System.Fabric.OperationData" /> objects that are created by the Secondary replica. </para>
             </param>
             <returns>
-            <para>Returns <see cref="T:System.Fabric.IOperationDataStream"/>.</para>
+            <para>Returns <see cref="T:System.Fabric.IOperationDataStream" />.</para>
             </returns>
             <remarks>
-            <para>Just as <see cref="M:System.Fabric.IStateProvider.GetCopyContext"/> enables the Secondary replica to send context to the Primary replica via
-            an <see cref="T:System.Fabric.IOperationDataStream"/>, <see cref="M:System.Fabric.IStateProvider.GetCopyState(System.Int64,System.Fabric.IOperationDataStream)"/> enables the Primary 
-            replica to respond with an <see cref="T:System.Fabric.IOperationDataStream"/>. The stream contains objects that are delivered to the Secondary replica
-            via the <see cref="M:System.Fabric.IStateReplicator.GetCopyStream"/> method of the <see cref="T:System.Fabric.FabricReplicator"/> class. The objects implement 
-            <see cref="T:System.Fabric.IOperation"/> and contain the specified data. </para>
-            <para> When the Primary replica receives this call, it should create and return another <see cref="T:System.Fabric.IOperationDataStream"/> 
-            that contains <see cref="T:System.Fabric.OperationData"/>. <see cref="T:System.Fabric.OperationData"/> represents the data/state that the Secondary replica
-            requires to catch up to the provided <paramref name="upToSequenceNumber"/> maximum LSN. 
+            <para>Just as <see cref="M:System.Fabric.IStateProvider.GetCopyContext" /> enables the Secondary replica to send context to the Primary replica via
+            an <see cref="T:System.Fabric.IOperationDataStream" />, <see cref="M:System.Fabric.IStateProvider.GetCopyState(System.Int64,System.Fabric.IOperationDataStream)" /> enables the Primary 
+            replica to respond with an <see cref="T:System.Fabric.IOperationDataStream" />. The stream contains objects that are delivered to the Secondary replica
+            via the <see cref="M:System.Fabric.IStateReplicator.GetCopyStream" /> method of the <see cref="T:System.Fabric.FabricReplicator" /> class. The objects implement 
+            <see cref="T:System.Fabric.IOperation" /> and contain the specified data. </para>
+            <para> When the Primary replica receives this call, it should create and return another <see cref="T:System.Fabric.IOperationDataStream" /> 
+            that contains <see cref="T:System.Fabric.OperationData" />. <see cref="T:System.Fabric.OperationData" /> represents the data/state that the Secondary replica
+            requires to catch up to the provided <paramref name="upToSequenceNumber" /> maximum LSN. 
             How much and which state has to be sent can be determined via the context information that the Secondary replica provides via 
             <see cref="M:System.Fabric.IStateProvider.GetCopyContext"/> method.</para>
             </remarks>
@@ -3506,14 +3600,14 @@
             <para>Obtains the last sequence number that the service has committed. </para>
             </summary>
             <returns>
-            <para>Returns <see cref="T:System.Int64"/>.</para>
+            <para>Returns <see cref="T:System.Int64" />.</para>
             </returns>
             <remarks>
             <para>This method is called on a service when it first starts up, in case it has any persistent state, and when data loss is suspected. 
             When a stateful service replica starts up, it has the option to restore any data that might have persisted from previous updates.
             If it restores some state in this manner, its current progress is the last written sequence number for that data. A volatile service can simply return 0.
             Note that this method is not called to determine a new primary election during fail-over, 
-            because the current committed progress is already known by the <see cref="T:System.Fabric.FabricReplicator"/> class at that time. </para>
+            because the current committed progress is already known by the <see cref="T:System.Fabric.FabricReplicator" /> class at that time. </para>
             </remarks>
         </member>
         <member name="M:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider.System#Fabric#IStateProvider#OnDataLossAsync(System.Threading.CancellationToken)">
@@ -3522,11 +3616,11 @@
             The replica set consists of a majority of replicas, which includes the Primary replica. </para>
             </summary>
             <param name="cancellationToken">
-            <para>The <see cref="T:System.Threading.CancellationToken"/> object that the operation is observing. 
+            <para>The <see cref="T:System.Threading.CancellationToken" /> object that the operation is observing. 
             It can be used to send a notification that the operation should be canceled. Note that cancellation is advisory and that the operation might still be completed even if it is canceled.</para>
             </param>
             <returns>
-            <para>Returns <see cref="T:System.Threading.Tasks.Task`1"/> of type <see cref="T:System.Boolean"/>, that indicates whether state changed. 
+            <para>Returns <see cref="T:System.Threading.Tasks.Task`1" /> of type <see cref="T:System.Boolean" />, that indicates whether state changed. 
             When it changed, the method returns true or when it did not change, the method returns false.</para>
             </returns>
             <remarks>
@@ -3545,34 +3639,26 @@
             into the exact configuration periods in which they were sent by a specific Primary replica.</para>
             </summary>
             <param name="epoch">
-            <para>The new <see cref="T:System.Fabric.Epoch"/>.</para>
+            <para>The new <see cref="T:System.Fabric.Epoch" />.</para>
             </param>
             <param name="previousEpochLastSequenceNumber">
             <para> The maximum sequence number (LSN) that should have been observed in the previous epoch.</para>
             </param>
             <param name="cancellationToken">
-            <para>The <see cref="T:System.Threading.CancellationToken"/> object that the operation is observing. It can be used to send a notification 
+            <para>The <see cref="T:System.Threading.CancellationToken" /> object that the operation is observing. It can be used to send a notification 
             that the operation should be canceled. Note that cancellation is advisory and that the operation might still be completed even if it is canceled.</para>
             </param>
             <returns>
-            <para>Returns <see cref="T:System.Threading.Tasks.Task"/>.</para>
+            <para>Returns <see cref="T:System.Threading.Tasks.Task" />.</para>
             </returns>
             <remarks>
             <para>This method is called because the Primary replica of the replica set has changed, or a change was attempted. 
             Secondary replicas receive this method either when they are about to become the new Primary replica, or, if they are not the new Primary replica, 
             they receive it when they attempt to get the first operation from the new Primary replica from the replication stream. 
             Primary replicas might occasionally receive this method if there is an attempt to swap the Primary replica, which fails.</para>
-            <para>The information in the <see cref="M:System.Fabric.IStateProvider.UpdateEpochAsync(System.Fabric.Epoch,System.Int64,System.Threading.CancellationToken)"/> 
+            <para>The information in the <see cref="M:System.Fabric.IStateProvider.UpdateEpochAsync(System.Fabric.Epoch,System.Int64,System.Threading.CancellationToken)" /> 
             method enables the service to maintain a progress vector, which is a list of each epoch that the replica has received, and the maximum LSN that they contained. The progress vector data along with the current applied maximum LSN is useful for a Secondary replica to send during the copy operation  to describe how far the operation has progressed. Comparing progress vectors that are received from Secondary replicas during the copy operation enables Primary replicas to determine whether the Secondary replica is up-to-date, what state must be sent to the Secondary replica, and whether the Secondary replica has made false progress. False progress means that an LSN in a previous epoch was greater than the LSN that the Primary replica receives. </para>
             </remarks>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider.OnDataLossAsync">
-            <summary>
-            Function called during suspected data-loss.
-            </summary>
-            <value>
-            A function representing data-loss callback function.
-            </value>
         </member>
         <member name="F:Microsoft.ServiceFabric.Actors.Runtime.VolatileActorStateProvider.CopyStateEnumerator.copyStateList">
             <summary>
@@ -3996,21 +4082,6 @@
         <member name="P:Microsoft.ServiceFabric.Actors.SR.keyword_MetricActorMethodCallsWaitingForLock">
             <summary>
               Looks up a localized string similar to MetricActorMethodCallsWaitingForLock.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.SR.map_ActorIdKind_Guid">
-            <summary>
-              Looks up a localized string similar to Guid.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.SR.map_ActorIdKind_Long">
-            <summary>
-              Looks up a localized string similar to Long.
-            </summary>
-        </member>
-        <member name="P:Microsoft.ServiceFabric.Actors.SR.map_ActorIdKind_String">
-            <summary>
-              Looks up a localized string similar to String.
             </summary>
         </member>
         <member name="P:Microsoft.ServiceFabric.Actors.SR.ReentrancyModeDisallowed">

@@ -1,0 +1,258 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.ServiceFabric.Diagnostics</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource">
+            <summary>
+            ServiceFabricEventSource class is a wrapper on top of EventSource with following benefits
+            1) It contains stack-allocated WriteEvent overloads which are faster than ones available under EventSource
+            2) It has custom filtering for events through Settings.xml
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.#ctor">
+            <summary>
+            Constructor which populates the events descriptor data for all events defined
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.#ctor(System.String)">
+            <summary>
+            Constructor which populates the events descriptor data for all events defined
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.WriteEvent(System.Int32)">
+            <summary>
+            Overriding WriteEvent of EventSource for optimization
+            </summary>
+            <param name="eventId"></param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.WriteEvent(System.Int32,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant)">
+            <summary>
+            Overriding WriteEvent of EventSource for optimization
+            </summary>
+            <param name="eventId"></param>
+            <param name="param0"></param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.WriteEvent(System.Int32,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant)">
+            <summary>
+            Overriding WriteEvent of EventSource for optimization
+            </summary>
+            <param name="eventId"></param>
+            <param name="param0"></param>
+            <param name="param1"></param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.WriteEvent(System.Int32,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant)">
+            <summary>
+            Overriding WriteEvent of EventSource for optimization
+            </summary>
+            <param name="eventId"></param>
+            <param name="param0"></param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.WriteEvent(System.Int32,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant)">
+            <summary>
+            Overriding WriteEvent of EventSource for optimization
+            </summary>
+            <param name="eventId"></param>
+            <param name="param0"></param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="param3"></param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.WriteEvent(System.Int32,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant)">
+            <summary>
+            Overriding WriteEvent of EventSource for optimization
+            </summary>
+            <param name="eventId"></param>
+            <param name="param0"></param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="param3"></param>
+            <param name="param4"></param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.WriteEvent(System.Int32,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant)">
+            <summary>
+            Overriding WriteEvent of EventSource for optimization
+            </summary>
+            <param name="eventId"></param>
+            <param name="param0"></param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="param3"></param>
+            <param name="param4"></param>
+            <param name="param5"></param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.WriteEvent(System.Int32,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant)">
+            <summary>
+            Overriding WriteEvent of EventSource for optimization
+            </summary>
+            <param name="eventId"></param>
+            <param name="param0"></param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="param3"></param>
+            <param name="param4"></param>
+            <param name="param5"></param>
+            <param name="param6"></param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.WriteEvent(System.Int32,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant)">
+            <summary>
+            Overriding WriteEvent of EventSource for optimization
+            </summary>
+            <param name="eventId"></param>
+            <param name="param0"></param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="param3"></param>
+            <param name="param4"></param>
+            <param name="param5"></param>
+            <param name="param6"></param>
+            <param name="param7"></param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.WriteEvent(System.Int32,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant,Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant)">
+            <summary>
+            Overriding WriteEvent of EventSource for optimization
+            </summary>
+            <param name="eventId"></param>
+            <param name="param0"></param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="param3"></param>
+            <param name="param4"></param>
+            <param name="param5"></param>
+            <param name="param6"></param>
+            <param name="param7"></param>
+            <param name="param8"></param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.ServiceFabricEventSource.GenerateEventDescriptors(System.Type)">
+            <summary>
+            Generates descriptors for all the events inside a specified class type
+            </summary>
+            <param name="eventSourceType">type of the class deriving from ServiceFabricEventSource</param>
+            <returns>Dictionary of events</returns>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.TraceEvent">
+            <summary>
+            TraceEvent stores the state of any event
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.TraceEvent.#ctor(System.String,System.Diagnostics.Tracing.EventLevel,System.Diagnostics.Tracing.EventKeywords,Microsoft.ServiceFabric.Diagnostics.Tracing.Config.TraceConfig)">
+            <summary>
+            Constructor for TraceEvent
+            </summary>
+            <param name="eventName">Name of event</param>
+            <param name="level">Level of event</param>
+            <param name="keywords">keywords of event</param>
+            <param name="configMgr">Config manager for settings</param>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.TraceEvent.UpdateSinkEnabledStatus">
+            <summary>
+            Updates the status for the specified sink
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.TraceEvent.IsEventSinkEnabled">
+            <summary>
+            Checks if the current event should be sent to EventSource, this is based on filters used
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            Variant class for generic types
+            </summary>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.Boolean)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            Boolean to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.Byte)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            Byte to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.SByte)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            SByte to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.Int16)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            Int16 to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.UInt16)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            UInt16 to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.Int32)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            Int32 to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.UInt32)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            UInt32 to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.Int64)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            Int64 to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.UInt64)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            UInt64 to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.Double)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            Double to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.Guid)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            Guid to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.DateTime)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            DateTime to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant.op_Implicit(System.String)~Microsoft.ServiceFabric.Diagnostics.Tracing.Writer.Variant">
+            <summary>
+            string to Variant
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
