@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="MyServiceFabricAppType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <Parameters>
+    <Parameter Name="PubSubService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="PubSubService_PartitionCount" DefaultValue="4" />
+    <Parameter Name="PubSubService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="SubscribingToRelayStatefulService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="SubscribingToRelayStatefulService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="SubscribingToRelayStatefulService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="PublishingStatelessService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="SubscribingStatefulService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="SubscribingStatefulService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="SubscribingStatefulService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="SubscribingStatelessService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="ISubscribingActor_PartitionCount" DefaultValue="10" />
+    <Parameter Name="IBrokerActor_PartitionCount" DefaultValue="10" />
+    <Parameter Name="IBrokerActor_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="IBrokerActor_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="PublishingActorService_PartitionCount" DefaultValue="10" />
+    <Parameter Name="PublishingActorService_MinReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="PublishingActorService_TargetReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="ISubscribingActor_MinReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="ISubscribingActor_TargetReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="IRelayBrokerActor_PartitionCount" DefaultValue="10" />
+    <Parameter Name="IRelayBrokerActor_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="IRelayBrokerActor_TargetReplicaSetSize" DefaultValue="3" />
+  </Parameters>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="PubSubServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="SubscribingToRelayStatefulServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="PubkSubRelayActorPkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="PublishingStatelessServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="SubscribingStatefulServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="SubscribingStatelessServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="SubscribingActorPkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="PubSubActorPkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="PublishingActorPkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <DefaultServices>
+    <Service Name="PubSubService">
+      <StatefulService ServiceTypeName="PubSubServiceType" TargetReplicaSetSize="[PubSubService_TargetReplicaSetSize]" MinReplicaSetSize="[PubSubService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[PubSubService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="SubscribingToRelayStatefulService">
+      <StatefulService ServiceTypeName="SubscribingToRelayStatefulServiceType" TargetReplicaSetSize="[SubscribingToRelayStatefulService_TargetReplicaSetSize]" MinReplicaSetSize="[SubscribingToRelayStatefulService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[SubscribingToRelayStatefulService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="PublishingStatelessService">
+      <StatelessService ServiceTypeName="PublishingStatelessServiceType" InstanceCount="[PublishingStatelessService_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="SubscribingStatefulService">
+      <StatefulService ServiceTypeName="SubscribingStatefulServiceType" TargetReplicaSetSize="[SubscribingStatefulService_TargetReplicaSetSize]" MinReplicaSetSize="[SubscribingStatefulService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[SubscribingStatefulService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="SubscribingStatelessService">
+      <StatelessService ServiceTypeName="SubscribingStatelessServiceType" InstanceCount="[SubscribingStatelessService_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="ISubscribingActor" GeneratedIdRef="16067bff-424d-40d1-b72e-2d892236ed11|None">
+      <StatefulService ServiceTypeName="ISubscribingActorType" TargetReplicaSetSize="[ISubscribingActor_TargetReplicaSetSize]" MinReplicaSetSize="[ISubscribingActor_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[ISubscribingActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="IBrokerActor" GeneratedIdRef="a4642aa5-7f04-4e8e-a783-2e03f8f11570|None">
+      <StatefulService ServiceTypeName="IBrokerActorType" TargetReplicaSetSize="[IBrokerActor_TargetReplicaSetSize]" MinReplicaSetSize="[IBrokerActor_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[IBrokerActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="PublishingActorService" GeneratedIdRef="22068388-3b11-4506-8354-cef82a7e8c56|None">
+      <StatefulService ServiceTypeName="PublishingActorServiceType" TargetReplicaSetSize="[PublishingActorService_TargetReplicaSetSize]" MinReplicaSetSize="[PublishingActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[PublishingActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="IRelayBrokerActor" GeneratedIdRef="ed1eea87-2297-47d8-bc2d-d64cead7cc20|Persisted">
+      <StatefulService ServiceTypeName="IRelayBrokerActorType" TargetReplicaSetSize="[IRelayBrokerActor_TargetReplicaSetSize]" MinReplicaSetSize="[IRelayBrokerActor_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[IRelayBrokerActor_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+  </DefaultServices>
+</ApplicationManifest>
