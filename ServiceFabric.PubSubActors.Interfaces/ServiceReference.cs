@@ -31,11 +31,13 @@ namespace ServiceFabric.PubSubActors.Interfaces
 		[DataMember(IsRequired = false)]
 		public long? PartitionID { get; set; }
 
-
-		[DataMember(IsRequired = false)]
+        [DataMember(IsRequired = false)]
 		public Guid PartitionGuid { get; set; }
 
-		public string Description
+	    [DataMember(IsRequired = false)]
+	    public string ListenerName { get; set; }
+
+        public string Description
 		{
 
 			get

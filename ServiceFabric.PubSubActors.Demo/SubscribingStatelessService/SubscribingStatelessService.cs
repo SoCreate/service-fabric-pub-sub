@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Common.DataContracts;
 using Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.V1.FabricTransport.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberServices;
@@ -28,10 +29,10 @@ namespace SubscribingStatelessService
 
 		protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
 		{
-		    return this.CreateServiceRemotingInstanceListeners();
+		    //return this.CreateServiceRemotingInstanceListeners();
 
             //yield return new ServiceInstanceListener(p => new SubscriberCommunicationListener(this, p), "StatelessSubscriberCommunicationListener");
-            //yield return new ServiceInstanceListener(context => new FabricTransportServiceRemotingListener(context, this), "StatelessFabricTransportServiceRemotingListener");
+            yield return new ServiceInstanceListener(context => new FabricTransportServiceRemotingListener(context, this), "StatelessFabricTransportServiceRemotingListener");
         }
 
         protected override async Task OnOpenAsync(CancellationToken cancellationToken)
@@ -67,7 +68,7 @@ namespace SubscribingStatelessService
 
 		public async Task RegisterAsync()
 		{
-			await this.RegisterMessageTypeAsync(typeof(PublishedMessageOne));
+			await this.RegisterMessageTypeAsync(typeof(PublishedMessageOne), "StatelessFabricTransportServiceRemotingListener");
             //await this.RegisterMessageTypeWithBrokerServiceAsync(typeof(PublishedMessageTwo));
 		    await _subscriberServiceHelper.RegisterMessageTypeAsync(this, typeof(PublishedMessageTwo));
 		}
