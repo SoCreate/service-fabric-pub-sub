@@ -118,7 +118,7 @@ namespace ServiceFabric.PubSubActors.State
 		        default:
 		            throw new ArgumentOutOfRangeException();
 		    }
-		    var client = _serviceProxyFactory.CreateServiceProxy<ISubscriberService>(ServiceReference.ServiceUri, partitionKey);
+		    var client = _serviceProxyFactory.CreateServiceProxy<ISubscriberService>(ServiceReference.ServiceUri, partitionKey, listenerName: ServiceReference.ListenerName);
 			return client.ReceiveMessageAsync(message);
 		}
 	}
