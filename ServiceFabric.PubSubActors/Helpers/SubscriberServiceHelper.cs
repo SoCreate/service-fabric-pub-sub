@@ -27,7 +27,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// </summary>
         /// <returns></returns>
         public async Task RegisterMessageTypeAsync(StatelessService service, Type messageType,
-            Uri brokerServiceName = null)
+            Uri brokerServiceName = null, string listenerName = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
@@ -42,7 +42,7 @@ namespace ServiceFabric.PubSubActors.Helpers
             }
             var brokerService =
                 await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
-            var serviceReference = CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo);
+            var serviceReference = CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo, listenerName);
             await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName);
         }
 
@@ -75,7 +75,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// </summary>
         /// <returns></returns>
         public async Task RegisterMessageTypeAsync(StatefulService service, Type messageType,
-            Uri brokerServiceName = null)
+            Uri brokerServiceName = null, string listenerName = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
@@ -90,7 +90,7 @@ namespace ServiceFabric.PubSubActors.Helpers
             }
             var brokerService =
                 await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
-            var serviceReference = CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo);
+            var serviceReference = CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo, listenerName);
             await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName);
         }
 
@@ -145,15 +145,16 @@ namespace ServiceFabric.PubSubActors.Helpers
                 .GetProperty("Partition", BindingFlags.Instance | BindingFlags.NonPublic)
                 .GetValue(serviceBase);
         }
-        
-        
+
+
         /// <summary>
         /// Creates a <see cref="ServiceReference"/> for the provided service context and partition info.
         /// </summary>
         /// <param name="context"></param>
         /// <param name="info"></param>
+        /// <param name="listenerName">(optional) The name of the listener that is used to communicate with the service</param>
         /// <returns></returns>
-        private static ServiceReference CreateServiceReference(ServiceContext context, ServicePartitionInformation info)
+        private static ServiceReference CreateServiceReference(ServiceContext context, ServicePartitionInformation info, string listenerName = null)
         {
             var serviceReference = new ServiceReference
             {
@@ -161,6 +162,7 @@ namespace ServiceFabric.PubSubActors.Helpers
                 PartitionKind = info.Kind,
                 ServiceUri = context.ServiceName,
                 PartitionGuid = context.PartitionId,
+                ListenerName = listenerName
             };
 
             var longInfo = info as Int64RangePartitionInformation;
