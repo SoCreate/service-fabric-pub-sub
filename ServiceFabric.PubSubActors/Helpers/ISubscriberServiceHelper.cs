@@ -11,7 +11,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// </summary>
         /// <returns></returns>
         Task RegisterMessageTypeAsync(StatelessService service, Type messageType,
-            Uri brokerServiceName = null);
+            Uri brokerServiceName = null, string listenerName = null);
 
         /// <summary>
         /// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
@@ -25,7 +25,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// </summary>
         /// <returns></returns>
         Task RegisterMessageTypeAsync(StatefulService service, Type messageType,
-            Uri brokerServiceName = null);
+            Uri brokerServiceName = null, string listenerName = null);
 
         /// <summary>
         /// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
