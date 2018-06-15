@@ -17,6 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 7.3.5 Upgraded nuget packages (SF 3.1.283). Fixed null ref issue in `ServiceReferenceWrapper` after restarting broker. As reported by danijel-peric in issue 41.
 - 7.3.4 Added support for named listeners
 - 7.3.3 Upgraded nuget packages (SF 3.0.472)
 - 7.3.2 Upgraded nuget packages (SF 3.0.456)

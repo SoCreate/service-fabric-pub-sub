@@ -45,12 +45,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="3.0.472" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Fabric.MSBuild" Version="1.6.5" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="3.1.283" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Fabric.MSBuild" Version="1.6.6" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.0.472" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.0.472" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.283" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.283" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
   </ItemGroup>
  
 
