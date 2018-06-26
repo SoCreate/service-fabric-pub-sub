@@ -165,21 +165,15 @@ namespace ServiceFabric.PubSubActors.Helpers
                 ListenerName = listenerName
             };
 
-            var longInfo = info as Int64RangePartitionInformation;
-
-            if (longInfo != null)
+            if (info is Int64RangePartitionInformation longInfo)
             {
-                serviceReference.PartitionID = longInfo.LowKey;
                 serviceReference.PartitionKey = longInfo.LowKey;
             }
-            else
+            else if (info is NamedPartitionInformation stringInfo)
             {
-                var stringInfo = info as NamedPartitionInformation;
-                if (stringInfo != null)
-                {
-                    serviceReference.PartitionName = stringInfo.Name;
-                }
+                serviceReference.PartitionName = stringInfo.Name;
             }
+
             return serviceReference;
         }
     }

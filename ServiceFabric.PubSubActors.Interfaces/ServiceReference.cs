@@ -28,6 +28,7 @@ namespace ServiceFabric.PubSubActors.Interfaces
 		[DataMember(IsRequired = false)]
 		public string PartitionName { get; set; }
 
+        [Obsolete("Don't use this member. It's here for backwards compat.", true)]
 		[DataMember(IsRequired = false)]
 		public long? PartitionID { get; set; }
 
@@ -47,16 +48,16 @@ namespace ServiceFabric.PubSubActors.Interfaces
 				switch (PartitionKind)
 				{
 					case ServicePartitionKind.Invalid:
-						description = $"{ServiceUri} - ID:invalid - Guid:{PartitionGuid}";
+						description = $"{ServiceUri} - (invalid) - Guid:{PartitionGuid}";
 						break;
 					case ServicePartitionKind.Singleton:
-						description = $"{ServiceUri} - ID:singleton - Guid:{PartitionGuid}";
+						description = $"{ServiceUri} - (singleton) - Guid:{PartitionGuid}";
 						break;
 					case ServicePartitionKind.Int64Range:
-						description = $"{ServiceUri} - ID:{PartitionID} - Guid:{PartitionGuid}";
+						description = $"{ServiceUri} - Key:{PartitionKey} - Guid:{PartitionGuid}";
 						break;
 					case ServicePartitionKind.Named:
-						description = $"{ServiceUri} - ID:{PartitionName} - Guid:{PartitionGuid}";
+						description = $"{ServiceUri} - Name:{PartitionName} - Guid:{PartitionGuid}";
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();

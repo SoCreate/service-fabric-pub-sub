@@ -15,22 +15,7 @@ namespace ServiceFabric.PubSubActors.State
     [DataContract]
     public class ServiceReferenceWrapper : ReferenceWrapper
     {
-        private IServiceProxyFactory _serviceProxyFactory;
-
-        [IgnoreDataMember]
-        private IServiceProxyFactory ServiceProxyFactory
-        {
-            get
-            {
-                if (_serviceProxyFactory == null)
-                {
-                    _serviceProxyFactory = new ServiceProxyFactory();
-                }
-
-                return _serviceProxyFactory;
-            }
-        }
-
+        
         public override string Name
         {
             get { return ServiceReference.Description; }
@@ -54,10 +39,8 @@ namespace ServiceFabric.PubSubActors.State
         /// Creates a new instance using the provided <see cref="ServiceReference"/>.
         /// </summary>
         /// <param name="serviceReference"></param>
-        /// <param name="serviceProxyFactory">Optionak</param>
-        public ServiceReferenceWrapper(ServiceReference serviceReference, IServiceProxyFactory serviceProxyFactory = null)
+        public ServiceReferenceWrapper(ServiceReference serviceReference)
         {
-            _serviceProxyFactory = serviceProxyFactory ?? new ServiceProxyFactory();
             ServiceReference = serviceReference ?? throw new ArgumentNullException(nameof(serviceReference));
         }
 
@@ -70,8 +53,7 @@ namespace ServiceFabric.PubSubActors.State
         /// <param name="other">An object to compare with this object.</param>
         public bool Equals(ServiceReferenceWrapper other)
         {
-            if (other?.ServiceReference?.PartitionGuid == null) return false;
-            return Equals(other.ServiceReference.PartitionGuid, ServiceReference.PartitionGuid);
+            return Equals(other?.GetHashCode(), GetHashCode());
         }
 
         /// <summary>
@@ -94,8 +76,34 @@ namespace ServiceFabric.PubSubActors.State
         /// </returns>
         public override int GetHashCode()
         {
-            // ReSharper disable NonReadonlyMemberInGetHashCode  - need to support Serialization.
-            return ServiceReference.PartitionGuid.GetHashCode();
+            // ReSharper disable NonReadonlyMemberInGetHashCode - need to support Serialization.
+            var identifier = GetServiceIdentifier();
+            return identifier.GetHashCode();
+        }
+
+        /// <summary>
+        /// Gets a string that can be hashed and compared to see if one service reference points to the same service as another.
+        /// </summary>
+        /// <returns></returns>
+        private string GetServiceIdentifier()
+        {
+            string identifier = $"{ServiceReference.ApplicationName}-{ServiceReference.ServiceUri}";
+
+            switch (ServiceReference.PartitionKind)
+            {
+                case ServicePartitionKind.Singleton:
+                    break;
+                case ServicePartitionKind.Int64Range:
+                    identifier = $"{identifier}-{ServiceReference.PartitionKey}";
+                    break;
+                case ServicePartitionKind.Named:
+                    identifier = $"{identifier}-{ServiceReference.PartitionName}";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return identifier;
         }
 
         /// <summary>
@@ -110,30 +118,56 @@ namespace ServiceFabric.PubSubActors.State
             return Equals(other as ServiceReferenceWrapper);
         }
 
+        /// <inheritdoc />
+        public override Task PublishAsync(MessageWrapper message)
+        {
+            return MessageWrapperExtensions.PublishAsync(this, message);
+        }
+    }
+
+
+    internal static class MessageWrapperExtensions
+    {
+        private static readonly Lazy<IServiceProxyFactory> ServiceProxyFactoryLazy = new Lazy<IServiceProxyFactory>(()=> new ServiceProxyFactory());
+
+
         /// <summary>
         /// Attempts to publish the message to a listener.
         /// </summary>
+        /// <param name="wrapper"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public override Task PublishAsync(MessageWrapper message)
+        public static Task PublishAsync(this ServiceReferenceWrapper wrapper, MessageWrapper message)
         {
             ServicePartitionKey partitionKey;
-            switch (ServiceReference.PartitionKind)
+            switch (wrapper.ServiceReference.PartitionKind)
             {
                 case ServicePartitionKind.Singleton:
                     partitionKey = ServicePartitionKey.Singleton;
                     break;
                 case ServicePartitionKind.Int64Range:
-                    partitionKey = new ServicePartitionKey(ServiceReference.PartitionKey);
+                    partitionKey = new ServicePartitionKey(wrapper.ServiceReference.PartitionKey);
                     break;
                 case ServicePartitionKind.Named:
-                    partitionKey = new ServicePartitionKey(ServiceReference.PartitionName);
+                    partitionKey = new ServicePartitionKey(wrapper.ServiceReference.PartitionName);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            var client = ServiceProxyFactory.CreateServiceProxy<ISubscriberService>(ServiceReference.ServiceUri, partitionKey);
+            var client = ServiceProxyFactoryLazy.Value.CreateServiceProxy<ISubscriberService>(wrapper.ServiceReference.ServiceUri, partitionKey);
             return client.ReceiveMessageAsync(message);
+        }
+
+        /// <summary>
+        /// Attempts to publish the message to a listener.
+        /// </summary>
+        /// <param name="wrapper"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static Task PublishAsync(this ActorReferenceWrapper wrapper, MessageWrapper message)
+        {
+            ISubscriberActor actor = (ISubscriberActor)wrapper.ActorReference.Bind(typeof(ISubscriberActor));
+            return actor.ReceiveMessageAsync(message);
         }
     }
 }
