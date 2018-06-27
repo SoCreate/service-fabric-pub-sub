@@ -4,9 +4,9 @@
     <Description>ServiceFabric.PubSubActors adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. How to use this package: https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/README.md</Description>
     <Copyright>2018</Copyright>
     <AssemblyTitle>ServiceFabric.PubSubActors</AssemblyTitle>
-    <Version>7.3.7</Version>
+    <Version>7.4.0</Version>
     <Authors>Loek Duys</Authors>
-    <TargetFrameworks>net452;net46</TargetFrameworks>
+    <TargetFrameworks>net452;net46;netstandard2.0</TargetFrameworks>
     <PlatformTarget>x64</PlatformTarget>
     <Platform>x64</Platform>
     <AssemblyName>ServiceFabric.PubSubActors</AssemblyName>
@@ -53,10 +53,5 @@
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
   </ItemGroup>
  
-
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
 
 </Project>
