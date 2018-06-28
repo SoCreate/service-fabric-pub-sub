@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27703.2018
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "ServiceFabric.PubSubActors.Packaged", "ServiceFabric.PubSubActors.Packaged\ServiceFabric.PubSubActors.Packaged.sfproj", "{EF497583-DA41-4E45-A09E-6F46D3C19275}"
 EndProject
