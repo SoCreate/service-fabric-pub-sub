@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>ServiceFabric.PubSubActors.PackagedBrokerService</id>
-    <version>7.3.3</version>
+    <version>7.4.0</version>
     <title>ServiceFabric.PubSubActors.PackagedBrokerService</title>
     <authors>Loek Duys</authors>
     <owners>Loek Duys</owners>
@@ -15,15 +15,19 @@
     <iconUrl>https://nuget.org/Content/Images/packageDefaultIcon-50x50.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <licenseUrl>https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/LICENSE.md</licenseUrl>
-    <copyright>Copyright ©  2017</copyright>
+    <copyright>Copyright ©  2018</copyright>
     <dependencies>
       <group targetFramework=".NETFramework4.5.1">
-        <dependency id="ServiceFabric.PubSubActors" version="7.3.3" />
-        <dependency id="ServiceFabric.PubSubActors.Interfaces" version="7.3.3" />
+        <dependency id="ServiceFabric.PubSubActors" version="7.4.0" />
+        <dependency id="ServiceFabric.PubSubActors.Interfaces" version="7.4.0" />
       </group>
       <group targetFramework=".NETFramework4.6">
-        <dependency id="ServiceFabric.PubSubActors" version="7.3.3" />
-        <dependency id="ServiceFabric.PubSubActors.Interfaces" version="7.3.3" />
+        <dependency id="ServiceFabric.PubSubActors" version="7.4.0" />
+        <dependency id="ServiceFabric.PubSubActors.Interfaces" version="7.4.0" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="ServiceFabric.PubSubActors" version="7.4.0" />
+        <dependency id="ServiceFabric.PubSubActors.Interfaces" version="7.4.0" />
       </group>
     </dependencies>
     <references></references>
