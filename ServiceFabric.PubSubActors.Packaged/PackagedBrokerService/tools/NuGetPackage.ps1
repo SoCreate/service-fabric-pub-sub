@@ -4,7 +4,7 @@ Param (
 )
 
 $ErrorActionPreference = "Stop"
-$global:ExitCode = 1
+$global:ExitCode = 0
 
 function Write-Log {
 
@@ -28,7 +28,7 @@ function Write-Log {
 			[Int16] $Indent = 0,
 
 			[Parameter()]
-			[IO.FileInfo] $Path = ".\NuGet.log",
+			[IO.FileInfo] $Path = ".\NuGet2.log",
 			
 			[Parameter()]
 			[Switch] $Clobber,
@@ -70,15 +70,15 @@ function Write-Log {
 						}
 					}
 
-					if ($m.Trim().Length -gt 0) {
-						$msg = '{0}{1} [{2}] : {3}' -f (" " * $Indent), (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $Level.ToUpper(), $m
+					#if ($m.Trim().Length -gt 0) {
+					#	$msg = '{0}{1} [{2}] : {3}' -f (" " * $Indent), (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $Level.ToUpper(), $m
 	
-						if ($Clobber) {
-							$msg | Out-File -FilePath $Path -Force
-						} else {
-							$msg | Out-File -FilePath $Path -Append
-						}
-					}
+					#	if ($Clobber) {
+					#		$msg | Out-File -FilePath $Path -Force
+					#	} else {
+					#		$msg | Out-File -FilePath $Path -Append
+					#	}
+					#}
 			
 					if ($EventLogName) {
 			
@@ -103,7 +103,7 @@ function Write-Log {
 				}
 			} 
 			catch {
-				throw "Failed to create log entry in: '$Path'. The error was: '$_'."
+				Write-Host "Failed to create log entry. The error was: '$_'."
 			}
 		}
 	}
@@ -331,7 +331,13 @@ Else {
 
 Write-Log "Package created" -ForegroundColor Green
 Write-Log "Packages: "
-Get-ChildItem *.nupkg -Path $artifacts | Out-File packages.txt
+try{
+	$now = [System.DateTime]::Now.ToString("hh-mm-ss-fff")
+	Get-ChildItem *.nupkg -Path $artifacts | Out-File "packages$now.txt"
+}
+catch {
+	Write-Host "Failed to create log file. The error was: '$_'."
+}
 
 Get-Content packages.txt
 Write-Log "Logs: "
@@ -344,5 +350,6 @@ if ($Publish -and $global:ExitCode -eq 0) {
 Write-Log " "
 Write-Log "Exit Code: $global:ExitCode" -ForegroundColor Gray
 
+$global:ExitCode = 0
 $host.SetShouldExit($global:ExitCode)
 Exit $global:ExitCode

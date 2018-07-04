@@ -212,6 +212,6 @@ _Pvt_Extensions/
 ModelManifest.xml
 /publish nuget.bat
 /package.bat
-/ServiceFabric.PubSubActors.Packaged/PackagedBrokerService/packages.txt
+/ServiceFabric.PubSubActors.Packaged/PackagedBrokerService/packages*.txt
 /ServiceFabric.PubSubActors.snk
 /ServiceFabric.PubSubActors.Packaged/ServiceFabricBackup1/ServiceFabric.PubSubActors.Packaged.Test
