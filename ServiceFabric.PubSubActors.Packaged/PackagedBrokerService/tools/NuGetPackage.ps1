@@ -339,7 +339,7 @@ catch {
 	Write-Host "Failed to create log file. The error was: '$_'."
 }
 
-Get-Content packages.txt
+#Get-Content packages.txt
 Write-Log "Logs: "
 Get-Content NuGet.log
 # Check if package should be published
