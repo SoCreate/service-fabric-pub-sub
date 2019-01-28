@@ -4,6 +4,7 @@ using System.Fabric.Query;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
 
 namespace ServiceFabric.PubSubActors.Helpers
 {
@@ -11,13 +12,28 @@ namespace ServiceFabric.PubSubActors.Helpers
     {
         private static ServicePartitionList _cachedPartitions;
         private readonly FabricClient _fabricClient;
+        private readonly IServiceProxyFactory _serviceProxyFactory;
 
         /// <summary>
         /// Creates a new default instance.
         /// </summary>
-        public BrokerServiceLocator()
+        public BrokerServiceLocator(bool useRemotingV2 = false)
         {
             _fabricClient = new FabricClient();
+
+#if NETSTANDARD2_0
+
+            _serviceProxyFactory = new ServiceProxyFactory(c => new FabricTransportServiceRemotingClientFactory());
+#else
+            if (useRemotingV2)
+            {
+                _serviceProxyFactory = new ServiceProxyFactory(c => new FabricTransportServiceRemotingClientFactory());
+            }
+            else
+            {
+                _serviceProxyFactory = new ServiceProxyFactory();
+            }
+#endif
         }
 
 
@@ -82,7 +98,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         public async Task<IBrokerService> GetBrokerServiceForMessageAsync(object message, Uri brokerServiceName)
         {
             var resolvedPartition = await GetPartitionForMessageAsync(message, brokerServiceName);
-            var brokerService = ServiceProxy.Create<IBrokerService>(brokerServiceName, resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
+            var brokerService = _serviceProxyFactory.CreateServiceProxy<IBrokerService>(brokerServiceName, resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
             return brokerService;
         }
 
@@ -90,7 +106,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         public async Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName, Uri brokerServiceName)
         {
             var resolvedPartition = await GetPartitionForMessageAsync(messageTypeName, brokerServiceName);
-            var brokerService = ServiceProxy.Create<IBrokerService>(brokerServiceName, resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
+            var brokerService = _serviceProxyFactory.CreateServiceProxy<IBrokerService>(brokerServiceName, resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
             return brokerService;
         }
     }

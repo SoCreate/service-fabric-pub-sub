@@ -1,10 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <Description>ServiceFabric.PubSubActors adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. How to use this package: https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/README.md</Description>
     <Copyright>2018</Copyright>
     <AssemblyTitle>ServiceFabric.PubSubActors</AssemblyTitle>
-    <Version>7.4.0</Version>
+    <Version>7.4.1</Version>
     <Authors>Loek Duys</Authors>
     <TargetFrameworks>net452;net46;netstandard2.0</TargetFrameworks>
     <PlatformTarget>x64</PlatformTarget>
@@ -26,32 +25,26 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
-
   <PropertyGroup Condition=" '$(Configuration)' == 'Release'">
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <DelaySign>False</DelaySign>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\ServiceFabric.PubSubActors.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Update="Content\readme.md">
       <Pack>true</Pack>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ServiceFabric.PubSubActors.Interfaces\ServiceFabric.PubSubActors.Interfaces.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="3.1.283" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Fabric.MSBuild" Version="1.6.6" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.283" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.283" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="3.3.624" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Fabric.MSBuild" Version="1.6.7" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.3.624" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.3.624" />
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
   </ItemGroup>
- 
-
 </Project>
