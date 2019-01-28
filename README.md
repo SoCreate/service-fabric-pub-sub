@@ -17,6 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 7.4.1 Upgraded nuget packages (SF 3.3.624).  Required updating BrokerServiceLocator to support V2 remoting.
 - 7.4.0 Add NETSTANDARD2.0 version to the package. Allow SF Remoting V1/V2 for full framework. Requested by alexmarshall132 and danijel-peric in issue 45.
 - 7.3.7 Fix implementation of `ServiceReferenceWrapper.Equals` to allow changing partitionid's. As reported by danijel-peric in issue 44.
 - 7.3.6 Fix call to `GetPartitionForMessageAsync` with wrong argument. As reported by danijel-peric in issue 43.
@@ -34,13 +35,13 @@ Please also make sure all feature additions have a corresponding unit test.
 - 5.1.0 Add custom serialization option for kotvisbj
 - 5.0.0 Upgraded nuget packages (SF 2.5.216)
 - 4.9.1 merged PR by johnkattenhorn that changes 2 consts into properties on BrokerService
-- 4.9.0 upgraded to new SDK (2.4.164) 
+- 4.9.0 upgraded to new SDK (2.4.164)
 - 4.8.1 BrokerService.Subscribers is now protected, not private
-- 4.8.0 upgraded to new SDK (2.4.145) 
+- 4.8.0 upgraded to new SDK (2.4.145)
 - 4.7.1 merged pull request by Sterlingg that fixes Dispose issue
 - 4.7.0 upgraded to new SDK (2.3.311)
 - 4.6.1 merged pr by kelvintmv
-- 4.6.0 upgraded to new SDK and packages (2.3.301) 
+- 4.6.0 upgraded to new SDK and packages (2.3.301)
 - 4.5.4 fixed unregister issue found by schernets
 - 4.5.0 updated nuget packages (new SDK), moving from extension methods to injectable helpers for test support.
 - 4.4.13 fixed memory leak.
@@ -57,11 +58,11 @@ https://www.nuget.org/packages/ServiceFabric.PubSubActors.PackagedBrokerService 
 ## Getting started
 (This is the short version.)
 
-1. Add Nuget package 'ServiceFabric.PubSubActors.PackagedBrokerService' (PREVIEW) to your existing Service Fabric application. 
+1. Add Nuget package 'ServiceFabric.PubSubActors.PackagedBrokerService' (PREVIEW) to your existing Service Fabric application.
 2. Add Nuget package 'ServiceFabric.PubSubActors' to your Actor or Service project.
 3. Publish a message
 
-	3.1. From an Actor:  
+	3.1. From an Actor:
 	``` csharp
 	using ServiceFabric.PubSubActors.PublisherActors;
 	using ServiceFabric.PubSubActors.Helpers;
@@ -71,7 +72,7 @@ https://www.nuget.org/packages/ServiceFabric.PubSubActors.PackagedBrokerService 
         //use any JSON serializable object as a message, not just PublishedMessageTwo
 	```
 
-	3.2. From a Service:  
+	3.2. From a Service:
 	``` csharp
 	using ServiceFabric.PubSubActors.PublisherServices;
 	using ServiceFabric.PubSubActors.Helpers;
@@ -82,11 +83,11 @@ https://www.nuget.org/packages/ServiceFabric.PubSubActors.PackagedBrokerService 
 	```
 
 	*you can use dependency injection with the Publisher helpers to facilitate unit testing*
-	
+
 4. Subscribe to messages
 
 	4.1. From an Actor: implement ISubscriberActor (like described below)
-	
+
 	4.2. From a Service : implement ISubscriberService and add the 'SubscriberCommunicationListener' (like described below)
 
 That's it. Actors and Services can be both subscribers and publishers.
@@ -96,7 +97,7 @@ Now the long version:
 
 ## Introduction
 
-Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services). 
+Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services).
 This is done using an intermediate, which is the BrokerActor or BrokerService.
 Add this package to all Reliable Actor & Service projects that participate in the pub/sub messaging.
 Add the package 'ServiceFabric.PubSubActors.Interfaces' to all (*ReliableActor).Interfaces projects.
@@ -156,7 +157,7 @@ Replace the code of PubSubActor with the following code:
 [ActorService(Name = nameof(IBrokerActor))] //required because of interface operations
 internal class PubSubActor : ServiceFabric.PubSubActors.BrokerActor, Interfaces.IBrokerActor
 {
-	public PubSubActor() 
+	public PubSubActor()
 	{
         //optional: provide a logging callback
 		ActorEventSourceMessageCallback = message => ActorEventSource.Current.ActorMessage(this, message);
@@ -240,7 +241,7 @@ public interface ISubscribingActor : ISubscriberActor
 	{
 		// allow external callers to manipulate register/unregister on this sample actor:
 		//for regular messaging:
-		Task RegisterAsync(); 
+		Task RegisterAsync();
 		Task UnregisterAsync();
 		//for relayed messaging:
 		Task RegisterWithRelayAsync();
@@ -280,7 +281,7 @@ Add Nuget package 'ServiceFabric.PubSubActors' to 'PublishingActor'.
 Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to 'PublishingActor.Interfaces'.
 Add a project reference to the shared data contracts library ('DataContracts').
 
-Go to the project 'PublishingActor.Interfaces' and open the file IPublishingActor.cs. 
+Go to the project 'PublishingActor.Interfaces' and open the file IPublishingActor.cs.
 Replace the contents with the code below, to allow external callers to trigger a publish action (not required, Actors can decide for themselves too):
 
 ```javascript
@@ -305,7 +306,7 @@ Add Nuget package 'ServiceFabric.PubSubActors' to 'PublishingStatelessService'.
 Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to 'PublishingStatelessService'.
 Add a project reference to the shared data contracts library ('DataContracts').
 
-Go to the project 'DataContracts' and add an interface file IPublishingStatelessService.cs. 
+Go to the project 'DataContracts' and add an interface file IPublishingStatelessService.cs.
 Add the code below:
 ```javascript
 [ServiceContract]
