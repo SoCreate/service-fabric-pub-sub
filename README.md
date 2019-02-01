@@ -17,6 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 7.5.0 Added SubscriberStatelessServiceBase class to simplify managing Stateless Service subscribers.
 - 7.4.1 Upgraded nuget packages (SF 3.3.624).  Required updating BrokerServiceLocator to support V2 remoting.
 - 7.4.0 Add NETSTANDARD2.0 version to the package. Allow SF Remoting V1/V2 for full framework. Requested by alexmarshall132 and danijel-peric in issue 45.
 - 7.3.7 Fix implementation of `ServiceReferenceWrapper.Equals` to allow changing partitionid's. As reported by danijel-peric in issue 44.
@@ -270,6 +271,44 @@ Now open the file SubscribingStatefulService.cs in the project 'SubscribingState
 (Implement 'ServiceFabric.PubSubActors.SubscriberServices.ISubscriberService' and self-register.)
 
 https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/SubscribingStatefulService/SubscribingStatefulService.cs
+
+### Subscribing to messages using Stateless Service
+*Create a sample Service that extends SubscriberStatelessServiceBase.*
+In this example, the Service called 'SubscribingStatefulService' subscribes to messages of Type 'PublishedMessageOne' and 'PublishedMessageTwo'.
+
+Add a Reliable Stateless Service project called 'SubscribingStatelessService'.
+Add Nuget package 'ServiceFabric.PubSubActors'.
+Add Nuget package 'ServiceFabric.PubSubActors.Interfaces'.
+Add a project reference to the shared data contracts library ('DataContracts').
+
+Now open the file SubscribingStatelessService.cs in the project 'SubscribingStatelessService' and replace the SubscribingStatelessService class with this code:
+```
+internal sealed class SubscribingStatelessService : SubscriberStatelessServiceBase
+{
+    public SubscribingStatelessService(StatelessServiceContext serviceContext) : base(serviceContext)
+    {
+        // Configure service event source messaging.
+        ServiceEventSourceMessageCallback = message => ServiceEventSource.Current.ServiceMessage(this, message);
+
+        // Register handlers for all types that we are consuming.
+        RegisterHandler<PublishedMessageOne>(HandleMessageOne);
+        RegisterHandler<PublishedMessageTwo>(HandleMessageTwo);
+    }
+
+    private Task HandleMessageOne(PublishedMessageOne message)
+    {
+        ServiceEventSourceMessage($"Processing PublishedMessageOne: {message.Content} on Instance:'{Context.InstanceId}");
+        return Task.CompletedTask;
+    }
+
+    private Task HandleMessageTwo(PublishedMessageTwo message)
+    {
+        ServiceEventSourceMessage($"Processing PublishedMessageOne: {message.Content} on Instance:'{Context.InstanceId}");
+        return Task.CompletedTask;
+    }
+}
+```
+The SubscriberStatelessServiceBase class automatically handles subscribing to the message types that were registered using the RegisterHandler() method and exposes endpoints to subscribe and unsubscribe to message types from external services.
 
 ### Publishing messages from Actors
 *Create a sample Actor that publishes messages.*

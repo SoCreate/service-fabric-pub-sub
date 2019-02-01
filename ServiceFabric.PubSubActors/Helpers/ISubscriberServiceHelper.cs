@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
+using ServiceFabric.PubSubActors.Interfaces;
 
 namespace ServiceFabric.PubSubActors.Helpers
 {
@@ -33,5 +34,11 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <returns></returns>
         Task UnregisterMessageTypeAsync(StatefulService service, Type messageType, bool flushQueue,
             Uri brokerServiceName = null);
+
+        /// <summary>
+        /// Deserializes the provided <paramref name="message"/> Payload into an intance of type <paramref name="type"/>
+        /// </summary>
+        /// <returns></returns>
+        object Deserialize(MessageWrapper message, Type type);
     }
 }
