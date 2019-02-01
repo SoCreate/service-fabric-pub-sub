@@ -25,8 +25,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         public async Task RegisterAsync(Uri brokerServiceName)
         {
             var activationContext = FabricRuntime.GetActivationContext();
-            var fc = new FabricClient();
-            await fc.PropertyManager.PutPropertyAsync(new Uri(activationContext.ApplicationName), nameof(BrokerService), brokerServiceName.ToString());
+            await _fabricClient.PropertyManager.PutPropertyAsync(new Uri(activationContext.ApplicationName), nameof(BrokerService), brokerServiceName.ToString());
         }
 
         /// <inheritdoc />
@@ -34,18 +33,47 @@ namespace ServiceFabric.PubSubActors.Helpers
         {
             try
             {
+                // check current context
                 var activationContext = FabricRuntime.GetActivationContext();
-                var fc = new FabricClient();
-                var property = await fc.PropertyManager.GetPropertyAsync(new Uri(activationContext.ApplicationName), nameof(BrokerService));
-                if (property == null) return null;
-                string value = property.GetValue<string>();
-                return new Uri(value);
+                var property = await GetBrokerProperty(activationContext.ApplicationName);
+                
+                if (property == null)
+                {
+                    // try to find borker name in other application types
+                    var apps = await _fabricClient.QueryManager.GetApplicationListAsync();
+
+                    foreach (var app in apps)
+                    {
+                        var found = await LocateAsync(app.ApplicationName);
+                        if(found != null)
+                            return found;
+                    }
+                }
+                else
+                {
+                    return new Uri(property.GetValue<string>());
+                }
             }
-            // ReSharper disable once EmptyGeneralCatchClause
             catch
             {
+                ;
             }
             return null;
+        }
+
+        private async Task<Uri> LocateAsync(Uri applicationName)
+        {
+            var property = await GetBrokerProperty(applicationName);
+
+            return property != null ? new Uri(property.GetValue<string>()) : null;
+        }
+        private async Task<NamedProperty> GetBrokerProperty(string applicationName)
+        {
+           return await GetBrokerProperty(new Uri(applicationName));
+        }
+        private async Task<NamedProperty> GetBrokerProperty(Uri applicationName)
+        {
+           return await _fabricClient.PropertyManager.GetPropertyAsync(applicationName, nameof(BrokerService));
         }
 
         /// <inheritdoc />
