@@ -3,8 +3,8 @@ using System.Fabric;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Newtonsoft.Json;
 using ServiceFabric.PubSubActors.Interfaces;
-using ServiceFabric.PubSubActors.State;
 
 namespace ServiceFabric.PubSubActors.Helpers
 {
@@ -116,6 +116,19 @@ namespace ServiceFabric.PubSubActors.Helpers
                 await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
             var serviceReference = CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo);
             await brokerService.UnregisterServiceSubscriberAsync(serviceReference, messageType.FullName, flushQueue);
+        }
+
+        /// <summary>
+        /// Deserializes the provided <paramref name="message"/> Payload into an intance of type <paramref name="type"/>
+        /// </summary>
+        /// <returns></returns>
+        public object Deserialize(MessageWrapper message, Type type)
+        {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            if (string.IsNullOrWhiteSpace(message.Payload)) throw new ArgumentNullException(nameof(message.Payload));
+
+            return JsonConvert.DeserializeObject(message.Payload, type);
         }
 
         /// <summary>
