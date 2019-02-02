@@ -1,42 +1,41 @@
-﻿using System;
+﻿using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Client;
+using Microsoft.ServiceFabric.Services.Runtime;
+using ServiceFabric.PubSubActors.Interfaces;
+using System;
 using System.Fabric;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Actors;
-using Microsoft.ServiceFabric.Actors.Client;
-using Microsoft.ServiceFabric.Services.Runtime;
-using Newtonsoft.Json;
-using ServiceFabric.PubSubActors.Interfaces;
 
 namespace ServiceFabric.PubSubActors.SubscriberServices
 {
     public static class SubscriberServiceExtensions
     {
         /// <summary>
-        /// Deserializes the provided <paramref name="message"/> Payload into an intance of type <typeparam name="TResult"></typeparam>
+        /// Deserializes the provided <paramref name="messageWrapper"/> Payload into an intance of type <typeparam name="TResult"></typeparam>
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
-        public static TResult Deserialize<TResult>(this StatefulServiceBase service, MessageWrapper message)
+        public static TResult Deserialize<TResult>(this StatefulServiceBase service, MessageWrapper messageWrapper)
         {
-            if (message == null) throw new ArgumentNullException(nameof(message));
-            if (string.IsNullOrWhiteSpace(message.Payload)) throw new ArgumentNullException(nameof(message.Payload));
+            if (messageWrapper == null) throw new ArgumentNullException(nameof(messageWrapper));
+            if (string.IsNullOrWhiteSpace(messageWrapper.Payload)) throw new ArgumentNullException(nameof(messageWrapper.Payload));
 
-            var payload = JsonConvert.DeserializeObject<TResult>(message.Payload);
+            var payload = messageWrapper.CreateMessage<TResult>();
             return payload;
         }
 
         /// <summary>
-        /// Deserializes the provided <paramref name="message"/> Payload into an intance of type <typeparam name="TResult"></typeparam>
+        /// Deserializes the provided <paramref name="messageWrapper"/> Payload into an intance of type <typeparam name="TResult"></typeparam>
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
-        public static TResult Deserialize<TResult>(this StatelessService service, MessageWrapper message)
+        public static TResult Deserialize<TResult>(this StatelessService service, MessageWrapper messageWrapper)
         {
-            if (message == null) throw new ArgumentNullException(nameof(message));
-            if (string.IsNullOrWhiteSpace(message.Payload)) throw new ArgumentNullException(nameof(message.Payload));
+            if (messageWrapper == null) throw new ArgumentNullException(nameof(messageWrapper));
+            if (string.IsNullOrWhiteSpace(messageWrapper.Payload)) throw new ArgumentNullException(nameof(messageWrapper.Payload));
 
-            var payload = JsonConvert.DeserializeObject<TResult>(message.Payload);
+            var payload = messageWrapper.CreateMessage<TResult>();
             return payload;
         }
 
@@ -355,7 +354,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         private static async Task RegisterMessageTypeWithRelayBrokerAsync(ServiceContext context, ServicePartitionInformation info, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId, string listenerName = null)
         {
             var serviceReference = CreateServiceReference(context, info, listenerName);
-        
+
             if (sourceBrokerActorId == null)
             {
                 sourceBrokerActorId = new ActorId(messageType.FullName);
