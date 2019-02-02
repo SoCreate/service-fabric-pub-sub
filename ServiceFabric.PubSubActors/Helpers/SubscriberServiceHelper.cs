@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Microsoft.ServiceFabric.Services.Runtime;
+using ServiceFabric.PubSubActors.Interfaces;
+using System;
 using System.Fabric;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Runtime;
-using Newtonsoft.Json;
-using ServiceFabric.PubSubActors.Interfaces;
 
 namespace ServiceFabric.PubSubActors.Helpers
 {
@@ -119,19 +118,6 @@ namespace ServiceFabric.PubSubActors.Helpers
         }
 
         /// <summary>
-        /// Deserializes the provided <paramref name="message"/> Payload into an intance of type <paramref name="type"/>
-        /// </summary>
-        /// <returns></returns>
-        public object Deserialize(MessageWrapper message, Type type)
-        {
-            if (message == null) throw new ArgumentNullException(nameof(message));
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            if (string.IsNullOrWhiteSpace(message.Payload)) throw new ArgumentNullException(nameof(message.Payload));
-
-            return JsonConvert.DeserializeObject(message.Payload, type);
-        }
-
-        /// <summary>
         /// Gets the Partition info for the provided StatefulServiceBase instance.
         /// </summary>
         /// <param name="serviceBase"></param>
@@ -139,7 +125,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         private IStatefulServicePartition GetServicePartition(StatefulServiceBase serviceBase)
         {
             if (serviceBase == null) throw new ArgumentNullException(nameof(serviceBase));
-            return (IStatefulServicePartition) serviceBase
+            return (IStatefulServicePartition)serviceBase
                 .GetType()
                 .GetProperty("Partition", BindingFlags.Instance | BindingFlags.NonPublic)
                 .GetValue(serviceBase);
@@ -153,7 +139,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         private static IStatelessServicePartition GetServicePartition(StatelessService serviceBase)
         {
             if (serviceBase == null) throw new ArgumentNullException(nameof(serviceBase));
-            return (IStatelessServicePartition) serviceBase
+            return (IStatelessServicePartition)serviceBase
                 .GetType()
                 .GetProperty("Partition", BindingFlags.Instance | BindingFlags.NonPublic)
                 .GetValue(serviceBase);
