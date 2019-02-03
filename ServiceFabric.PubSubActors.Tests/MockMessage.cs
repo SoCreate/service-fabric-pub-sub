@@ -5,4 +5,10 @@ namespace ServiceFabric.PubSubActors.Tests
         public string SomeValue { get; set; }
 
     }
+
+    public class MockMessageSpecialized : MockMessage
+    {
+        public string SomeOtherValue { get; set; }
+
+    }
 }

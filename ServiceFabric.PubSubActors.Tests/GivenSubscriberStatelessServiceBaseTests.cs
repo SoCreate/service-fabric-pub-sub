@@ -35,11 +35,15 @@ namespace ServiceFabric.PubSubActors.Tests
         }
 
         [TestMethod]
-        public async Task WhenMarkedServiceScansAttributesButNoHandlerPresent_ThenThrowsException()
+        public async Task WhenMarkedServiceReceivesMessage_ThenCorrectOverloadMethodIsInvoked()
         {
-            var service = new MockSubscriberStatelessServiceBase2(MockStatelessServiceContextFactory.Default, new MockSubscriberServiceHelper());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(()=>service.InvokeOnOpenAsync(CancellationToken.None));
+            var service = new MockSubscriberStatelessServiceBase(MockStatelessServiceContextFactory.Default, new MockSubscriberServiceHelper());
+            await service.InvokeOnOpenAsync(CancellationToken.None);
+            await service.ReceiveMessageAsync(new MockMessageSpecialized { SomeValue = "SomeValue" }.CreateMessageWrapper());
+            Assert.IsTrue(service.MethodCalled);
         }
+
+       
 
         public class MockSubscriberServiceHelper : ISubscriberServiceHelper
         {
@@ -73,7 +77,6 @@ namespace ServiceFabric.PubSubActors.Tests
         }
 
 
-        [Subscribe(typeof(MockMessage))]
         public class MockSubscriberStatelessServiceBase : SubscriberStatelessServiceBase
         {
             public bool MethodCalled { get; private set; }
@@ -85,6 +88,7 @@ namespace ServiceFabric.PubSubActors.Tests
             {
             }
 
+            [Subscribe(typeof(MockMessage))]
             private Task HandleMockMessage(MockMessage message)
             {
                 MethodCalled = true;
@@ -92,17 +96,6 @@ namespace ServiceFabric.PubSubActors.Tests
             }
         }
 
-        [Subscribe(typeof(MockMessage))]
-        public class MockSubscriberStatelessServiceBase2 : SubscriberStatelessServiceBase
-        {
-            internal new IEnumerable<SubscriptionDefinition> Subscriptions => base.Subscriptions.Values;
-
-            /// <inheritdoc />
-            public MockSubscriberStatelessServiceBase2(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)
-            {
-            }
-
-            //missing handler method
-        }
+        
     }
 }
