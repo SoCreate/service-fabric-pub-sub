@@ -11,6 +11,7 @@ namespace ServiceFabric.PubSubActors.Helpers
     {
         private static ServicePartitionList _cachedPartitions;
         private readonly FabricClient _fabricClient;
+        private const string _borkerName = nameof(BrokerService);
 
         /// <summary>
         /// Creates a new default instance.
@@ -25,7 +26,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         public async Task RegisterAsync(Uri brokerServiceName)
         {
             var activationContext = FabricRuntime.GetActivationContext();
-            await _fabricClient.PropertyManager.PutPropertyAsync(new Uri(activationContext.ApplicationName), nameof(BrokerService), brokerServiceName.ToString());
+            await _fabricClient.PropertyManager.PutPropertyAsync(new Uri(activationContext.ApplicationName), _borkerName, brokerServiceName.ToString());
         }
 
         /// <inheritdoc />
@@ -35,11 +36,11 @@ namespace ServiceFabric.PubSubActors.Helpers
             {
                 // check current context
                 var activationContext = FabricRuntime.GetActivationContext();
-                var property = await GetBrokerProperty(activationContext.ApplicationName);
+                var property = await GetBrokerPropertyOrNull(activationContext.ApplicationName);
                 
                 if (property == null)
                 {
-                    // try to find borker name in other application types
+                    // try to find broker name in other application types
                     var apps = await _fabricClient.QueryManager.GetApplicationListAsync();
 
                     foreach (var app in apps)
@@ -63,17 +64,25 @@ namespace ServiceFabric.PubSubActors.Helpers
 
         private async Task<Uri> LocateAsync(Uri applicationName)
         {
-            var property = await GetBrokerProperty(applicationName);
+            var property = await GetBrokerPropertyOrNull(applicationName);
 
             return property != null ? new Uri(property.GetValue<string>()) : null;
         }
-        private async Task<NamedProperty> GetBrokerProperty(string applicationName)
+        private async Task<NamedProperty> GetBrokerPropertyOrNull(string applicationName)
         {
-           return await GetBrokerProperty(new Uri(applicationName));
+           return await GetBrokerPropertyOrNull(new Uri(applicationName));
         }
-        private async Task<NamedProperty> GetBrokerProperty(Uri applicationName)
+        private async Task<NamedProperty> GetBrokerPropertyOrNull(Uri applicationName)
         {
-           return await _fabricClient.PropertyManager.GetPropertyAsync(applicationName, nameof(BrokerService));
+            try
+            {
+                return await _fabricClient.PropertyManager.GetPropertyAsync(applicationName, _borkerName);
+            }
+            catch
+            {
+                ;
+            }
+            return null;
         }
 
         /// <inheritdoc />
