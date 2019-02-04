@@ -17,6 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 7.4.2 BrokerServiceLocator located in other Application will now be found.
 - 7.4.1 Upgraded nuget packages (SF 3.3.624).  Required updating BrokerServiceLocator to support V2 remoting.
 - 7.4.0 Add NETSTANDARD2.0 version to the package. Allow SF Remoting V1/V2 for full framework. Requested by alexmarshall132 and danijel-peric in issue 45.
 - 7.3.7 Fix implementation of `ServiceReferenceWrapper.Equals` to allow changing partitionid's. As reported by danijel-peric in issue 44.

@@ -60,7 +60,7 @@ namespace ServiceFabric.PubSubActors.Helpers
                     // try to find broker name in other application types
                     bool hasPages = true;
                     
-                    var query = new ApplicationQueryDescription() { MaxResults = 5 };
+                    var query = new ApplicationQueryDescription() { MaxResults = 50 };
 
                     while (hasPages)
                     {

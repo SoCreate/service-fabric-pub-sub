@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabric.PubSubActors"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabric.PubSubActors.Interfaces", "ServiceFabric.PubSubActors.Interfaces\ServiceFabric.PubSubActors.Interfaces.csproj", "{8E319BE1-AF0A-4683-997F-7577E369850A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceFabric.PubSubActors.Tests", "ServiceFabric.PubSubActors.Tests\ServiceFabric.PubSubActors.Tests.csproj", "{29169DCB-AA96-4B25-8395-32DC00473F34}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,14 @@ Global
 		{8E319BE1-AF0A-4683-997F-7577E369850A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8E319BE1-AF0A-4683-997F-7577E369850A}.Release|x64.ActiveCfg = Release|Any CPU
 		{8E319BE1-AF0A-4683-997F-7577E369850A}.Release|x64.Build.0 = Release|Any CPU
+		{29169DCB-AA96-4B25-8395-32DC00473F34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29169DCB-AA96-4B25-8395-32DC00473F34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29169DCB-AA96-4B25-8395-32DC00473F34}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{29169DCB-AA96-4B25-8395-32DC00473F34}.Debug|x64.Build.0 = Debug|Any CPU
+		{29169DCB-AA96-4B25-8395-32DC00473F34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29169DCB-AA96-4B25-8395-32DC00473F34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29169DCB-AA96-4B25-8395-32DC00473F34}.Release|x64.ActiveCfg = Release|Any CPU
+		{29169DCB-AA96-4B25-8395-32DC00473F34}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
