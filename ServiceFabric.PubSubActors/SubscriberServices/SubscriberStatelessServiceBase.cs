@@ -80,7 +80,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// </summary>
         /// <param name="messageType">Full type of message object.</param>
         /// <param name="flush">Publish any remaining messages before unsubscribing.</param>
-        public async Task UnsubscribeAsync(Type messageType, bool flush = true)
+        public async Task UnsubscribeAsync(Type messageType, bool flush)
         {
             if (messageType.FullName != null && Subscriptions.TryGetValue(messageType, out var subscription))
             {
@@ -149,33 +149,34 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         }
 
         /// <summary>
-        /// Scans this service for attributes of type <see cref="SubscribeAttribute"/> and corresponding methods that can handle 
-        /// messages. 
+        /// Scans this service for attributes of type <see cref="SubscribeAttribute"/> and corresponding methods that can handle
+        /// messages.
         /// </summary>
         internal void DiscoverHandlers()
         {
             Type taskType = typeof(Task);
-            var methods = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            foreach (var method in methods)
+            var handlers = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            foreach (var handlerMethod in handlers)
             {
-                var handlesAttribute = method.GetCustomAttributes(typeof(SubscribeAttribute), false)
+                var subscribeAttribute = handlerMethod.GetCustomAttributes(typeof(SubscribeAttribute), false)
                     .Cast<SubscribeAttribute>()
                     .SingleOrDefault();
 
-                if (handlesAttribute == null) continue;
-                var parameters = method.GetParameters();
+                if (subscribeAttribute == null) continue;
+
+                var parameters = handlerMethod.GetParameters();
                 if (parameters.Length != 1) continue;
-                if (!taskType.IsAssignableFrom(method.ReturnType)) continue;
+                if (!taskType.IsAssignableFrom(handlerMethod.ReturnType)) continue;
 
                 //exact match
                 //or overload
-                if (parameters[0].ParameterType == handlesAttribute.MessageType
-                    || handlesAttribute.MessageType.IsAssignableFrom(parameters[0].ParameterType))
+                if (parameters[0].ParameterType == subscribeAttribute.MessageType
+                    || subscribeAttribute.MessageType.IsAssignableFrom(parameters[0].ParameterType))
                 {
-                    Subscriptions[handlesAttribute.MessageType] = new SubscriptionDefinition
+                    Subscriptions[subscribeAttribute.MessageType] = new SubscriptionDefinition
                     {
-                        MessageType = handlesAttribute.MessageType,
-                        Handler = m => (Task) method.Invoke(this, new[] {m})
+                        MessageType = subscribeAttribute.MessageType,
+                        Handler = m => (Task) handlerMethod.Invoke(this, new[] {m})
                     };
                 }
             }

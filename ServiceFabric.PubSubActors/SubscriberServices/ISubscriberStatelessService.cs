@@ -11,7 +11,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// <param name="messageType"></param>
         /// <param name="flush"></param>
         /// <returns></returns>
-        Task UnsubscribeAsync(Type messageType, bool flush = true);
+        Task UnsubscribeAsync(Type messageType, bool flush);
 
         /// <summary>
         /// Subscribe to the messageType.
