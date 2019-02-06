@@ -19,10 +19,11 @@ namespace ServiceFabric.PubSubActors.Tests
         [TestMethod]
         public async Task WhenMarkedServiceScansAttributes_ThenCorrectlyRegistered()
         {
-            var service = new MockSubscriberStatelessServiceBase(MockStatelessServiceContextFactory.Default, new MockSubscriberServiceHelper());
+            var helper = new MockSubscriberServiceHelper();
+            var service = new MockSubscriberStatelessServiceBase(MockStatelessServiceContextFactory.Default, helper);
             await service.InvokeOnOpenAsync(CancellationToken.None);
 
-            Assert.AreEqual(1, service.Subscriptions.Count());
+            Assert.AreEqual(1, helper.Subscriptions.Count());
         }
 
         [TestMethod]
@@ -43,33 +44,31 @@ namespace ServiceFabric.PubSubActors.Tests
             Assert.IsTrue(service.MethodCalled);
         }
 
-       
 
-        public class MockSubscriberServiceHelper : ISubscriberServiceHelper
+
+        public class MockSubscriberServiceHelper : SubscriberServiceHelper
         {
-            /// <inheritdoc />
-            public Task RegisterMessageTypeAsync(StatelessService service, Type messageType, Uri brokerServiceName = null,
+            internal new IEnumerable<SubscriptionDefinition> Subscriptions => base.Subscriptions.Values;
+
+            public new Task RegisterMessageTypeAsync(StatelessService service, Type messageType, Uri brokerServiceName = null,
                 string listenerName = null)
             {
                 return Task.CompletedTask;
             }
 
-            /// <inheritdoc />
-            public Task UnregisterMessageTypeAsync(StatelessService service, Type messageType, bool flushQueue,
+            public new Task UnregisterMessageTypeAsync(StatelessService service, Type messageType, bool flushQueue,
                 Uri brokerServiceName = null)
             {
                 return Task.CompletedTask;
             }
 
-            /// <inheritdoc />
-            public Task RegisterMessageTypeAsync(StatefulService service, Type messageType, Uri brokerServiceName = null,
+            public new Task RegisterMessageTypeAsync(StatefulService service, Type messageType, Uri brokerServiceName = null,
                 string listenerName = null)
             {
                 return Task.CompletedTask;
             }
 
-            /// <inheritdoc />
-            public Task UnregisterMessageTypeAsync(StatefulService service, Type messageType, bool flushQueue,
+            public new Task UnregisterMessageTypeAsync(StatefulService service, Type messageType, bool flushQueue,
                 Uri brokerServiceName = null)
             {
                 return Task.CompletedTask;
@@ -80,8 +79,6 @@ namespace ServiceFabric.PubSubActors.Tests
         public class MockSubscriberStatelessServiceBase : SubscriberStatelessServiceBase
         {
             public bool MethodCalled { get; private set; }
-
-            internal new IEnumerable<SubscriptionDefinition> Subscriptions => base.Subscriptions.Values;
 
             /// <inheritdoc />
             public MockSubscriberStatelessServiceBase(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)
@@ -96,6 +93,6 @@ namespace ServiceFabric.PubSubActors.Tests
             }
         }
 
-        
+
     }
 }
