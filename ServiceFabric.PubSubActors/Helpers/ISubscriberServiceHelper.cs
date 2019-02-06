@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Interfaces;
@@ -34,5 +35,9 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <returns></returns>
         Task UnregisterMessageTypeAsync(StatefulService service, Type messageType, bool flushQueue,
             Uri brokerServiceName = null);
+
+        Dictionary<Type, SubscriptionDefinition> DiscoverMessageHandlers<T>(T service) where T : class;
+
+        Task ProccessMessageAsync(MessageWrapper messageWrapper);
     }
 }

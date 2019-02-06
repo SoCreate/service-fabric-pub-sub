@@ -6,8 +6,6 @@ using ServiceFabric.PubSubActors.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Fabric;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,9 +14,9 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 {
     /// <remarks>
     /// Base class for a <see cref="StatelessService"/> that serves as a subscriber of messages from the broker.
-    /// Subscribe to message types and define a handler callback by calling <see cref="SubscriberStatelessServiceBase.RegisterHandler{T}"/>.
+    /// Subscribe to message types and define a handler callback by using the <see cref="SubscribeAttribute"/>.
     /// </remarks>
-    public abstract class SubscriberStatelessServiceBase : StatelessService, ISubscriberStatelessService
+    public abstract class SubscriberStatelessServiceBase : StatelessService, ISubscriberService
     {
         private readonly ISubscriberServiceHelper _subscriberServiceHelper;
 
@@ -27,11 +25,6 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// </summary>
         protected Action<string> ServiceEventSourceMessageCallback { get; set; }
 
-        /// <summary>
-        /// Dictionary of <see cref="SubscriptionDefinition"/>, keyed by the message type name, that this service subscribes to.
-        /// </summary>
-        protected Dictionary<Type, SubscriptionDefinition> Subscriptions { get; } = new Dictionary<Type, SubscriptionDefinition>();
-
         protected SubscriberStatelessServiceBase(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null)
             : base(serviceContext)
         {
@@ -39,53 +32,25 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         }
 
         /// <summary>
-        /// Subscribes to all messages that have been registered by calling <see cref="SubscriberStatelessServiceBase.RegisterHandler{T}"/>.
+        /// Subscribes to all message types that have a handler registered using the <see cref="SubscribeAttribute"/>.
         /// </summary>
         /// <param name="cancellationToken"></param>
         protected override async Task OnOpenAsync(CancellationToken cancellationToken)
         {
-            DiscoverHandlers();
-            var serviceName = GetType().FullName;
+            var serviceType = GetType();
+            var subscriptions = _subscriberServiceHelper.DiscoverMessageHandlers(this);
 
-            foreach (var subscription in Subscriptions.Values)
+            foreach (var subscription in subscriptions.Values)
             {
                 try
                 {
-                    await SubscribeAsync(subscription.MessageType);
-                    ServiceEventSourceMessage($"Registered Service:'{serviceName}' Instance:'{Context.InstanceId}' as Subscriber of {subscription.MessageType}.");
+                    await _subscriberServiceHelper.RegisterMessageTypeAsync(this, subscription.MessageType, subscription.Broker);
+                    ServiceEventSourceMessage($"Registered Service:'{serviceType.FullName}' Instance:'{Context.InstanceId}' as Subscriber of {subscription.MessageType}.");
                 }
                 catch (Exception ex)
                 {
-                    ServiceEventSourceMessage($"Failed to register Service:'{serviceName}' Instance:'{Context.InstanceId}' as Subscriber of {subscription.MessageType}. Error:'{ex}'.");
+                    ServiceEventSourceMessage($"Failed to register Service:'{serviceType.FullName}' Instance:'{Context.InstanceId}' as Subscriber of {subscription.MessageType}. Error:'{ex}'.");
                 }
-            }
-        }
-
-        /// <summary>
-        /// Registers this service as a subscriber for the given message type.
-        /// </summary>
-        /// <param name="messageType">Full type of message object.</param>
-        public Task SubscribeAsync(Type messageType)
-        {
-            if (messageType.FullName != null && Subscriptions.TryGetValue(messageType, out var subscription))
-            {
-                return _subscriberServiceHelper.RegisterMessageTypeAsync(this, messageType, subscription.Broker);
-            }
-
-            return Task.FromResult(true);
-        }
-
-        /// <summary>
-        /// Unsubscribes service from a given message type.
-        /// </summary>
-        /// <param name="messageType">Full type of message object.</param>
-        /// <param name="flush">Publish any remaining messages before unsubscribing.</param>
-        public async Task UnsubscribeAsync(Type messageType, bool flush)
-        {
-            if (messageType.FullName != null && Subscriptions.TryGetValue(messageType, out var subscription))
-            {
-                await _subscriberServiceHelper.UnregisterMessageTypeAsync(this, messageType, flush, subscription.Broker);
-                Subscriptions.Remove(messageType);
             }
         }
 
@@ -96,40 +61,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// <returns></returns>
         public Task ReceiveMessageAsync(MessageWrapper messageWrapper)
         {
-            SubscriptionDefinition subscription;
-            var messageType = Assembly.Load(messageWrapper.Assembly).GetType(messageWrapper.MessageType);
-
-            while (true)
-            {
-                if (Subscriptions.TryGetValue(messageType, out subscription))
-                {
-                    break;
-                }
-                messageType = messageType.BaseType;
-
-            }
-            return subscription.Handler(messageWrapper.CreateMessage());
-        }
-
-        /// <summary>
-        /// Registers a handler for a given message type (T).
-        /// </summary>
-        /// <param name="handler"></param>
-        /// <param name="broker"></param>
-        public SubscriberStatelessServiceBase RegisterHandler<T>(Func<T, Task> handler, Uri broker = null) where T : class
-        {
-            var messageType = typeof(T);
-            if (messageType.FullName != null)
-            {
-                Subscriptions[messageType] = new SubscriptionDefinition
-                {
-                    Broker = broker,
-                    MessageType = messageType,
-                    Handler = message => handler((T)message)
-                };
-            }
-
-            return this;
+            return _subscriberServiceHelper.ProccessMessageAsync(messageWrapper);
         }
 
         /// <inheritdoc/>
@@ -146,66 +78,6 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         protected void ServiceEventSourceMessage(string message, [CallerMemberName] string caller = "unknown")
         {
             ServiceEventSourceMessageCallback?.Invoke($"{caller} - {message}");
-        }
-
-        /// <summary>
-        /// Scans this service for attributes of type <see cref="SubscribeAttribute"/> and corresponding methods that can handle
-        /// messages.
-        /// </summary>
-        internal void DiscoverHandlers()
-        {
-            Type taskType = typeof(Task);
-            var handlers = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            foreach (var handlerMethod in handlers)
-            {
-                var subscribeAttribute = handlerMethod.GetCustomAttributes(typeof(SubscribeAttribute), false)
-                    .Cast<SubscribeAttribute>()
-                    .SingleOrDefault();
-
-                if (subscribeAttribute == null) continue;
-
-                var parameters = handlerMethod.GetParameters();
-                if (parameters.Length != 1) continue;
-                if (!taskType.IsAssignableFrom(handlerMethod.ReturnType)) continue;
-
-                //exact match
-                //or overload
-                if (parameters[0].ParameterType == subscribeAttribute.MessageType
-                    || subscribeAttribute.MessageType.IsAssignableFrom(parameters[0].ParameterType))
-                {
-                    Subscriptions[subscribeAttribute.MessageType] = new SubscriptionDefinition
-                    {
-                        MessageType = subscribeAttribute.MessageType,
-                        Handler = m => (Task) handlerMethod.Invoke(this, new[] {m})
-                    };
-                }
-            }
-        }
-    }
-
-    public class SubscriptionDefinition
-    {
-        public Uri Broker { get; set; }
-        public Type MessageType { get; set; }
-        public Func<object, Task> Handler { get; set; }
-    }
-
-    /// <summary>
-    /// Marks a service method as being capable of receiving messages.
-    /// Follows convention that method has signature 'Task MethodName(MessageType message)'
-    /// Polymorphism is supported.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-    public class SubscribeAttribute : Attribute
-    {
-        /// <summary>
-        /// Type of message.
-        /// </summary>
-        public Type MessageType { get; }
-
-        public SubscribeAttribute(Type messageType)
-        {
-            MessageType = messageType;
         }
     }
 }
