@@ -1,7 +1,9 @@
 ﻿using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Fabric;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -9,6 +11,11 @@ namespace ServiceFabric.PubSubActors.Helpers
 {
     public class SubscriberServiceHelper : ISubscriberServiceHelper
     {
+        /// <summary>
+        /// Dictionary of <see cref="SubscriptionDefinition"/>, keyed by the message type name, that this service subscribes to.
+        /// </summary>
+        protected Dictionary<Type, SubscriptionDefinition> Subscriptions { get; } = new Dictionary<Type, SubscriptionDefinition>();
+
         private readonly IBrokerServiceLocator _brokerServiceLocator;
 
         public SubscriberServiceHelper()
@@ -117,6 +124,55 @@ namespace ServiceFabric.PubSubActors.Helpers
             await brokerService.UnregisterServiceSubscriberAsync(serviceReference, messageType.FullName, flushQueue);
         }
 
+        public Dictionary<Type, SubscriptionDefinition> DiscoverMessageHandlers<T>(T service) where T : class
+        {
+            Type taskType = typeof(Task);
+            var handlers = service.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            foreach (var handlerMethod in handlers)
+            {
+                var subscribeAttribute = handlerMethod.GetCustomAttributes(typeof(SubscribeAttribute), false)
+                    .Cast<SubscribeAttribute>()
+                    .SingleOrDefault();
+
+                if (subscribeAttribute == null) continue;
+
+                var parameters = handlerMethod.GetParameters();
+                if (parameters.Length != 1) continue;
+                if (!taskType.IsAssignableFrom(handlerMethod.ReturnType)) continue;
+
+                //exact match
+                //or overload
+                if (parameters[0].ParameterType == subscribeAttribute.MessageType
+                    || subscribeAttribute.MessageType.IsAssignableFrom(parameters[0].ParameterType))
+                {
+                    Subscriptions[subscribeAttribute.MessageType] = new SubscriptionDefinition
+                    {
+                        MessageType = subscribeAttribute.MessageType,
+                        Handler = m => (Task) handlerMethod.Invoke(service, new[] {m})
+                    };
+                }
+            }
+
+            return Subscriptions;
+        }
+
+        public Task ProccessMessageAsync(MessageWrapper messageWrapper)
+        {
+            SubscriptionDefinition subscription;
+            var messageType = Assembly.Load(messageWrapper.Assembly).GetType(messageWrapper.MessageType);
+
+            while (true)
+            {
+                if (Subscriptions.TryGetValue(messageType, out subscription))
+                {
+                    break;
+                }
+                messageType = messageType.BaseType;
+
+            }
+            return subscription.Handler(messageWrapper.CreateMessage());
+        }
+
         /// <summary>
         /// Gets the Partition info for the provided StatefulServiceBase instance.
         /// </summary>
@@ -174,6 +230,32 @@ namespace ServiceFabric.PubSubActors.Helpers
             }
 
             return serviceReference;
+        }
+    }
+
+    public class SubscriptionDefinition
+    {
+        public Uri Broker { get; set; }
+        public Type MessageType { get; set; }
+        public Func<object, Task> Handler { get; set; }
+    }
+
+    /// <summary>
+    /// Marks a service method as being capable of receiving messages.
+    /// Follows convention that method has signature 'Task MethodName(MessageType message)'
+    /// Polymorphism is supported.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+    public class SubscribeAttribute : Attribute
+    {
+        /// <summary>
+        /// Type of message.
+        /// </summary>
+        public Type MessageType { get; }
+
+        public SubscribeAttribute(Type messageType)
+        {
+            MessageType = messageType;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Fabric;
+using System.Fabric.Description;
 using System.Fabric.Query;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Client;
@@ -12,6 +13,7 @@ namespace ServiceFabric.PubSubActors.Helpers
     {
         private static ServicePartitionList _cachedPartitions;
         private readonly FabricClient _fabricClient;
+        private const string _brokerName = nameof(BrokerService);
         private readonly IServiceProxyFactory _serviceProxyFactory;
 
         /// <summary>
@@ -41,8 +43,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         public async Task RegisterAsync(Uri brokerServiceName)
         {
             var activationContext = FabricRuntime.GetActivationContext();
-            var fc = new FabricClient();
-            await fc.PropertyManager.PutPropertyAsync(new Uri(activationContext.ApplicationName), nameof(BrokerService), brokerServiceName.ToString());
+            await _fabricClient.PropertyManager.PutPropertyAsync(new Uri(activationContext.ApplicationName), _brokerName, brokerServiceName.ToString());
         }
 
         /// <inheritdoc />
@@ -50,16 +51,64 @@ namespace ServiceFabric.PubSubActors.Helpers
         {
             try
             {
+                // check current context
                 var activationContext = FabricRuntime.GetActivationContext();
-                var fc = new FabricClient();
-                var property = await fc.PropertyManager.GetPropertyAsync(new Uri(activationContext.ApplicationName), nameof(BrokerService));
-                if (property == null) return null;
-                string value = property.GetValue<string>();
-                return new Uri(value);
+                var property = await GetBrokerPropertyOrNull(activationContext.ApplicationName);
+
+                if (property == null)
+                {
+                    // try to find broker name in other application types
+                    bool hasPages = true;
+                    
+                    var query = new ApplicationQueryDescription() { MaxResults = 50 };
+
+                    while (hasPages)
+                    {
+                        var apps = await _fabricClient.QueryManager.GetApplicationPagedListAsync(query);
+
+                        query.ContinuationToken = apps.ContinuationToken;
+
+                        hasPages = !string.IsNullOrEmpty(query.ContinuationToken);
+
+                        foreach (var app in apps)
+                        {
+                            var found = await LocateAsync(app.ApplicationName);
+                            if (found != null)
+                                return found;
+                        }
+                    }
+                }
+                else
+                {
+                    return new Uri(property.GetValue<string>());
+                }
             }
-            // ReSharper disable once EmptyGeneralCatchClause
             catch
             {
+                ;
+            }
+            return null;
+        }
+
+        private async Task<Uri> LocateAsync(Uri applicationName)
+        {
+            var property = await GetBrokerPropertyOrNull(applicationName);
+
+            return property != null ? new Uri(property.GetValue<string>()) : null;
+        }
+        private async Task<NamedProperty> GetBrokerPropertyOrNull(string applicationName)
+        {
+            return await GetBrokerPropertyOrNull(new Uri(applicationName));
+        }
+        private async Task<NamedProperty> GetBrokerPropertyOrNull(Uri applicationName)
+        {
+            try
+            {
+                return await _fabricClient.PropertyManager.GetPropertyAsync(applicationName, _brokerName);
+            }
+            catch
+            {
+                ;
             }
             return null;
         }

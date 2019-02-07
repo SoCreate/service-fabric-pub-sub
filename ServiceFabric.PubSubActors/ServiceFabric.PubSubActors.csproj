@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>ServiceFabric.PubSubActors adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. How to use this package: https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/README.md</Description>
-    <Copyright>2018</Copyright>
+    <Copyright>2019</Copyright>
     <AssemblyTitle>ServiceFabric.PubSubActors</AssemblyTitle>
     <Version>7.5.0</Version>
     <Authors>Loek Duys</Authors>
