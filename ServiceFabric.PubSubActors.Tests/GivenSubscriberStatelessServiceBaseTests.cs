@@ -81,7 +81,7 @@ namespace ServiceFabric.PubSubActors.Tests
         {
             public bool MethodCalled { get; private set; }
 
-            internal new IEnumerable<SubscriptionDefinition> Subscriptions => base.Subscriptions.Values;
+            internal new IEnumerable<Helpers.SubscriptionDefinition> Subscriptions => base.Subscriptions.Values;
 
             /// <inheritdoc />
             public MockSubscriberStatelessServiceBase(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)

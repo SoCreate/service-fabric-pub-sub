@@ -97,7 +97,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         public Task ReceiveMessageAsync(MessageWrapper messageWrapper)
         {
             SubscriptionDefinition subscription;
-            var messageType = Assembly.Load(messageWrapper.Assembly).GetType(messageWrapper.MessageType);
+            var messageType = Assembly.Load(messageWrapper.Assembly).GetType(messageWrapper.MessageType, true);
 
             while (true)
             {
@@ -175,36 +175,10 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
                     Subscriptions[handlesAttribute.MessageType] = new SubscriptionDefinition
                     {
                         MessageType = handlesAttribute.MessageType,
-                        Handler = m => (Task) method.Invoke(this, new[] {m})
+                        Handler = m => (Task)method.Invoke(this, new[] { m })
                     };
                 }
             }
-        }
-    }
-
-    public class SubscriptionDefinition
-    {
-        public Uri Broker { get; set; }
-        public Type MessageType { get; set; }
-        public Func<object, Task> Handler { get; set; }
-    }
-
-    /// <summary>
-    /// Marks a service method as being capable of receiving messages.
-    /// Follows convention that method has signature 'Task MethodName(MessageType message)'
-    /// Polymorphism is supported.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-    public class SubscribeAttribute : Attribute
-    {
-        /// <summary>
-        /// Type of message.
-        /// </summary>
-        public Type MessageType { get; }
-
-        public SubscribeAttribute(Type messageType)
-        {
-            MessageType = messageType;
         }
     }
 }
