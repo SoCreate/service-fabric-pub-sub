@@ -1,6 +1,8 @@
 ﻿using Microsoft.ServiceFabric.Services.Runtime;
 using System;
 using System.Threading.Tasks;
+using ServiceFabric.PubSubActors.Interfaces;
+using ServiceFabric.PubSubActors.SubscriberServices;
 
 namespace ServiceFabric.PubSubActors.Helpers
 {
@@ -33,5 +35,13 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <returns></returns>
         Task UnregisterMessageTypeAsync(StatefulService service, Type messageType, bool flushQueue,
             Uri brokerServiceName = null);
+
+        Task SubscribeAsync(ISubscriberService service, ServiceReference serviceReference);
+
+        Task ProccessMessageAsync(MessageWrapper messageWrapper);
+
+        ServiceReference CreateServiceReference(StatelessService service, string listenerName = null);
+
+        ServiceReference CreateServiceReference(StatefulService service, string listenerName = null);
     }
 }

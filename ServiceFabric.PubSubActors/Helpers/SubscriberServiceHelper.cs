@@ -5,12 +5,19 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using ServiceFabric.PubSubActors.SubscriberServices;
 
 namespace ServiceFabric.PubSubActors.Helpers
 {
     public class SubscriberServiceHelper : ISubscriberServiceHelper
     {
+        /// <summary>
+        /// When Set, this callback will be used to trace Service messages to.
+        /// </summary>
+        private readonly Action<string> _logCallback;
+
         /// <summary>
         /// Dictionary of <see cref="SubscriptionDefinition"/>, keyed by the message type name, that this service subscribes to.
         /// </summary>
@@ -23,9 +30,16 @@ namespace ServiceFabric.PubSubActors.Helpers
             _brokerServiceLocator = new BrokerServiceLocator();
         }
 
-        public SubscriberServiceHelper(IBrokerServiceLocator brokerServiceLocator)
+        public SubscriberServiceHelper(Action<string> logCallback = null)
+        {
+            _brokerServiceLocator = new BrokerServiceLocator();
+            _logCallback = logCallback;
+        }
+
+        public SubscriberServiceHelper(IBrokerServiceLocator brokerServiceLocator, Action<string> logCallback = null)
         {
             _brokerServiceLocator = brokerServiceLocator;
+            _logCallback = logCallback;
         }
 
         /// <summary>
@@ -36,19 +50,22 @@ namespace ServiceFabric.PubSubActors.Helpers
             Uri brokerServiceName = null, string listenerName = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
+            var serviceReference = CreateServiceReference(service, listenerName);
+            await RegisterMessageTypeAsync(serviceReference, messageType, brokerServiceName);
+        }
+
+        private async Task RegisterMessageTypeAsync(ServiceReference serviceReference, Type messageType, Uri brokerServiceName = null)
+        {
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
             if (brokerServiceName == null)
             {
                 brokerServiceName = await PublisherServiceHelper.DiscoverBrokerServiceNameAsync();
                 if (brokerServiceName == null)
                 {
-                    throw new InvalidOperationException(
-                        "No brokerServiceName was provided or discovered in the current application.");
+                    throw new InvalidOperationException("No brokerServiceName was provided or discovered in the current application.");
                 }
             }
-            var brokerService =
-                await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
-            var serviceReference = CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo, listenerName);
+            var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
             await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName);
         }
 
@@ -72,7 +89,7 @@ namespace ServiceFabric.PubSubActors.Helpers
             }
             var brokerService =
                 await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
-            var serviceReference = CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo);
+            var serviceReference = CreateServiceReference(service);
             await brokerService.UnregisterServiceSubscriberAsync(serviceReference, messageType.FullName, flushQueue);
         }
 
@@ -84,20 +101,8 @@ namespace ServiceFabric.PubSubActors.Helpers
             Uri brokerServiceName = null, string listenerName = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
-            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
-            if (brokerServiceName == null)
-            {
-                brokerServiceName = await _brokerServiceLocator.LocateAsync();
-                if (brokerServiceName == null)
-                {
-                    throw new InvalidOperationException(
-                        "No brokerServiceName was provided or discovered in the current application.");
-                }
-            }
-            var brokerService =
-                await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
-            var serviceReference = CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo, listenerName);
-            await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName);
+            var serviceReference = CreateServiceReference(service, listenerName);
+            await RegisterMessageTypeAsync(serviceReference, messageType, brokerServiceName);
         }
 
         /// <summary>
@@ -120,25 +125,45 @@ namespace ServiceFabric.PubSubActors.Helpers
             }
             var brokerService =
                 await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
-            var serviceReference = CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo);
+            var serviceReference = CreateServiceReference(service);
             await brokerService.UnregisterServiceSubscriberAsync(serviceReference, messageType.FullName, flushQueue);
         }
 
-        public Dictionary<Type, SubscriptionDefinition> DiscoverMessageHandlers<T>(T service) where T : class
+        public async Task SubscribeAsync(ISubscriberService service, ServiceReference serviceReference)
+        {
+            var serviceType = service.GetType();
+            DiscoverMessageHandlers(service);
+
+            foreach (var subscription in Subscriptions.Values)
+            {
+                try
+                {
+                    await RegisterMessageTypeAsync(serviceReference, subscription.MessageType, subscription.Broker);
+                    ServiceEventSourceMessage($"Registered Service:'{serviceType.FullName}' as Subscriber of {subscription.MessageType}.");
+                }
+                catch (Exception ex)
+                {
+                    ServiceEventSourceMessage($"Failed to register Service:'{serviceType.FullName}' as Subscriber of {subscription.MessageType}. Error:'{ex}'.");
+                }
+            }
+
+        }
+
+        private void DiscoverMessageHandlers(ISubscriberService service)
         {
             Type taskType = typeof(Task);
-            var handlers = service.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            foreach (var handlerMethod in handlers)
+            var methods = service.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            foreach (var method in methods)
             {
-                var subscribeAttribute = handlerMethod.GetCustomAttributes(typeof(SubscribeAttribute), false)
+                var subscribeAttribute = method.GetCustomAttributes(typeof(SubscribeAttribute), false)
                     .Cast<SubscribeAttribute>()
                     .SingleOrDefault();
 
                 if (subscribeAttribute == null) continue;
 
-                var parameters = handlerMethod.GetParameters();
+                var parameters = method.GetParameters();
                 if (parameters.Length != 1) continue;
-                if (!taskType.IsAssignableFrom(handlerMethod.ReturnType)) continue;
+                if (!taskType.IsAssignableFrom(method.ReturnType)) continue;
 
                 //exact match
                 //or overload
@@ -148,29 +173,36 @@ namespace ServiceFabric.PubSubActors.Helpers
                     Subscriptions[subscribeAttribute.MessageType] = new SubscriptionDefinition
                     {
                         MessageType = subscribeAttribute.MessageType,
-                        Handler = m => (Task) handlerMethod.Invoke(service, new[] {m})
+                        Handler = m => (Task) method.Invoke(service, new[] {m})
                     };
                 }
             }
-
-            return Subscriptions;
         }
 
         public Task ProccessMessageAsync(MessageWrapper messageWrapper)
         {
-            SubscriptionDefinition subscription;
-            var messageType = Assembly.Load(messageWrapper.Assembly).GetType(messageWrapper.MessageType);
+            var messageType = Assembly.Load(messageWrapper.Assembly).GetType(messageWrapper.MessageType, true);
 
-            while (true)
+            while (messageType != null)
             {
-                if (Subscriptions.TryGetValue(messageType, out subscription))
+                if (Subscriptions.TryGetValue(messageType, out var subscription))
                 {
-                    break;
+                    return subscription.Handler(messageWrapper.CreateMessage());
                 }
                 messageType = messageType.BaseType;
-
             }
-            return subscription.Handler(messageWrapper.CreateMessage());
+
+            return Task.FromResult(true);
+        }
+
+        public ServiceReference CreateServiceReference(StatelessService service, string listenerName = null)
+        {
+            return CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo, listenerName);
+        }
+
+        public ServiceReference CreateServiceReference(StatefulService service, string listenerName = null)
+        {
+            return CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo, listenerName);
         }
 
         /// <summary>
@@ -201,7 +233,6 @@ namespace ServiceFabric.PubSubActors.Helpers
                 .GetValue(serviceBase);
         }
 
-
         /// <summary>
         /// Creates a <see cref="ServiceReference"/> for the provided service context and partition info.
         /// </summary>
@@ -230,6 +261,16 @@ namespace ServiceFabric.PubSubActors.Helpers
             }
 
             return serviceReference;
+        }
+
+        /// <summary>
+        /// Outputs the provided message to the <see cref="_logCallback"/> if it's configured.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="caller"></param>
+        protected void ServiceEventSourceMessage(string message, [CallerMemberName] string caller = "unknown")
+        {
+            _logCallback?.Invoke($"{caller} - {message}");
         }
     }
 
