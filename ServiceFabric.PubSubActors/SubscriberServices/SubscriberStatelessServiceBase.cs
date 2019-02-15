@@ -1,3 +1,4 @@
+using System;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
@@ -18,6 +19,21 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
     {
         private readonly ISubscriberServiceHelper _subscriberServiceHelper;
 
+        /// <summary>
+        /// Meta data about the service that helps the Broker deliver messages to this service.
+        /// </summary>
+        protected ServiceReference ServiceReference;
+
+        /// <summary>
+        /// The message types that this service subscribes to and their respective handler methods.
+        /// </summary>
+        protected Dictionary<Type, Func<object, Task>> Handlers { get; set; } = new Dictionary<Type, Func<object, Task>>();
+
+        /// <summary>
+        /// Set the Listener name so the remote Broker can find this service when there are multiple listeners available.
+        /// </summary>
+        protected string ListenerName { get; set; }
+
         protected SubscriberStatelessServiceBase(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null)
             : base(serviceContext)
         {
@@ -30,7 +46,9 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// <param name="cancellationToken"></param>
         protected override Task OnOpenAsync(CancellationToken cancellationToken)
         {
-            return _subscriberServiceHelper.SubscribeAsync(this, _subscriberServiceHelper.CreateServiceReference(this));
+            Handlers = _subscriberServiceHelper.DiscoverMessageHandlers(this);
+            ServiceReference = _subscriberServiceHelper.CreateServiceReference(this, ListenerName);
+            return Subscribe();
         }
 
         /// <summary>
@@ -38,9 +56,19 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// </summary>
         /// <param name="messageWrapper"></param>
         /// <returns></returns>
-        public Task ReceiveMessageAsync(MessageWrapper messageWrapper)
+        public virtual Task ReceiveMessageAsync(MessageWrapper messageWrapper)
         {
-            return _subscriberServiceHelper.ProccessMessageAsync(messageWrapper);
+            return _subscriberServiceHelper.ProccessMessageAsync(messageWrapper, Handlers);
+        }
+
+        /// <summary>
+        /// Subscribe to all message types that have a handler method marked with a <see cref="SubscribeAttribute"/>.
+        /// This method can be overriden to subscribe manually based on custom logic.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual Task Subscribe()
+        {
+            return _subscriberServiceHelper.SubscribeAsync(ServiceReference, Handlers.Keys);
         }
 
         /// <inheritdoc/>

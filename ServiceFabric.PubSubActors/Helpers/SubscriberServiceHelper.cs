@@ -1,4 +1,4 @@
-﻿using Microsoft.ServiceFabric.Services.Runtime;
+﻿﻿using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -17,11 +17,6 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// When Set, this callback will be used to trace Service messages to.
         /// </summary>
         private readonly Action<string> _logCallback;
-
-        /// <summary>
-        /// Dictionary of <see cref="SubscriptionDefinition"/>, keyed by the message type name, that this service subscribes to.
-        /// </summary>
-        protected Dictionary<Type, SubscriptionDefinition> Subscriptions { get; } = new Dictionary<Type, SubscriptionDefinition>();
 
         private readonly IBrokerServiceLocator _brokerServiceLocator;
 
@@ -129,28 +124,27 @@ namespace ServiceFabric.PubSubActors.Helpers
             await brokerService.UnregisterServiceSubscriberAsync(serviceReference, messageType.FullName, flushQueue);
         }
 
-        public async Task SubscribeAsync(ISubscriberService service, ServiceReference serviceReference)
+        /// <inheritdoc/>
+        public async Task SubscribeAsync(ServiceReference serviceReference, IEnumerable<Type> messageTypes, Uri broker = null)
         {
-            var serviceType = service.GetType();
-            DiscoverMessageHandlers(service);
-
-            foreach (var subscription in Subscriptions.Values)
+            foreach (var messageType in messageTypes)
             {
                 try
                 {
-                    await RegisterMessageTypeAsync(serviceReference, subscription.MessageType, subscription.Broker);
-                    ServiceEventSourceMessage($"Registered Service:'{serviceType.FullName}' as Subscriber of {subscription.MessageType}.");
+                    await RegisterMessageTypeAsync(serviceReference, messageType, broker);
+                    LogMessage($"Registered Service:'{serviceReference.ApplicationName}' as Subscriber of {messageType}.");
                 }
                 catch (Exception ex)
                 {
-                    ServiceEventSourceMessage($"Failed to register Service:'{serviceType.FullName}' as Subscriber of {subscription.MessageType}. Error:'{ex}'.");
+                    LogMessage($"Failed to register Service:'{serviceReference.ApplicationName}' as Subscriber of {messageType}. Error:'{ex}'.");
                 }
             }
-
         }
 
-        private void DiscoverMessageHandlers(ISubscriberService service)
+        /// <inheritdoc/>
+        public Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers(ISubscriberService service)
         {
+            Dictionary<Type, Func<object, Task>> handlers = new Dictionary<Type, Func<object, Task>>();
             Type taskType = typeof(Task);
             var methods = service.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             foreach (var method in methods)
@@ -162,32 +156,24 @@ namespace ServiceFabric.PubSubActors.Helpers
                 if (subscribeAttribute == null) continue;
 
                 var parameters = method.GetParameters();
-                if (parameters.Length != 1) continue;
-                if (!taskType.IsAssignableFrom(method.ReturnType)) continue;
+                if (parameters.Length != 1 || !taskType.IsAssignableFrom(method.ReturnType)) continue;
 
-                //exact match
-                //or overload
-                if (parameters[0].ParameterType == subscribeAttribute.MessageType
-                    || subscribeAttribute.MessageType.IsAssignableFrom(parameters[0].ParameterType))
-                {
-                    Subscriptions[subscribeAttribute.MessageType] = new SubscriptionDefinition
-                    {
-                        MessageType = subscribeAttribute.MessageType,
-                        Handler = m => (Task) method.Invoke(service, new[] {m})
-                    };
-                }
+                handlers[parameters[0].ParameterType] = m => (Task) method.Invoke(service, new[] {m});
             }
+
+            return handlers;
         }
 
-        public Task ProccessMessageAsync(MessageWrapper messageWrapper)
+        /// <inheritdoc/>
+        public Task ProccessMessageAsync(MessageWrapper messageWrapper, Dictionary<Type, Func<object, Task>> handlers)
         {
             var messageType = Assembly.Load(messageWrapper.Assembly).GetType(messageWrapper.MessageType, true);
 
             while (messageType != null)
             {
-                if (Subscriptions.TryGetValue(messageType, out var subscription))
+                if (handlers.TryGetValue(messageType, out var handler))
                 {
-                    return subscription.Handler(messageWrapper.CreateMessage());
+                    return handler(messageWrapper.CreateMessage());
                 }
                 messageType = messageType.BaseType;
             }
@@ -195,11 +181,13 @@ namespace ServiceFabric.PubSubActors.Helpers
             return Task.FromResult(true);
         }
 
+        /// <inheritdoc/>
         public ServiceReference CreateServiceReference(StatelessService service, string listenerName = null)
         {
             return CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo, listenerName);
         }
 
+        /// <inheritdoc/>
         public ServiceReference CreateServiceReference(StatefulService service, string listenerName = null)
         {
             return CreateServiceReference(service.Context, GetServicePartition(service).PartitionInfo, listenerName);
@@ -215,8 +203,8 @@ namespace ServiceFabric.PubSubActors.Helpers
             if (serviceBase == null) throw new ArgumentNullException(nameof(serviceBase));
             return (IStatefulServicePartition)serviceBase
                 .GetType()
-                .GetProperty("Partition", BindingFlags.Instance | BindingFlags.NonPublic)
-                .GetValue(serviceBase);
+                .GetProperty("Partition", BindingFlags.Instance | BindingFlags.NonPublic)?
+                .GetValue(serviceBase) ?? throw new ArgumentNullException($"Unable to find partition information for service: {serviceBase}");
         }
 
         /// <summary>
@@ -229,8 +217,8 @@ namespace ServiceFabric.PubSubActors.Helpers
             if (serviceBase == null) throw new ArgumentNullException(nameof(serviceBase));
             return (IStatelessServicePartition)serviceBase
                 .GetType()
-                .GetProperty("Partition", BindingFlags.Instance | BindingFlags.NonPublic)
-                .GetValue(serviceBase);
+                .GetProperty("Partition", BindingFlags.Instance | BindingFlags.NonPublic)?
+                .GetValue(serviceBase) ?? throw new ArgumentNullException($"Unable to find partition information for service: {serviceBase}");
         }
 
         /// <summary>
@@ -268,17 +256,10 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// </summary>
         /// <param name="message"></param>
         /// <param name="caller"></param>
-        protected void ServiceEventSourceMessage(string message, [CallerMemberName] string caller = "unknown")
+        protected void LogMessage(string message, [CallerMemberName] string caller = "unknown")
         {
             _logCallback?.Invoke($"{caller} - {message}");
         }
-    }
-
-    public class SubscriptionDefinition
-    {
-        public Uri Broker { get; set; }
-        public Type MessageType { get; set; }
-        public Func<object, Task> Handler { get; set; }
     }
 
     /// <summary>
@@ -289,14 +270,5 @@ namespace ServiceFabric.PubSubActors.Helpers
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class SubscribeAttribute : Attribute
     {
-        /// <summary>
-        /// Type of message.
-        /// </summary>
-        public Type MessageType { get; }
-
-        public SubscribeAttribute(Type messageType)
-        {
-            MessageType = messageType;
-        }
     }
 }
