@@ -11,22 +11,22 @@ using System.Threading.Tasks;
 
 namespace ServiceFabric.PubSubActors.PublisherActors
 {
-    /// <summary>
-    /// Common operations of <see cref="ServiceFabric.PubSubActors.PublisherActors"/>
-    /// </summary>
-    public static class PublisherActorExtensions
-    {
-        /// <summary>
-        /// Publish a message.
-        /// </summary>
-        /// <param name="actor"></param>
-        /// <param name="message"></param>
-        /// <param name="applicationName">The name of the SF application that hosts the <see cref="BrokerActor"/>. If not provided, actor.ApplicationName will be used.</param>
-        /// <returns></returns>
-        public static async Task PublishMessageAsync(this ActorBase actor, object message, string applicationName = null)
-        {
-            if (actor == null) throw new ArgumentNullException(nameof(actor));
-            if (message == null) throw new ArgumentNullException(nameof(message));
+	/// <summary>
+	/// Common operations of <see cref="ServiceFabric.PubSubActors.PublisherActors"/>
+	/// </summary>
+	public static class PublisherActorExtensions
+	{
+		/// <summary>
+		/// Publish a message.
+		/// </summary>
+		/// <param name="actor"></param>
+		/// <param name="message"></param>
+		/// <param name="applicationName">The name of the SF application that hosts the <see cref="BrokerActor"/>. If not provided, actor.ApplicationName will be used.</param>
+		/// <returns></returns>
+		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]public static async Task PublishMessageAsync(this ActorBase actor, object message, string applicationName = null)
+		{
+			if (actor == null) throw new ArgumentNullException(nameof(actor));
+			if (message == null) throw new ArgumentNullException(nameof(message));
 
             if (string.IsNullOrWhiteSpace(applicationName))
             {

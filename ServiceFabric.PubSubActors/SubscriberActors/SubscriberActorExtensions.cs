@@ -7,25 +7,26 @@ using System.Threading.Tasks;
 
 namespace ServiceFabric.PubSubActors.SubscriberActors
 {
-    /// <summary>
-    /// Common operations for Actors to become Subscribers
-    /// </summary>
-    public static class SubscriberActorExtensions
-    {
-        /// <summary>
-        /// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.   
-        /// The relay actor will register itself as subscriber to the broker actor, creating a fan out pattern for scalability.
-        /// </summary>
-        /// <param name="actor">The actor registering itself as a subscriber for messages of type <paramref name="messageType"/></param>
-        /// <param name="messageType">The type of message to register for (each message type has its own <see cref="IBrokerActor"/> instance)</param>
-        /// <param name="relayBrokerActorId">The ID of the relay broker to register with. Remember this ID in the caller, if you ever need to unregister.</param>
-        /// <param name="sourceBrokerActorId">(optional) The ID of the source <see cref="IBrokerActor"/> to use as the source for the <paramref name="relayBrokerActorId"/> 
-        /// Remember this ID in the caller, if you ever need to unregister.
-        /// If not specified, the default <see cref="IBrokerActor"/> for the message type <paramref name="messageType"/> will be used.</param>
-        /// <returns></returns>
-        public static async Task RegisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId)
-        {
-            if (actor == null) throw new ArgumentNullException(nameof(actor));
+	/// <summary>
+	/// Common operations for Actors to become Subscribers
+	/// </summary>
+	public static class SubscriberActorExtensions
+	{
+		/// <summary>
+		/// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.
+		/// The relay actor will register itself as subscriber to the broker actor, creating a fan out pattern for scalability.
+		/// </summary>
+		/// <param name="actor">The actor registering itself as a subscriber for messages of type <paramref name="messageType"/></param>
+		/// <param name="messageType">The type of message to register for (each message type has its own <see cref="IBrokerActor"/> instance)</param>
+		/// <param name="relayBrokerActorId">The ID of the relay broker to register with. Remember this ID in the caller, if you ever need to unregister.</param>
+		/// <param name="sourceBrokerActorId">(optional) The ID of the source <see cref="IBrokerActor"/> to use as the source for the <paramref name="relayBrokerActorId"/>
+		/// Remember this ID in the caller, if you ever need to unregister.
+		/// If not specified, the default <see cref="IBrokerActor"/> for the message type <paramref name="messageType"/> will be used.</param>
+		/// <returns></returns>
+		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]public static async Task RegisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId)
+		public static async Task RegisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId)
+		{
+			if (actor == null) throw new ArgumentNullException(nameof(actor));
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
             if (relayBrokerActorId == null) throw new ArgumentNullException(nameof(relayBrokerActorId));
 
@@ -42,18 +43,19 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
             await relayBrokerActor.RegisterSubscriberAsync(ActorReference.Get(actor));
         }
 
-        /// <summary>
-        /// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.   
-        /// </summary>
-        /// <param name="actor">The actor registering itself as a subscriber for messages of type <paramref name="messageType"/></param>
-        /// <param name="messageType">The type of message to unregister for (each message type has its own <see cref="IBrokerActor"/> instance)</param>
-        /// <param name="relayBrokerActorId">The ID of the relay broker to unregister with.</param>
-        /// <param name="sourceBrokerActorId">(optional) The ID of the source <see cref="IBrokerActor"/> that was used as the source for the <paramref name="relayBrokerActorId"/>
-        /// If not specified, the default <see cref="IBrokerActor"/> for the message type <paramref name="messageType"/> will be used.</param>
-        /// <param name="flushQueue">Publish any remaining messages.</param>
-        /// <returns></returns>
-        public static async Task UnregisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId, bool flushQueue)
-        {
+		/// <summary>
+		/// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.
+		/// </summary>
+		/// <param name="actor">The actor registering itself as a subscriber for messages of type <paramref name="messageType"/></param>
+		/// <param name="messageType">The type of message to unregister for (each message type has its own <see cref="IBrokerActor"/> instance)</param>
+		/// <param name="relayBrokerActorId">The ID of the relay broker to unregister with.</param>
+		/// <param name="sourceBrokerActorId">(optional) The ID of the source <see cref="IBrokerActor"/> that was used as the source for the <paramref name="relayBrokerActorId"/>
+		/// If not specified, the default <see cref="IBrokerActor"/> for the message type <paramref name="messageType"/> will be used.</param>
+		/// <param name="flushQueue">Publish any remaining messages.</param>
+		/// <returns></returns>
+		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]public static async Task UnregisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId, bool flushQueue)
+		public static async Task UnregisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId, bool flushQueue)
+		{
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
             if (actor == null) throw new ArgumentNullException(nameof(actor));
             if (relayBrokerActorId == null) throw new ArgumentNullException(nameof(relayBrokerActorId));
@@ -71,12 +73,13 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
             await relayBrokerActor.UnregisterSubscriberAsync(ActorReference.Get(actor), flushQueue);
         }
 
-        /// <summary>
-        /// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/>.
-        /// </summary>
-        /// <returns></returns>
-        public static async Task RegisterMessageTypeAsync(this ActorBase actor, Type messageType)
-        {
+		/// <summary>
+		/// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/>.
+		/// </summary>
+		/// <returns></returns>
+		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]public static async Task RegisterMessageTypeAsync(this ActorBase actor, Type messageType)
+		public static async Task RegisterMessageTypeAsync(this ActorBase actor, Type messageType)
+		{
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
             if (actor == null) throw new ArgumentNullException(nameof(actor));
             ActorId actorId = new ActorId(messageType.FullName);
@@ -84,12 +87,13 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
             await brokerActor.RegisterSubscriberAsync(ActorReference.Get(actor));
         }
 
-        /// <summary>
-        /// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/>.
-        /// </summary>
-        /// <returns></returns>
-        public static async Task UnregisterMessageTypeAsync(this ActorBase actor, Type messageType, bool flushQueue)
-        {
+		/// <summary>
+		/// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/>.
+		/// </summary>
+		/// <returns></returns>
+		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]public static async Task UnregisterMessageTypeAsync(this ActorBase actor, Type messageType, bool flushQueue)
+		public static async Task UnregisterMessageTypeAsync(this ActorBase actor, Type messageType, bool flushQueue)
+		{
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
             if (actor == null) throw new ArgumentNullException(nameof(actor));
             ActorId actorId = new ActorId(messageType.FullName);

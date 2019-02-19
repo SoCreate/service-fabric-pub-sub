@@ -17,6 +17,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
         /// <param name="message"></param>
         /// <param name="applicationName">The name of the SF application that hosts the <see cref="BrokerActor"/>. If not provided, ServiceInitializationParameters.CodePackageActivationContext.ApplicationName will be used.</param>
         /// <returns></returns>
+        [Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]
         public static async Task PublishMessageAsync(this StatelessService service, object message,
             string applicationName = null)
         {
@@ -40,6 +41,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
         /// <param name="message"></param>
         /// <param name="applicationName">The name of the SF application that hosts the <see cref="BrokerActor"/>. If not provided, ServiceInitializationParameters.CodePackageActivationContext.ApplicationName will be used.</param>
         /// <returns></returns>
+        [Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]
         public static async Task PublishMessageAsync(this StatefulServiceBase service, object message,
             string applicationName = null)
         {

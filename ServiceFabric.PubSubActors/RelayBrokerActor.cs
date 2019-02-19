@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using ServiceFabric.PubSubActors.Interfaces;
@@ -9,7 +10,8 @@ namespace ServiceFabric.PubSubActors
 	/// Special implementation of <see cref="BrokerActor"/> that receives and forwards incoming messages.
 	/// </summary>
 	[StatePersistence(StatePersistence.Persisted)]
-	public class RelayBrokerActor : BrokerActor, IRelayBrokerActor
+    [Obsolete("This class will be removed in the next major upgrade. Use the BrokerService instead.")]
+    public class RelayBrokerActor : BrokerActor, IRelayBrokerActor
 	{
         /// <summary>
         /// Initializes a new instance of <see cref="RelayBrokerActor" />

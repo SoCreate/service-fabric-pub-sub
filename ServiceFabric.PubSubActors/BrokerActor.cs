@@ -17,6 +17,7 @@ namespace ServiceFabric.PubSubActors
     /// Every message type results in 1 BrokerActor instance.
     /// </remarks>
     [StatePersistence(StatePersistence.Persisted)]
+    [Obsolete("This class will be removed in the next major upgrade. Use the BrokerService instead.")]
 	public abstract class BrokerActor : Actor, IBrokerActor
 	{
 		private string _messageType;
