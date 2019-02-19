@@ -23,7 +23,7 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
 		/// Remember this ID in the caller, if you ever need to unregister.
 		/// If not specified, the default <see cref="IBrokerActor"/> for the message type <paramref name="messageType"/> will be used.</param>
 		/// <returns></returns>
-		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]public static async Task RegisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId)
+		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]
 		public static async Task RegisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId)
 		{
 			if (actor == null) throw new ArgumentNullException(nameof(actor));
@@ -53,7 +53,7 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
 		/// If not specified, the default <see cref="IBrokerActor"/> for the message type <paramref name="messageType"/> will be used.</param>
 		/// <param name="flushQueue">Publish any remaining messages.</param>
 		/// <returns></returns>
-		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]public static async Task UnregisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId, bool flushQueue)
+		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]
 		public static async Task UnregisterMessageTypeWithRelayBrokerAsync(this ActorBase actor, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId, bool flushQueue)
 		{
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
@@ -77,7 +77,7 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
 		/// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/>.
 		/// </summary>
 		/// <returns></returns>
-		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]public static async Task RegisterMessageTypeAsync(this ActorBase actor, Type messageType)
+		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]
 		public static async Task RegisterMessageTypeAsync(this ActorBase actor, Type messageType)
 		{
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
@@ -91,7 +91,7 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
 		/// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/>.
 		/// </summary>
 		/// <returns></returns>
-		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]public static async Task UnregisterMessageTypeAsync(this ActorBase actor, Type messageType, bool flushQueue)
+		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]
 		public static async Task UnregisterMessageTypeAsync(this ActorBase actor, Type messageType, bool flushQueue)
 		{
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));

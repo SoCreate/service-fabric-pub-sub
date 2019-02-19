@@ -1,17 +1,14 @@
 ﻿using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Fabric;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+using ServiceFabric.PubSubActors.Interfaces;
 
 namespace ServiceFabric.PubSubActors.SubscriberServices
 {
     /// <summary>
-    /// Factory for Stateful subscriber services, automatically registers subscriptions for messages. 
-    /// Use <see cref="SubscribeAttribute"/> to mark receiving methods. 
+    /// Factory for Stateful subscriber services, automatically registers subscriptions for messages.
+    /// Use <see cref="SubscribeAttribute"/> to mark receiving methods.
     /// </summary>
     /// <typeparam name="TService"></typeparam>
     /// <example>
@@ -20,7 +17,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
     /// ctx =&gt; new SubscriberService(ctx)).Build())
     /// .GetAwaiter().GetResult();
     /// </example>
-    public sealed class StatefulSubscriberServiceBootstrapper<TService> : SubscriberServiceBootstrapper
+    public sealed class StatefulSubscriberServiceBootstrapper<TService>
         where TService : StatefulService, ISubscriberService
     {
         private readonly StatefulServiceContext _context;
@@ -50,14 +47,15 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         public TService Build()
         {
             var service = _serviceFactory(_context);
-            SubscribeStateful(_subscriberServiceHelper, service).ConfigureAwait(false).GetAwaiter().GetResult();
+            _subscriberServiceHelper.SubscribeAsync(_subscriberServiceHelper.CreateServiceReference(service), _subscriberServiceHelper.DiscoverMessageHandlers(service).Keys)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
             return service;
         }
     }
 
     /// <summary>
-    /// Factory for Stateful subscriber services, automatically registers subscriptions for messages. 
-    /// Use <see cref="SubscribeAttribute"/> to mark receiving methods. 
+    /// Factory for Stateful subscriber services, automatically registers subscriptions for messages.
+    /// Use <see cref="SubscribeAttribute"/> to mark receiving methods.
     /// </summary>
     /// <typeparam name="TService"></typeparam>
     /// <example>
@@ -66,7 +64,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
     /// ctx =&gt; new SubscriberService(ctx)).Build())
     /// .GetAwaiter().GetResult();
     /// </example>
-    public sealed class StatelessSubscriberServiceBootstrapper<TService> : SubscriberServiceBootstrapper
+    public sealed class StatelessSubscriberServiceBootstrapper<TService>
         where TService : StatelessService, ISubscriberService
     {
         private readonly StatelessServiceContext _context;
@@ -96,84 +94,18 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         public TService Build()
         {
             var service = _serviceFactory(_context);
-            SubscribeStateless(_subscriberServiceHelper, service).ConfigureAwait(false).GetAwaiter().GetResult();
+            // TODO: We have to create a ServiceReference manually because the Partition information doesn't exist yet.  This only works if the ServicePartitionKind is Singleton.
+            var serviceReference = new ServiceReference
+            {
+                ApplicationName = _context.CodePackageActivationContext.ApplicationName,
+                PartitionKind = ServicePartitionKind.Singleton,
+                ServiceUri = _context.ServiceName,
+                PartitionGuid = _context.PartitionId,
+                ListenerName = null
+            };
+            _subscriberServiceHelper.SubscribeAsync(serviceReference, _subscriberServiceHelper.DiscoverMessageHandlers(service).Keys)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
             return service;
-        }
-    }
-
-    /// <summary>
-    /// Shared base for subscriber service bootstrappers.
-    /// </summary>
-    public abstract class SubscriberServiceBootstrapper
-    {
-        /// <summary>
-        /// Discovers all annotated methods.
-        /// </summary>
-        /// <param name="serviceType"></param>
-        /// <returns></returns>
-        public IEnumerable<SubscriptionDefinition> DiscoverSubscribers(Type serviceType)
-        {
-            Type taskType = typeof(Task);
-            var methods = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            foreach (var method in methods)
-            {
-                var handlesAttribute = method.GetCustomAttributes(typeof(SubscribeAttribute), false)
-                    .Cast<SubscribeAttribute>()
-                    .SingleOrDefault();
-
-                if (handlesAttribute == null) continue;
-                var parameters = method.GetParameters();
-                if (parameters.Length != 1) continue;
-                if (!taskType.IsAssignableFrom(method.ReturnType)) continue;
-
-                //exact match
-                //or overload
-                if (parameters[0].ParameterType == handlesAttribute.MessageType
-                    || handlesAttribute.MessageType.IsAssignableFrom(parameters[0].ParameterType))
-                {
-                    yield return new SubscriptionDefinition
-                    {
-                        MessageType = handlesAttribute.MessageType,
-                        Handler = m => (Task) method.Invoke(this, new[] {m})
-                    };
-                }
-            }
-        }
-
-        /// <summary>
-        /// Creates subscriptions for all annotated receive methods.
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <param name="helper"></param>
-        /// <param name="service"></param>
-        /// <returns></returns>
-        public async Task SubscribeStateless<TService>(ISubscriberServiceHelper helper, TService service)
-            where TService : StatelessService, ISubscriberService
-        {
-            var subscriptions = DiscoverSubscribers(service.GetType());
-
-            foreach (var subscription in subscriptions)
-            {
-                await helper.RegisterMessageTypeAsync(service, subscription.MessageType);
-            }
-        }
-
-        /// <summary>
-        /// Creates subscriptions for all annotated receive methods.
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <param name="helper"></param>
-        /// <param name="service"></param>
-        /// <returns></returns>
-        public async Task SubscribeStateful<TService>(ISubscriberServiceHelper helper, TService service)
-            where TService : StatefulService, ISubscriberService
-        {
-            var subscriptions = DiscoverSubscribers(service.GetType());
-
-            foreach (var subscription in subscriptions)
-            {
-                await helper.RegisterMessageTypeAsync(service, subscription.MessageType);
-            }
         }
     }
 }

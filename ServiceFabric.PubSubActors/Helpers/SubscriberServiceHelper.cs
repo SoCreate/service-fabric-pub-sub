@@ -25,15 +25,9 @@ namespace ServiceFabric.PubSubActors.Helpers
             _brokerServiceLocator = new BrokerServiceLocator();
         }
 
-        public SubscriberServiceHelper(Action<string> logCallback = null)
+        public SubscriberServiceHelper(IBrokerServiceLocator brokerServiceLocator = null, Action<string> logCallback = null)
         {
-            _brokerServiceLocator = new BrokerServiceLocator();
-            _logCallback = logCallback;
-        }
-
-        public SubscriberServiceHelper(IBrokerServiceLocator brokerServiceLocator, Action<string> logCallback = null)
-        {
-            _brokerServiceLocator = brokerServiceLocator;
+            _brokerServiceLocator = brokerServiceLocator ?? new BrokerServiceLocator();
             _logCallback = logCallback;
         }
 

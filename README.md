@@ -201,25 +201,21 @@ Now open the file SubscribingStatelessService.cs in the project 'SubscribingStat
 ```
 internal sealed class SubscribingStatelessService : SubscriberStatelessServiceBase
 {
-    public SubscribingStatelessService(StatelessServiceContext serviceContext) : base(serviceContext)
+    public Service(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)
     {
-        // Configure service event source messaging.
-        ServiceEventSourceMessageCallback = message => ServiceEventSource.Current.ServiceMessage(this, message);
-
-        // Register handlers for all types that we are consuming.
-        RegisterHandler<PublishedMessageOne>(HandleMessageOne);
-        RegisterHandler<PublishedMessageTwo>(HandleMessageTwo);
     }
 
+    [Subscribe]
     private Task HandleMessageOne(PublishedMessageOne message)
     {
-        ServiceEventSourceMessage($"Processing PublishedMessageOne: {message.Content} on Instance:'{Context.InstanceId}");
+        ServiceEventSource.Current.ServiceMessage(Context, $"Processing PublishedMessageOne: {message.Content}");
         return Task.CompletedTask;
     }
 
+    [Subscribe]
     private Task HandleMessageTwo(PublishedMessageTwo message)
     {
-        ServiceEventSourceMessage($"Processing PublishedMessageOne: {message.Content} on Instance:'{Context.InstanceId}");
+        ServiceEventSource.Current.ServiceMessage(Context, $"Processing PublishedMessageTwo: {message.Content}");
         return Task.CompletedTask;
     }
 }
