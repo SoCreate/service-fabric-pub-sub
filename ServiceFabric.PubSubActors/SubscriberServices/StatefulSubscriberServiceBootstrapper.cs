@@ -30,15 +30,22 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         private TService _service;
 
         /// <summary>
+        /// Indicates whether the created service subscription should be removed after the service is deleted.
+        /// </summary>
+        public bool AutoUnsubscribe { get; }
+
+        /// <summary>
         /// Creates a new instance.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="serviceFactory"></param>
-        /// <param name="subscriberServiceHelper"></param>
+        /// <param name="context">Service context.</param>
+        /// <param name="serviceFactory">Builds an instance of <typeparamref name="TService"/></param>
+        /// <param name="subscriberServiceHelper">Helps with subscriptions.</param>
+        /// <param name="autoUnsubscribe">Indicates whether the created service subscription should be removed after the service is deleted.</param>
         /// <param name="loggingCallback">Optional logging callback.</param>
         public StatefulSubscriberServiceBootstrapper(StatefulServiceContext context,
             Func<StatefulServiceContext, TService> serviceFactory,
             ISubscriberServiceHelper subscriberServiceHelper = null,
+            bool autoUnsubscribe = false,
             Action<string> loggingCallback = null)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -47,6 +54,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
             _subscriberServiceHelper = subscriberServiceHelper ?? new SubscriberServiceHelper();
             _fabricClient = new FabricClient(FabricClientRole.User);
             _fabricClient.ServiceManager.ServiceNotificationFilterMatched += ServiceNotificationFilterMatched;
+            AutoUnsubscribe = autoUnsubscribe;
         }
 
         /// <summary>
@@ -93,14 +101,18 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
             if (args.Notification.Endpoints.Count == 0)
             {
                 //service deleted
-                await UnregisterSubscriptions()
-                    .ConfigureAwait(false);
+
+                //end notification subscription
+                await _fabricClient.ServiceManager.UnregisterServiceNotificationFilterAsync(_filterId).ConfigureAwait(false);
+                if (AutoUnsubscribe)
+                {
+                    await UnregisterSubscriptions().ConfigureAwait(false);
+                }
             }
             else
             {
                 //service created or moved
-                await RegisterSubscriptions()
-                    .ConfigureAwait(false);
+                await RegisterSubscriptions().ConfigureAwait(false);
             }
         }
 
@@ -117,15 +129,14 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
             catch (Exception ex)
             {
                 _loggingCallback?.Invoke(
-                    $"Failed to register for notifications about service '{_context.ServiceName}'. Error: {ex}");
+                    $"Failed to register subscriptions for service '{_context.ServiceName}'. Error: {ex}");
             }
         }
 
         private async Task UnregisterSubscriptions()
         {
             _loggingCallback?.Invoke($"Unregistering subscriptions for deleted service '{_context.ServiceName}'.");
-            await _fabricClient.ServiceManager.UnregisterServiceNotificationFilterAsync(_filterId)
-                .ConfigureAwait(false);
+            
             try
             {
                 await _subscriberServiceHelper.SubscribeAsync(
@@ -136,9 +147,8 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
             catch (Exception ex)
             {
                 _loggingCallback?.Invoke(
-                    $"Failed to register for notifications about service '{_context.ServiceName}'. Error: {ex}");
+                    $"Failed to unregister subscriptions for service '{_context.ServiceName}'. Error: {ex}");
             }
         }
-
     }
 }

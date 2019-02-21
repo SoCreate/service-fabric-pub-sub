@@ -97,7 +97,7 @@ namespace ServiceFabric.PubSubActors.PublisherActors
             if (message == null) throw new ArgumentNullException(nameof(message));
             if (brokerServiceName == null) throw new ArgumentNullException(nameof(brokerServiceName));
 
-            string messageTypeName = (message.GetType().FullName);
+            string messageTypeName = message.GetType().FullName;
 
             if (_cachedPartitions == null)
             {
