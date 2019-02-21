@@ -17,7 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
-- 7.5.0 Added SubscriberStatelessServiceBase class to simplify managing Stateless Service subscribers.
+- 7.5.0 Added `SubscriberStatelessServiceBase` and `SubscriberStatefulServiceBase` classes to simplify managing Service subscribers.
 - 7.4.3 Broker actor is now obsolete. The interfaces library will be removed as well.
 - 7.4.2 BrokerServiceLocator located in other Application will now be found.
 - 7.4.1 Upgraded nuget packages (SF 3.3.624).  Required updating BrokerServiceLocator to support V2 remoting.
@@ -99,29 +99,7 @@ internal sealed class PubSubService : BrokerService
 }
 ```
 
-### Optional, for 'Large Scale Messaging' using Broker Actors: Add a RelayBrokerActor type to your existing BrokerActor (Not in combination with the BrokerService)
-
-**Preferably, just use the BrokerService/BrokerServiceUnordered**
-
-*Actors of this type will be used to relay messges from a BrokerActor, and relay it to registered subscribers, and every instance will publish one type of message.*
-
-Add a new Stateful Reliable Actor project. Call it 'PubkSubRelayActor'.
-Add Nuget package 'ServiceFabric.PubSubActors' to the 'PubkSubRelayActor' project
-Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to the 'PubkSubRelayActor.Interfaces' project.
-Replace the code of PubkSubRelayActor with the following code:
-
-```javascript
-    [StatePersistence(StatePersistence.Persisted)]
-    [ActorService(Name = nameof(IRelayBrokerActor))]
-    internal class PubkSubRelayActor : RelayBrokerActor, IPubkSubRelayActor
-    {
-        public PubkSubRelayActor()
-        {
-            //optional: provide a logging callback
-            ActorEventSourceMessageCallback = message => ActorEventSource.Current.ActorMessage(this, message);
-        }
-    }
-```
+*Optional, for 'Large Scale Messaging' extend `BrokerServiceUnordered` instead of `BrokerService`*
 
 ### Add a shared data contracts library
 *Add a common datacontracts library for shared messages*
@@ -175,22 +153,8 @@ https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.Pu
 
 
 ### Subscribing to messages using Services
-*Create a sample Service that implements 'ISubscriberService', to become a subscriber to messages.*
-In this example, the Service called 'SubscribingStatefulService' subscribes to messages of Type 'PublishedMessageOne'.
-
-Add a Reliable Stateful Service project called 'SubscribingStatefulService'.
-Add Nuget package 'ServiceFabric.PubSubActors'.
-Add Nuget package 'ServiceFabric.PubSubActors.Interfaces'.
-Add a project reference to the shared data contracts library ('DataContracts').
-
-Now open the file SubscribingStatefulService.cs in the project 'SubscribingStatefulService' and replace the contents with this code:
-(Implement 'ServiceFabric.PubSubActors.SubscriberServices.ISubscriberService' and self-register.)
-
-https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/SubscribingStatefulService/SubscribingStatefulService.cs
-
-### Subscribing to messages using Stateless Service
 *Create a sample Service that extends SubscriberStatelessServiceBase.*
-In this example, the Service called 'SubscribingStatefulService' subscribes to messages of Type 'PublishedMessageOne' and 'PublishedMessageTwo'.
+In this example, the Service called 'SubscribingStatelessService' subscribes to messages of Type 'PublishedMessageOne' and 'PublishedMessageTwo'.
 
 Add a Reliable Stateless Service project called 'SubscribingStatelessService'.
 Add Nuget package 'ServiceFabric.PubSubActors'.
@@ -201,7 +165,7 @@ Now open the file SubscribingStatelessService.cs in the project 'SubscribingStat
 ```
 internal sealed class SubscribingStatelessService : SubscriberStatelessServiceBase
 {
-    public Service(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)
+    public SubscribingStatelessService(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)
     {
     }
 
@@ -220,7 +184,8 @@ internal sealed class SubscribingStatelessService : SubscriberStatelessServiceBa
     }
 }
 ```
-The SubscriberStatelessServiceBase class automatically handles subscribing to the message types that were registered using the RegisterHandler() method and exposes endpoints to subscribe and unsubscribe to message types from external services.
+The SubscriberStatelessServiceBase class automatically handles subscribing to the message types that were registered using the `Subscribe` attribute.
+*To subscribe from a Stateful Service, extend `SubscriberStatefulServiceBase` instead of `SubscribingStatelessServiceBase`*
 
 ### Publishing messages from Actors
 *Create a sample Actor that publishes messages.*
