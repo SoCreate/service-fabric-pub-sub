@@ -87,7 +87,7 @@ Add a new Stateful Reliable Service project. Call it 'PubSubService' (optional).
 Add Nuget package 'ServiceFabric.PubSubActors' to the 'PubSubActor' project
 Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to the project.
 Replace the code of PubSubService with the following code:
-```javascript
+```csharp
 internal sealed class PubSubService : BrokerService
 {
     public PubSubService(StatefulServiceContext context)
@@ -105,7 +105,7 @@ internal sealed class PubSubService : BrokerService
 *Add a common datacontracts library for shared messages*
 
 Add a new Class Library project, call it 'DataContracts', and add these sample message contracts:
-```javascript
+```csharp
 [DataContract]
 public class PublishedMessageOne
 {
@@ -131,7 +131,7 @@ Add a project reference to the shared data contracts library ('DataContracts').
 
 Go to the SubscribingActor.Interfaces project, open the file 'ISubscribingActor' and replace the contents with this code:
 **notice this implements ISubscriberActor from the package 'ServiceFabric.PubSubActors.Interfaces' which adds a Receive method. The additional methods are to enable this actor to be manipulated from the outside.**
-```javascript
+```csharp
 public interface ISubscribingActor : ISubscriberActor
     {
         // allow external callers to manipulate register/unregister on this sample actor:
@@ -162,7 +162,7 @@ Add Nuget package 'ServiceFabric.PubSubActors.Interfaces'.
 Add a project reference to the shared data contracts library ('DataContracts').
 
 Now open the file SubscribingStatelessService.cs in the project 'SubscribingStatelessService' and replace the SubscribingStatelessService class with this code:
-```
+```csharp
 internal sealed class SubscribingStatelessService : SubscriberStatelessServiceBase
 {
     public SubscribingStatelessService(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)
@@ -200,7 +200,7 @@ Add a project reference to the shared data contracts library ('DataContracts').
 Go to the project 'PublishingActor.Interfaces' and open the file IPublishingActor.cs.
 Replace the contents with the code below, to allow external callers to trigger a publish action (not required, Actors can decide for themselves too):
 
-```javascript
+```csharp
 public interface IPublishingActor : IActor
 {
     //enables external callers to trigger a publish action, not required for functionality
@@ -224,7 +224,7 @@ Add a project reference to the shared data contracts library ('DataContracts').
 
 Go to the project 'DataContracts' and add an interface file IPublishingStatelessService.cs.
 Add the code below:
-```javascript
+```csharp
 [ServiceContract]
 public interface IPublishingStatelessService : IService
 {
