@@ -75,9 +75,9 @@ namespace ServiceFabric.PubSubActors.Tests
                 return Task.CompletedTask;
             }
 
-            public Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers(ISubscriberService service)
+            public Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers<T>(T handlerClass) where T : class
             {
-                return _helper.DiscoverMessageHandlers(service);
+                return _helper.DiscoverMessageHandlers(handlerClass);
             }
 
             public Task SubscribeAsync(ServiceReference serviceReference, IEnumerable<Type> messageTypes, Uri broker = null)

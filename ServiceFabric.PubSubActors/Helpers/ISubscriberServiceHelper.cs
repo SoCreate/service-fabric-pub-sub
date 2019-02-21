@@ -40,9 +40,9 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <summary>
         /// Look for Subscribe attributes and create a list of SubscriptionDefinitions to map message types to handlers.
         /// </summary>
-        /// <param name="service"></param>
+        /// <param name="handlerClass"></param>
         /// <returns></returns>
-        Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers(ISubscriberService service);
+        Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers<T>(T handlerClass) where T : class;
 
         /// <summary>
         /// Subscribe to all message types in <paramref name="messageTypes"/>.

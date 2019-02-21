@@ -23,7 +23,8 @@ namespace ServiceFabric.PubSubActors.PublisherActors
 		/// <param name="message"></param>
 		/// <param name="applicationName">The name of the SF application that hosts the <see cref="BrokerActor"/>. If not provided, actor.ApplicationName will be used.</param>
 		/// <returns></returns>
-		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]public static async Task PublishMessageAsync(this ActorBase actor, object message, string applicationName = null)
+		[Obsolete("This method will be removed in the next major upgrade. Use the BrokerService instead.")]
+		public static async Task PublishMessageAsync(this ActorBase actor, object message, string applicationName = null)
 		{
 			if (actor == null) throw new ArgumentNullException(nameof(actor));
 			if (message == null) throw new ArgumentNullException(nameof(message));

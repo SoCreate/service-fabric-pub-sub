@@ -32,7 +32,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         }
 
         /// <summary>
-        /// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
+        /// Registers this Service as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
         /// </summary>
         /// <returns></returns>
         public async Task RegisterMessageTypeAsync(StatelessService service, Type messageType,
@@ -59,7 +59,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         }
 
         /// <summary>
-        /// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
+        /// Unregisters this Service as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
         /// </summary>
         /// <returns></returns>
         public async Task UnregisterMessageTypeAsync(StatelessService service, Type messageType, bool flushQueue,
@@ -126,21 +126,21 @@ namespace ServiceFabric.PubSubActors.Helpers
                 try
                 {
                     await RegisterMessageTypeAsync(serviceReference, messageType, broker);
-                    LogMessage($"Registered Service:'{serviceReference.ApplicationName}' as Subscriber of {messageType}.");
+                    LogMessage($"Registered Service:'{serviceReference.ServiceUri}' as Subscriber of {messageType}.");
                 }
                 catch (Exception ex)
                 {
-                    LogMessage($"Failed to register Service:'{serviceReference.ApplicationName}' as Subscriber of {messageType}. Error:'{ex}'.");
+                    LogMessage($"Failed to register Service:'{serviceReference.ServiceUri}' as Subscriber of {messageType}. Error:'{ex.Message}'.");
                 }
             }
         }
 
         /// <inheritdoc/>
-        public Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers(ISubscriberService service)
+        public Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers<T>(T handlerClass) where T : class
         {
             Dictionary<Type, Func<object, Task>> handlers = new Dictionary<Type, Func<object, Task>>();
             Type taskType = typeof(Task);
-            var methods = service.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            var methods = handlerClass.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             foreach (var method in methods)
             {
                 var subscribeAttribute = method.GetCustomAttributes(typeof(SubscribeAttribute), false)
@@ -152,7 +152,7 @@ namespace ServiceFabric.PubSubActors.Helpers
                 var parameters = method.GetParameters();
                 if (parameters.Length != 1 || !taskType.IsAssignableFrom(method.ReturnType)) continue;
 
-                handlers[parameters[0].ParameterType] = m => (Task) method.Invoke(service, new[] {m});
+                handlers[parameters[0].ParameterType] = m => (Task) method.Invoke(handlerClass, new[] {m});
             }
 
             return handlers;

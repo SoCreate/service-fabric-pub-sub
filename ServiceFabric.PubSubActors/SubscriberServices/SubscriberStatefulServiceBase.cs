@@ -1,21 +1,18 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Fabric;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Interfaces;
-using System.Collections.Generic;
-using System.Fabric;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ServiceFabric.PubSubActors.SubscriberServices
 {
-    /// <remarks>
-    /// Base class for a <see cref="StatelessService"/> that serves as a subscriber of messages from the broker.
-    /// Subscribe to message types and define a handler callback by using the <see cref="SubscribeAttribute"/>.
-    /// </remarks>
-    public abstract class SubscriberStatelessServiceBase : StatelessService, ISubscriberService
+    public class SubscriberStatefulServiceBase : StatefulService, ISubscriberService
     {
         private readonly ISubscriberServiceHelper _subscriberServiceHelper;
 
@@ -29,17 +26,32 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// </summary>
         protected string ListenerName { get; set; }
 
-        protected SubscriberStatelessServiceBase(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null)
+        /// <summary>
+        /// Creates a new instance using the provided context.
+        /// </summary>
+        /// <param name="serviceContext"></param>
+        /// <param name="subscriberServiceHelper"></param>
+        protected SubscriberStatefulServiceBase(StatefulServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null)
             : base(serviceContext)
         {
             _subscriberServiceHelper = subscriberServiceHelper ?? new SubscriberServiceHelper(new BrokerServiceLocator());
         }
 
         /// <summary>
-        /// Subscribes to all message types that have a handler registered using the <see cref="SubscribeAttribute"/>.
+        /// Creates a new instance using the provided context.
         /// </summary>
-        /// <param name="cancellationToken"></param>
-        protected override Task OnOpenAsync(CancellationToken cancellationToken)
+        /// <param name="serviceContext"></param>
+        /// <param name="reliableStateManagerReplica"></param>
+        /// <param name="subscriberServiceHelper"></param>
+        protected SubscriberStatefulServiceBase(StatefulServiceContext serviceContext,
+            IReliableStateManagerReplica2 reliableStateManagerReplica, ISubscriberServiceHelper subscriberServiceHelper = null)
+            : base(serviceContext, reliableStateManagerReplica)
+        {
+            _subscriberServiceHelper = subscriberServiceHelper ?? new SubscriberServiceHelper(new BrokerServiceLocator());
+        }
+
+        /// <inheritdoc/>
+        protected override Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
         {
             Handlers = _subscriberServiceHelper.DiscoverMessageHandlers(this);
             return Subscribe();
@@ -66,10 +78,10 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
             return _subscriberServiceHelper.SubscribeAsync(serviceReference, Handlers.Keys);
         }
 
-        /// <inheritdoc/>
-        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+        /// <inheritdoc />
+        protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return this.CreateServiceRemotingInstanceListeners();
+            return this.CreateServiceRemotingReplicaListeners();
         }
     }
 }
