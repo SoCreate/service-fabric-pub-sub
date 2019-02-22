@@ -30,7 +30,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
             }
 
             var brokerActor = GetBrokerActorForMessage(applicationName, message);
-            var wrapper = MessageWrapper.CreateMessageWrapper(message);
+            var wrapper = message.CreateMessageWrapper();
             await brokerActor.PublishMessageAsync(wrapper);
         }
 
@@ -54,7 +54,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
             }
 
             var brokerActor = GetBrokerActorForMessage(applicationName, message);
-            var wrapper = MessageWrapper.CreateMessageWrapper(message);
+            var wrapper = message.CreateMessageWrapper();
             await brokerActor.PublishMessageAsync(wrapper);
         }
 
@@ -103,7 +103,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
 
             var brokerService =
                 await PublisherActorExtensions.GetBrokerServiceForMessageAsync(message, brokerServiceName);
-            var wrapper = MessageWrapper.CreateMessageWrapper(message);
+            var wrapper = message.CreateMessageWrapper();
             await brokerService.PublishMessageAsync(wrapper);
         }
 
@@ -135,7 +135,7 @@ namespace ServiceFabric.PubSubActors.PublisherServices
 
             var brokerService =
                 await PublisherActorExtensions.GetBrokerServiceForMessageAsync(message, brokerServiceName);
-            var wrapper = MessageWrapper.CreateMessageWrapper(message);
+            var wrapper = message.CreateMessageWrapper();
             await brokerService.PublishMessageAsync(wrapper);
         }
 

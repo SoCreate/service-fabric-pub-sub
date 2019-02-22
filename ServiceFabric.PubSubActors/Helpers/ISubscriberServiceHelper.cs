@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Microsoft.ServiceFabric.Services.Runtime;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Runtime;
+using ServiceFabric.PubSubActors.Interfaces;
+using ServiceFabric.PubSubActors.SubscriberServices;
 
 namespace ServiceFabric.PubSubActors.Helpers
 {
@@ -33,5 +36,45 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <returns></returns>
         Task UnregisterMessageTypeAsync(StatefulService service, Type messageType, bool flushQueue,
             Uri brokerServiceName = null);
+
+        /// <summary>
+        /// Look for Subscribe attributes and create a list of SubscriptionDefinitions to map message types to handlers.
+        /// </summary>
+        /// <param name="handlerClass"></param>
+        /// <returns></returns>
+        Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers<T>(T handlerClass) where T : class;
+
+        /// <summary>
+        /// Subscribe to all message types in <paramref name="messageTypes"/>.
+        /// </summary>
+        /// <param name="serviceReference"></param>
+        /// <param name="messageTypes"></param>
+        /// <param name="broker"></param>
+        /// <returns></returns>
+        Task SubscribeAsync(ServiceReference serviceReference, IEnumerable<Type> messageTypes, Uri broker = null);
+
+        /// <summary>
+        /// Given the <paramref name="messageWrapper"/>, invoke the appropriate handler in <paramref name="handlers"/>.
+        /// </summary>
+        /// <param name="messageWrapper"></param>
+        /// <param name="handlers"></param>
+        /// <returns></returns>
+        Task ProccessMessageAsync(MessageWrapper messageWrapper, Dictionary<Type, Func<object, Task>> handlers);
+
+        /// <summary>
+        /// Creates a ServiceReference object for a StatelessService.  Used for subscribing/unsubscribing.
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="listenerName"></param>
+        /// <returns></returns>
+        ServiceReference CreateServiceReference(StatelessService service, string listenerName = null);
+
+        /// <summary>
+        /// Creates a ServiceReference object for a StatelessService.  Used for subscribing/unsubscribing.
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="listenerName"></param>
+        /// <returns></returns>
+        ServiceReference CreateServiceReference(StatefulService service, string listenerName = null);
     }
 }

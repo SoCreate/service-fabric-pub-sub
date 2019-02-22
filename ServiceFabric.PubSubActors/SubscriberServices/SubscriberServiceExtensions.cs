@@ -1,42 +1,41 @@
-﻿using System;
+﻿using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Client;
+using Microsoft.ServiceFabric.Services.Runtime;
+using ServiceFabric.PubSubActors.Interfaces;
+using System;
 using System.Fabric;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Actors;
-using Microsoft.ServiceFabric.Actors.Client;
-using Microsoft.ServiceFabric.Services.Runtime;
-using Newtonsoft.Json;
-using ServiceFabric.PubSubActors.Interfaces;
 
 namespace ServiceFabric.PubSubActors.SubscriberServices
 {
     public static class SubscriberServiceExtensions
     {
         /// <summary>
-        /// Deserializes the provided <paramref name="message"/> Payload into an instance of type <typeparam name="TResult"></typeparam>
+        /// Deserializes the provided <paramref name="messageWrapper"/> Payload into an instance of type <typeparam name="TResult"></typeparam>
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
-        public static TResult Deserialize<TResult>(this StatefulServiceBase service, MessageWrapper message)
+        public static TResult Deserialize<TResult>(this StatefulServiceBase service, MessageWrapper messageWrapper)
         {
-            if (message == null) throw new ArgumentNullException(nameof(message));
-            if (string.IsNullOrWhiteSpace(message.Payload)) throw new ArgumentNullException(nameof(message.Payload));
+            if (messageWrapper == null) throw new ArgumentNullException(nameof(messageWrapper));
+            if (string.IsNullOrWhiteSpace(messageWrapper.Payload)) throw new ArgumentNullException(nameof(messageWrapper.Payload));
 
-            var payload = JsonConvert.DeserializeObject<TResult>(message.Payload);
+            var payload = messageWrapper.CreateMessage<TResult>();
             return payload;
         }
 
         /// <summary>
-        /// Deserializes the provided <paramref name="message"/> Payload into an instance of type <typeparam name="TResult"></typeparam>
+        /// Deserializes the provided <paramref name="messageWrapper"/> Payload into an instance of type <typeparam name="TResult"></typeparam>
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
-        public static TResult Deserialize<TResult>(this StatelessService service, MessageWrapper message)
+        public static TResult Deserialize<TResult>(this StatelessService service, MessageWrapper messageWrapper)
         {
-            if (message == null) throw new ArgumentNullException(nameof(message));
-            if (string.IsNullOrWhiteSpace(message.Payload)) throw new ArgumentNullException(nameof(message.Payload));
+            if (messageWrapper == null) throw new ArgumentNullException(nameof(messageWrapper));
+            if (string.IsNullOrWhiteSpace(messageWrapper.Payload)) throw new ArgumentNullException(nameof(messageWrapper.Payload));
 
-            var payload = JsonConvert.DeserializeObject<TResult>(message.Payload);
+            var payload = messageWrapper.CreateMessage<TResult>();
             return payload;
         }
 
@@ -101,13 +100,13 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         }
 
         /// <summary>
-        /// Registers a Service as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.   
+        /// Registers a Service as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.
         /// The relay actor will register itself as subscriber to the broker actor, creating a fan out pattern for scalability.
         /// </summary>
         /// <param name="service">The service registering itself as a subscriber for messages of type <paramref name="messageType"/></param>
         /// <param name="messageType">The type of message to register for (each message type has its own <see cref="IBrokerActor"/> instance)</param>
         /// <param name="relayBrokerActorId">The ID of the relay broker to register with. Remember this ID in the caller, if you ever need to unregister.</param>
-        /// <param name="sourceBrokerActorId">(optional) The ID of the source <see cref="IBrokerActor"/> to use as the source for the <paramref name="relayBrokerActorId"/> 
+        /// <param name="sourceBrokerActorId">(optional) The ID of the source <see cref="IBrokerActor"/> to use as the source for the <paramref name="relayBrokerActorId"/>
         /// Remember this ID in the caller, if you ever need to unregister.
         /// If not specified, the default <see cref="IBrokerActor"/> for the message type <paramref name="messageType"/> will be used.</param>
         /// <param name="listenerName">(optional) The name of the listener that is used to communicate with the service</param>
@@ -123,13 +122,13 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         }
 
         /// <summary>
-        /// Registers a Service as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.   
+        /// Registers a Service as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.
         /// The relay actor will register itself as subscriber to the broker actor, creating a fan out pattern for scalability.
         /// </summary>
         /// <param name="service">The service registering itself as a subscriber for messages of type <paramref name="messageType"/></param>
         /// <param name="messageType">The type of message to register for (each message type has its own <see cref="IBrokerActor"/> instance)</param>
         /// <param name="relayBrokerActorId">The ID of the relay broker to register with. Remember this ID in the caller, if you ever need to unregister.</param>
-        /// <param name="sourceBrokerActorId">(optional) The ID of the source <see cref="IBrokerActor"/> to use as the source for the <paramref name="relayBrokerActorId"/> 
+        /// <param name="sourceBrokerActorId">(optional) The ID of the source <see cref="IBrokerActor"/> to use as the source for the <paramref name="relayBrokerActorId"/>
         /// Remember this ID in the caller, if you ever need to unregister.
         /// If not specified, the default <see cref="IBrokerActor"/> for the message type <paramref name="messageType"/> will be used.</param>
         /// <param name="listenerName">(optional) The name of the listener that is used to communicate with the service</param>
@@ -145,7 +144,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         }
 
         /// <summary>
-        /// Unregisters a Service as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.   
+        /// Unregisters a Service as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.
         /// </summary>
         /// <param name="service">The service registering itself as a subscriber for messages of type <paramref name="messageType"/></param>
         /// <param name="messageType">The type of message to unregister for (each message type has its own <see cref="IBrokerActor"/> instance)</param>
@@ -165,7 +164,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         }
 
         /// <summary>
-        /// Unregisters a Service as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.   
+        /// Unregisters a Service as a subscriber for messages of type <paramref name="messageType"/> using a <see cref="IRelayBrokerActor"/> approach.
         /// </summary>
         /// <param name="service">The service registering itself as a subscriber for messages of type <paramref name="messageType"/></param>
         /// <param name="messageType">The type of message to unregister for (each message type has its own <see cref="IBrokerActor"/> instance)</param>
@@ -359,7 +358,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         private static async Task RegisterMessageTypeWithRelayBrokerAsync(ServiceContext context, ServicePartitionInformation info, Type messageType, ActorId relayBrokerActorId, ActorId sourceBrokerActorId, string listenerName = null)
         {
             var serviceReference = CreateServiceReference(context, info, listenerName);
-        
+
             if (sourceBrokerActorId == null)
             {
                 sourceBrokerActorId = new ActorId(messageType.FullName);

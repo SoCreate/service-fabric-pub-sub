@@ -17,6 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 7.5.0 Major upgrade. Added `SubscriberStatelessServiceBase`,`SubscriberStatefulServiceBase`, `StatefulSubscriberServiceBootstrapper` and `StatelessSubscriberServiceBootstrapper` classes to simplify managing subscriber services. Thanks @danadesrosiers.
 - 7.4.3 Broker actor is now obsolete. The interfaces library will be removed as well.
 - 7.4.2 BrokerServiceLocator located in other Application will now be found.
 - 7.4.1 Upgraded nuget packages (SF 3.3.624).  Required updating BrokerServiceLocator to support V2 remoting.
@@ -86,7 +87,7 @@ Add a new Stateful Reliable Service project. Call it 'PubSubService' (optional).
 Add Nuget package 'ServiceFabric.PubSubActors' to the 'PubSubActor' project
 Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to the project.
 Replace the code of PubSubService with the following code:
-```javascript
+```csharp
 internal sealed class PubSubService : BrokerService
 {
     public PubSubService(StatefulServiceContext context)
@@ -98,35 +99,13 @@ internal sealed class PubSubService : BrokerService
 }
 ```
 
-### Optional, for 'Large Scale Messaging' using Broker Actors: Add a RelayBrokerActor type to your existing BrokerActor (Not in combination with the BrokerService)
-
-**Preferably, just use the BrokerService/BrokerServiceUnordered**
-
-*Actors of this type will be used to relay messges from a BrokerActor, and relay it to registered subscribers, and every instance will publish one type of message.*
-
-Add a new Stateful Reliable Actor project. Call it 'PubkSubRelayActor'.
-Add Nuget package 'ServiceFabric.PubSubActors' to the 'PubkSubRelayActor' project
-Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to the 'PubkSubRelayActor.Interfaces' project.
-Replace the code of PubkSubRelayActor with the following code:
-
-```javascript
-    [StatePersistence(StatePersistence.Persisted)]
-    [ActorService(Name = nameof(IRelayBrokerActor))]
-    internal class PubkSubRelayActor : RelayBrokerActor, IPubkSubRelayActor
-    {
-        public PubkSubRelayActor()
-        {
-            //optional: provide a logging callback
-            ActorEventSourceMessageCallback = message => ActorEventSource.Current.ActorMessage(this, message);
-        }
-    }
-```
+*Optional, for 'Large Scale Messaging' extend `BrokerServiceUnordered` instead of `BrokerService`*
 
 ### Add a shared data contracts library
 *Add a common datacontracts library for shared messages*
 
 Add a new Class Library project, call it 'DataContracts', and add these sample message contracts:
-```javascript
+```csharp
 [DataContract]
 public class PublishedMessageOne
 {
@@ -152,7 +131,7 @@ Add a project reference to the shared data contracts library ('DataContracts').
 
 Go to the SubscribingActor.Interfaces project, open the file 'ISubscribingActor' and replace the contents with this code:
 **notice this implements ISubscriberActor from the package 'ServiceFabric.PubSubActors.Interfaces' which adds a Receive method. The additional methods are to enable this actor to be manipulated from the outside.**
-```javascript
+```csharp
 public interface ISubscribingActor : ISubscriberActor
     {
         // allow external callers to manipulate register/unregister on this sample actor:
@@ -173,19 +152,96 @@ Open the file 'SubscribingActor.cs' and replace the contents with the code below
 https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/SubscribingActor/SubscribingActor.cs
 
 
-### Subscribing to messages using Services
-*Create a sample Service that implements 'ISubscriberService', to become a subscriber to messages.*
-In this example, the Service called 'SubscribingStatefulService' subscribes to messages of Type 'PublishedMessageOne'.
+### Subscribing to messages using Services using our base class
 
-Add a Reliable Stateful Service project called 'SubscribingStatefulService'.
+*Create a sample Service that extends SubscriberStatelessServiceBase.*
+In this example, the Service called 'SubscribingStatelessService' subscribes to messages of Type 'PublishedMessageOne' and 'PublishedMessageTwo'.
+
+Add a Reliable Stateless Service project called 'SubscribingStatelessService'.
 Add Nuget package 'ServiceFabric.PubSubActors'.
 Add Nuget package 'ServiceFabric.PubSubActors.Interfaces'.
 Add a project reference to the shared data contracts library ('DataContracts').
 
-Now open the file SubscribingStatefulService.cs in the project 'SubscribingStatefulService' and replace the contents with this code:
-(Implement 'ServiceFabric.PubSubActors.SubscriberServices.ISubscriberService' and self-register.)
+Now open the file SubscribingStatelessService.cs in the project 'SubscribingStatelessService' and replace the SubscribingStatelessService class with this code:
+```csharp
+internal sealed class SubscribingStatelessService : SubscriberStatelessServiceBase
+{
+    public SubscribingStatelessService(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)
+    {
+    }
 
-https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/SubscribingStatefulService/SubscribingStatefulService.cs
+    [Subscribe]
+    private Task HandleMessageOne(PublishedMessageOne message)
+    {
+        ServiceEventSource.Current.ServiceMessage(Context, $"Processing PublishedMessageOne: {message.Content}");
+        return Task.CompletedTask;
+    }
+
+    [Subscribe]
+    private Task HandleMessageTwo(PublishedMessageTwo message)
+    {
+        ServiceEventSource.Current.ServiceMessage(Context, $"Processing PublishedMessageTwo: {message.Content}");
+        return Task.CompletedTask;
+    }
+}
+```
+The SubscriberStatelessServiceBase class automatically handles subscribing to the message types that were registered using the `Subscribe` attribute when the service is 'opened'.
+*To subscribe from a Stateful Service, extend `SubscriberStatefulServiceBase` instead of `SubscribingStatelessServiceBase`*
+
+### Subscribing to messages using Services without using our base class
+
+If you don't want to inherit from our base classes, you can use the `StatefulSubscriberServiceBootstrapper` and `StatelessSubscriberServiceBootstrapper` as a wrapper around the service factory delegate in `Program.cs`.
+
+The code in `Program` will look like this:
+
+```csharp
+    var helper = new SubscriberServiceHelper();
+    ServiceRuntime.RegisterServiceAsync("SubscribingStatelessServiceType",
+        context => new StatelessSubscriberServiceBootstrapper<SubscribingStatelessService >(context, ctx => new SubscribingStatelessService (ctx, helper), helper).Build())
+        .GetAwaiter().GetResult();
+```
+
+The service looks like this:
+
+```csharp
+internal sealed class SubscribingStatelessService : StatelessService, ISubscriberService
+{
+    public SubscribingStatelessService(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)
+    {
+    }
+
+    public Task ReceiveMessageAsync(MessageWrapper messageWrapper)
+    {
+        // Automatically delegates work to annotated methods withing this class.
+        return _subscriberServiceHelper.ProccessMessageAsync(messageWrapper);
+    }
+
+    protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+    {
+        return this.CreateServiceRemotingInstanceListeners();
+    }
+
+    [Subscribe]
+    private Task HandleMessageOne(PublishedMessageOne message)
+    {
+        ServiceEventSource.Current.ServiceMessage(Context, $"Processing PublishedMessageOne: {message.Content}");
+        return Task.CompletedTask;
+    }
+
+    [Subscribe]
+    private Task HandleMessageTwo(PublishedMessageTwo message)
+    {
+        ServiceEventSource.Current.ServiceMessage(Context, $"Processing PublishedMessageTwo: {message.Content}");
+        return Task.CompletedTask;
+    }
+}
+```
+
+Once the service gets an endpoint, it will automatically create subscriptions for all methods annotated with the `Subscribe` attribute.
+For stateful services, use the `StatefulSubscriberServiceBootstrapper`.
+
+*Check the Demo project for a working reference implementation.*
+
 
 ### Publishing messages from Actors
 *Create a sample Actor that publishes messages.*
@@ -200,7 +256,7 @@ Add a project reference to the shared data contracts library ('DataContracts').
 Go to the project 'PublishingActor.Interfaces' and open the file IPublishingActor.cs.
 Replace the contents with the code below, to allow external callers to trigger a publish action (not required, Actors can decide for themselves too):
 
-```javascript
+```csharp
 public interface IPublishingActor : IActor
 {
     //enables external callers to trigger a publish action, not required for functionality
@@ -224,7 +280,7 @@ Add a project reference to the shared data contracts library ('DataContracts').
 
 Go to the project 'DataContracts' and add an interface file IPublishingStatelessService.cs.
 Add the code below:
-```javascript
+```csharp
 [ServiceContract]
 public interface IPublishingStatelessService : IService
 {

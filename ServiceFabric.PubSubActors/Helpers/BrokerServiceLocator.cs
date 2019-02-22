@@ -139,7 +139,7 @@ namespace ServiceFabric.PubSubActors.Helpers
             if (message == null) throw new ArgumentNullException(nameof(message));
             if (brokerServiceName == null) throw new ArgumentNullException(nameof(brokerServiceName));
 
-            string messageTypeName = (message.GetType().FullName);
+            string messageTypeName = message.GetType().FullName;
             return GetPartitionForMessageAsync(messageTypeName, brokerServiceName);
         }
 

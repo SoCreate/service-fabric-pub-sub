@@ -42,7 +42,7 @@ namespace ServiceFabric.PubSubActors.Helpers
                 }
             }
             
-            var wrapper = MessageWrapper.CreateMessageWrapper(message);
+            var wrapper = message.CreateMessageWrapper();
             var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(message, brokerServiceName);            
             await brokerService.PublishMessageAsync(wrapper);
         }
