@@ -17,7 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
-- 7.5.0 Added `SubscriberStatelessServiceBase` and `SubscriberStatefulServiceBase` classes to simplify managing Service subscribers.
+- 7.5.0 Major upgrade. Added `SubscriberStatelessServiceBase`,`SubscriberStatefulServiceBase`, `StatefulSubscriberServiceBootstrapper` and `StatelessSubscriberServiceBootstrapper` classes to simplify managing subscriber services. Thanks @danadesrosiers.
 - 7.4.3 Broker actor is now obsolete. The interfaces library will be removed as well.
 - 7.4.2 BrokerServiceLocator located in other Application will now be found.
 - 7.4.1 Upgraded nuget packages (SF 3.3.624).  Required updating BrokerServiceLocator to support V2 remoting.
@@ -152,7 +152,8 @@ Open the file 'SubscribingActor.cs' and replace the contents with the code below
 https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/SubscribingActor/SubscribingActor.cs
 
 
-### Subscribing to messages using Services
+### Subscribing to messages using Services using our base class
+
 *Create a sample Service that extends SubscriberStatelessServiceBase.*
 In this example, the Service called 'SubscribingStatelessService' subscribes to messages of Type 'PublishedMessageOne' and 'PublishedMessageTwo'.
 
@@ -184,8 +185,63 @@ internal sealed class SubscribingStatelessService : SubscriberStatelessServiceBa
     }
 }
 ```
-The SubscriberStatelessServiceBase class automatically handles subscribing to the message types that were registered using the `Subscribe` attribute.
+The SubscriberStatelessServiceBase class automatically handles subscribing to the message types that were registered using the `Subscribe` attribute when the service is 'opened'.
 *To subscribe from a Stateful Service, extend `SubscriberStatefulServiceBase` instead of `SubscribingStatelessServiceBase`*
+
+### Subscribing to messages using Services without using our base class
+
+If you don't want to inherit from our base classes, you can use the `StatefulSubscriberServiceBootstrapper` and `StatelessSubscriberServiceBootstrapper` as a wrapper around the service factory delegate in `Program.cs`.
+
+The code in `Program` will look like this:
+
+```csharp
+    var helper = new SubscriberServiceHelper();
+    ServiceRuntime.RegisterServiceAsync("SubscribingStatelessServiceType",
+        context => new StatelessSubscriberServiceBootstrapper<SubscribingStatelessService >(context, ctx => new SubscribingStatelessService (ctx, helper), helper).Build())
+        .GetAwaiter().GetResult();
+```
+
+The service looks like this:
+
+```csharp
+internal sealed class SubscribingStatelessService : StatelessService, ISubscriberService
+{
+    public SubscribingStatelessService(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)
+    {
+    }
+
+    public Task ReceiveMessageAsync(MessageWrapper messageWrapper)
+    {
+        // Automatically delegates work to annotated methods withing this class.
+        return _subscriberServiceHelper.ProccessMessageAsync(messageWrapper);
+    }
+
+    protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+    {
+        return this.CreateServiceRemotingInstanceListeners();
+    }
+
+    [Subscribe]
+    private Task HandleMessageOne(PublishedMessageOne message)
+    {
+        ServiceEventSource.Current.ServiceMessage(Context, $"Processing PublishedMessageOne: {message.Content}");
+        return Task.CompletedTask;
+    }
+
+    [Subscribe]
+    private Task HandleMessageTwo(PublishedMessageTwo message)
+    {
+        ServiceEventSource.Current.ServiceMessage(Context, $"Processing PublishedMessageTwo: {message.Content}");
+        return Task.CompletedTask;
+    }
+}
+```
+
+Once the service gets an endpoint, it will automatically create subscriptions for all methods annotated with the `Subscribe` attribute.
+For stateful services, use the `StatefulSubscriberServiceBootstrapper`.
+
+*Check the Demo project for a working reference implementation.*
+
 
 ### Publishing messages from Actors
 *Create a sample Actor that publishes messages.*
