@@ -138,24 +138,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <inheritdoc/>
         public Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers<T>(T handlerClass) where T : class
         {
-            Dictionary<Type, Func<object, Task>> handlers = new Dictionary<Type, Func<object, Task>>();
-            Type taskType = typeof(Task);
-            var methods = handlerClass.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            foreach (var method in methods)
-            {
-                var subscribeAttribute = method.GetCustomAttributes(typeof(SubscribeAttribute), false)
-                    .Cast<SubscribeAttribute>()
-                    .SingleOrDefault();
-
-                if (subscribeAttribute == null) continue;
-
-                var parameters = method.GetParameters();
-                if (parameters.Length != 1 || !taskType.IsAssignableFrom(method.ReturnType)) continue;
-
-                handlers[parameters[0].ParameterType] = m => (Task) method.Invoke(handlerClass, new[] {m});
-            }
-
-            return handlers;
+            return ((ISubscriber)handlerClass).DiscoverMessageHandlers();
         }
 
         /// <inheritdoc/>
@@ -254,15 +237,5 @@ namespace ServiceFabric.PubSubActors.Helpers
         {
             _logCallback?.Invoke($"{caller} - {message}");
         }
-    }
-
-    /// <summary>
-    /// Marks a service method as being capable of receiving messages.
-    /// Follows convention that method has signature 'Task MethodName(MessageType message)'
-    /// Polymorphism is supported.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-    public class SubscribeAttribute : Attribute
-    {
     }
 }

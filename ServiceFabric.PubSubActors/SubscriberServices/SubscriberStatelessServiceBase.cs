@@ -6,6 +6,7 @@ using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Interfaces;
 using System.Collections.Generic;
 using System.Fabric;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,33 +16,29 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
     /// Base class for a <see cref="StatelessService"/> that serves as a subscriber of messages from the broker.
     /// Subscribe to message types and define a handler callback by using the <see cref="SubscribeAttribute"/>.
     /// </remarks>
-    public abstract class SubscriberStatelessServiceBase : StatelessService, ISubscriberService
+    public abstract class SubscriberStatelessServiceBase : StatelessService, ISubscriberService, ISubscriber
     {
-        private readonly ISubscriberServiceHelper _subscriberServiceHelper;
+        private readonly IBrokerClient _brokerClient;
 
         /// <summary>
-        /// The message types that this service subscribes to and their respective handler methods.
+        /// When Set, this callback will be used to log messages to.
         /// </summary>
-        protected Dictionary<Type, Func<object, Task>> Handlers { get; set; } = new Dictionary<Type, Func<object, Task>>();
+        protected Action<string> Logger { get; set; }
 
         /// <summary>
         /// Set the Listener name so the remote Broker can find this service when there are multiple listeners available.
         /// </summary>
         protected string ListenerName { get; set; }
 
-        protected SubscriberStatelessServiceBase(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null)
+        protected SubscriberStatelessServiceBase(StatelessServiceContext serviceContext, IBrokerClient brokerClient = null)
             : base(serviceContext)
         {
-            _subscriberServiceHelper = subscriberServiceHelper ?? new SubscriberServiceHelper(new BrokerServiceLocator());
+            _brokerClient = brokerClient ?? new BrokerClient();
         }
 
-        /// <summary>
-        /// Subscribes to all message types that have a handler registered using the <see cref="SubscribeAttribute"/>.
-        /// </summary>
-        /// <param name="cancellationToken"></param>
+        /// <inheritdoc/>
         protected override Task OnOpenAsync(CancellationToken cancellationToken)
         {
-            Handlers = _subscriberServiceHelper.DiscoverMessageHandlers(this);
             return Subscribe();
         }
 
@@ -52,7 +49,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// <returns></returns>
         public virtual Task ReceiveMessageAsync(MessageWrapper messageWrapper)
         {
-            return _subscriberServiceHelper.ProccessMessageAsync(messageWrapper, Handlers);
+            return _brokerClient.ProcessMessageAsync(messageWrapper);
         }
 
         /// <summary>
@@ -60,16 +57,36 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// This method can be overriden to subscribe manually based on custom logic.
         /// </summary>
         /// <returns></returns>
-        protected virtual Task Subscribe()
+        protected virtual async Task Subscribe()
         {
-            var serviceReference = _subscriberServiceHelper.CreateServiceReference(this, ListenerName);
-            return _subscriberServiceHelper.SubscribeAsync(serviceReference, Handlers.Keys);
+            foreach (var handler in this.DiscoverMessageHandlers())
+            {
+                try
+                {
+                    await _brokerClient.SubscribeAsync(this, handler.Key, handler.Value, ListenerName);
+                    LogMessage($"Registered Service:'{Context.ServiceName}' as Subscriber of {handler.Key}.");
+                }
+                catch (Exception ex)
+                {
+                    LogMessage($"Failed to register Service:'{Context.ServiceName}' as Subscriber of {handler.Key}. Error:'{ex.Message}'.");
+                }
+            }
         }
 
         /// <inheritdoc/>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();
+        }
+
+        /// <summary>
+        /// Outputs the provided message to the <see cref="Logger"/> if it's configured.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="caller"></param>
+        protected void LogMessage(string message, [CallerMemberName] string caller = "unknown")
+        {
+            Logger?.Invoke($"{caller} - {message}");
         }
     }
 }

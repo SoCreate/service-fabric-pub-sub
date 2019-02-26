@@ -41,7 +41,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="message"></param>
         /// <param name="brokerServiceName">Uri of BrokerService instance</param>
         /// <returns></returns>
-        Task<IBrokerService> GetBrokerServiceForMessageAsync(object message, Uri brokerServiceName);
+        Task<IBrokerService> GetBrokerServiceForMessageAsync(object message, Uri brokerServiceName = null);
 
         /// <summary>
         /// Gets the <see cref="IBrokerService"/> instance for the provided <paramref name="messageTypeName"/>
@@ -49,6 +49,6 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="messageTypeName">Full type name of message object.</param>
         /// <param name="brokerServiceName">Uri of BrokerService instance</param>
         /// <returns></returns>
-        Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName, Uri brokerServiceName);
+        Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName, Uri brokerServiceName = null);
     }
 }

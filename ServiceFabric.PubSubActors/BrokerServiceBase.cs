@@ -13,17 +13,15 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Interfaces;
-using ServiceFabric.PubSubActors.PublisherActors;
 using ServiceFabric.PubSubActors.State;
 using ServiceFabric.PubSubActors.SubscriberServices;
 
 namespace ServiceFabric.PubSubActors
 {
     /// <remarks>
-    /// Base class for a <see cref="StatefulService"/> that serves as a Broker that accepts messages 
-    /// from Actors & Services calling <see cref="PublisherActorExtensions.PublishMessageAsync"/>
-    /// and forwards them to <see cref="ISubscriberActor"/> Actors and <see cref="ISubscriberService"/> Services.
-    /// Every message type is mapped to one of the partitions of this service.
+    /// Base class for a <see cref="StatefulService"/> that serves as a Broker that accepts messages from Actors &
+    /// Services and forwards them to <see cref="ISubscriberActor"/> Actors and <see cref="ISubscriberService"/>
+    /// Services.  Every message type is mapped to one of the partitions of this service.
     /// </remarks>
     public abstract class BrokerServiceBase : StatefulService, IBrokerService
     {
@@ -119,7 +117,7 @@ namespace ServiceFabric.PubSubActors
         public async Task RegisterSubscriberAsync(ActorReference actor, string messageTypeName, string routingKey)
         {
             var actorReference = new ActorReferenceWrapper(actor, routingKey);
-            await RegisterSubscriberAsync(actorReference, messageTypeName);
+            await SubscribeAsync(actorReference, messageTypeName);
         }
         /// <summary>
         /// Unregisters an Actor as a subscriber for messages.
@@ -130,7 +128,7 @@ namespace ServiceFabric.PubSubActors
         public async Task UnregisterSubscriberAsync(ActorReference actor, string messageTypeName, bool flushQueue)
         {
             var actorReference = new ActorReferenceWrapper(actor);
-            await UnregisterSubscriberAsync(actorReference, messageTypeName);
+            await UnsubscribeAsync(actorReference, messageTypeName, flushQueue);
         }
         /// <summary>
         /// Registers a service as a subscriber for messages.
@@ -141,7 +139,7 @@ namespace ServiceFabric.PubSubActors
         public async Task RegisterServiceSubscriberAsync(ServiceReference service, string messageTypeName, string routingKey)
         {
             var serviceReference = new ServiceReferenceWrapper(service, routingKey);
-            await RegisterSubscriberAsync(serviceReference, messageTypeName);
+            await SubscribeAsync(serviceReference, messageTypeName);
         }
         /// <summary>
         /// Unregisters a service as a subscriber for messages.
@@ -149,11 +147,10 @@ namespace ServiceFabric.PubSubActors
         /// <param name="messageTypeName">Full type name of message object.</param>
         /// <param name="service">Reference to the actor to unsubscribe.</param>
         /// <param name="flushQueue">Publish any remaining messages.</param>
-        public async Task UnregisterServiceSubscriberAsync(ServiceReference service, string messageTypeName,
-            bool flushQueue)
+        public async Task UnregisterServiceSubscriberAsync(ServiceReference service, string messageTypeName, bool flushQueue)
         {
             var serviceReference = new ServiceReferenceWrapper(service);
-            await UnregisterSubscriberAsync(serviceReference, messageTypeName);
+            await UnsubscribeAsync(serviceReference, messageTypeName, flushQueue);
         }
         /// <summary>
         /// Takes a published message and forwards it (indirectly) to all Subscribers.
@@ -209,7 +206,7 @@ namespace ServiceFabric.PubSubActors
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                //process messages for given time, then allow other transactions to enqueue messages 
+                //process messages for given time, then allow other transactions to enqueue messages
                 var cts = new CancellationTokenSource(MaxProcessingPeriod);
                 var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken);
                 try
@@ -347,7 +344,7 @@ namespace ServiceFabric.PubSubActors
         /// <param name="reference"></param>
         /// <param name="messageTypeName"></param>
         /// <returns></returns>
-        private async Task RegisterSubscriberAsync(ReferenceWrapper reference, string messageTypeName)
+        public async Task SubscribeAsync(ReferenceWrapper reference, string messageTypeName)
         {
             await WaitForInitializeAsync(CancellationToken.None);
 
@@ -384,15 +381,16 @@ namespace ServiceFabric.PubSubActors
         }
 
         protected abstract Task CreateQueueAsync(ITransaction tx, string queueName);
-        
+
 
         /// <summary>
         /// Unregisters a Service or Actor <paramref name="reference"/> as subscriber for messages of type <paramref name="messageTypeName"/>
         /// </summary>
         /// <param name="reference"></param>
         /// <param name="messageTypeName"></param>
+        /// <param name="flushQueue"></param>
         /// <returns></returns>
-        private async Task UnregisterSubscriberAsync(ReferenceWrapper reference, string messageTypeName)
+        public async Task UnsubscribeAsync(ReferenceWrapper reference, string messageTypeName, bool flushQueue)
         {
             await WaitForInitializeAsync(CancellationToken.None);
 

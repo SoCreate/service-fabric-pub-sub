@@ -123,6 +123,12 @@ public class PublishedMessageTwo
 }
 ```
 
+### Publishing messages from Service or Actor
+```csharp
+var brokerClient = new BrokerClient();
+brokerClient.PublishMessageAsync(new PublishedMessageOne { Content = "Hello PubSub World, from Subscriber, using Broker Service!" })
+```
+
 ### Subscribing to messages using Actors
 *Create a sample Actor that implements 'ISubscriberActor', to become a subscriber to messages.*
 In this example, the Actor called 'SubscribingActor' subscribes to messages of Type 'PublishedMessageOne'.
@@ -169,7 +175,7 @@ Now open the file SubscribingStatelessService.cs in the project 'SubscribingStat
 ```csharp
 internal sealed class SubscribingStatelessService : SubscriberStatelessServiceBase
 {
-    public SubscribingStatelessService(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)
+    public SubscribingStatelessService(StatelessServiceContext serviceContext, IBrokerClient brokerClient = null) : base(serviceContext, subscriberServiceHelper)
     {
     }
 
@@ -246,64 +252,11 @@ For stateful services, use the `StatefulSubscriberServiceBootstrapper`.
 *Check the Demo project for a working reference implementation.*
 
 
-### Publishing messages from Actors
-*Create a sample Actor that publishes messages.*
-In this example, the Actor called 'PublishingActor' publishes messages of Type 'PublishedMessageOne'.
-
-In this example, the Publisher Actor publishes messages of Type 'PublishedMessageOne'.
-Add a Reliable Stateless Actor project called 'PublishingActor'.
-Add Nuget package 'ServiceFabric.PubSubActors' to 'PublishingActor'.
-Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to 'PublishingActor.Interfaces'.
-Add a project reference to the shared data contracts library ('DataContracts').
-
-Go to the project 'PublishingActor.Interfaces' and open the file IPublishingActor.cs.
-Replace the contents with the code below, to allow external callers to trigger a publish action (not required, Actors can decide for themselves too):
-
-```csharp
-public interface IPublishingActor : IActor
-{
-    //enables external callers to trigger a publish action, not required for functionality
-    Task<string> PublishMessageOneAsync();
-    Task<string> PublishMessageTwoAsync();
-}
-```
-
-Now open the file PublishingActor.cs in the project 'PublishingActor' and replace the contents with this code:
-
-https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/PublishingActor/PublishingActor.cs
-
-### Publishing messages from Services
-*Create a sample Service that publishes messages.*
-In this example, the Service called 'PublishingStatelessService' publishes messages of Type 'PublishedMessageOne'.
-
-Add a Reliable Stateless Service project called 'PublishingStatelessService'.
-Add Nuget package 'ServiceFabric.PubSubActors' to 'PublishingStatelessService'.
-Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to 'PublishingStatelessService'.
-Add a project reference to the shared data contracts library ('DataContracts').
-
-Go to the project 'DataContracts' and add an interface file IPublishingStatelessService.cs.
-Add the code below:
-```csharp
-[ServiceContract]
-public interface IPublishingStatelessService : IService
-{
-    //allows external callers to trigger a publish action, not required for functionality
-    [OperationContract]
-    Task<string> PublishMessageOneAsync();
-    [OperationContract]
-    Task<string> PublishMessageTwoAsync();
-}
-```
-Open the file 'PublishingStatelessService.cs'. Replace the contents with the code below:
-
-https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/PublishingStatelessService/PublishingStatelessService.cs
-
-
 ## Routing
 **This experimental feature works only when using the `DefaultPayloadSerializer`.**
 It adds support for an additional subscriber filter, based on message content.
 
-### Example 
+### Example
 
 Given this message type:
 
