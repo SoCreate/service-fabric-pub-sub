@@ -25,7 +25,7 @@ namespace ServiceFabric.PubSubActors.Tests
         }
 
         [TestMethod]
-        public void WhenDeterminingShouldDeliverMessageToServiceWithUnmatchingPayload_ThenReturnsTrue()
+        public void WhenDeterminingShouldDeliverMessageToServiceWithUnmatchingPayload_ThenReturnsFalse()
         {
             var serviceRef = new ServiceReferenceWrapper(new ServiceReference(), "Customer.Name=Customer1");
             var messageWrapper = new
@@ -41,7 +41,7 @@ namespace ServiceFabric.PubSubActors.Tests
         }
 
         [TestMethod]
-        public void WhenDeterminingShouldDeliverMessageToActorWithUnmatchingPayload_ThenReturnsTrue()
+        public void WhenDeterminingShouldDeliverMessageToActorWithUnmatchingPayload_ThenReturnsFalse()
         {
             var actorRef = new ActorReferenceWrapper(new ActorReference { ActorId = ActorId.CreateRandom() }, "Customer.Name=Customer1");
             var messageWrapper = new
