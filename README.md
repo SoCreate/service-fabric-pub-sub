@@ -17,6 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 7.5.1 Add routing key support, to support attribute based messaging.
 - 7.5.0 Major upgrade. Added `SubscriberStatelessServiceBase`,`SubscriberStatefulServiceBase`, `StatefulSubscriberServiceBootstrapper` and `StatelessSubscriberServiceBootstrapper` classes to simplify managing subscriber services. Thanks @danadesrosiers.
 - 7.4.3 Broker actor is now obsolete. The interfaces library will be removed as well.
 - 7.4.2 BrokerServiceLocator located in other Application will now be found.

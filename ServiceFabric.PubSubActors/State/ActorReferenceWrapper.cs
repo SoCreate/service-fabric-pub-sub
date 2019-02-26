@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Microsoft.ServiceFabric.Actors;
+using Newtonsoft.Json.Linq;
+using ServiceFabric.PubSubActors.Interfaces;
+using System;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Actors;
-using ServiceFabric.PubSubActors.Interfaces;
 
 namespace ServiceFabric.PubSubActors.State
 {
@@ -12,6 +13,7 @@ namespace ServiceFabric.PubSubActors.State
     [DataContract]
     public class ActorReferenceWrapper : ReferenceWrapper
     {
+
         public override string Name
         {
             get { return $"{ActorReference.ServiceUri}\t{ActorReference.ActorId}"; }
@@ -35,11 +37,13 @@ namespace ServiceFabric.PubSubActors.State
         /// Creates a new instance using the provided <see cref="Microsoft.ServiceFabric.Actors.ActorReference"/>.
         /// </summary>
         /// <param name="actorReference"></param>
-        public ActorReferenceWrapper(ActorReference actorReference)
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
+        /// <remarks>Only works when using the <see cref="DefaultPayloadSerializer"/>. Uses <see cref="JToken"/>.SelectToken to find message property.</remarks>
+        public ActorReferenceWrapper(ActorReference actorReference, string routingKey = null)
+            : base(routingKey)
         {
             if (actorReference == null) throw new ArgumentNullException(nameof(actorReference));
             if (actorReference.ActorId == null) throw new ArgumentException(nameof(actorReference.ActorId));
-
             ActorReference = actorReference;
         }
 
@@ -77,7 +81,16 @@ namespace ServiceFabric.PubSubActors.State
         public override int GetHashCode()
         {
             // ReSharper disable NonReadonlyMemberInGetHashCode  - need to support Serialization.
-            return ActorReference.ActorId.GetHashCode();
+            switch (ActorReference.ActorId.Kind)
+            {
+                case ActorIdKind.Guid:
+                case ActorIdKind.Long:
+                    return ActorReference.ActorId.GetHashCode();
+                case ActorIdKind.String:
+                    return unchecked((int)HashingHelper.HashString(ActorReference.ActorId.GetStringId()));
+                default:
+                    throw new InvalidOperationException($"Unexpected ActorReference kind: '{ActorReference.ActorId.Kind}'.");
+            }
         }
 
         /// <summary>
@@ -95,7 +108,13 @@ namespace ServiceFabric.PubSubActors.State
         /// <inheritdoc />
         public override Task PublishAsync(MessageWrapper message)
         {
-            return MessageWrapperExtensions.PublishAsync(this, message);
+            if (string.IsNullOrWhiteSpace(RoutingKey)
+                || ShouldDeliverMessage(message))
+            {
+                return MessageWrapperExtensions.PublishAsync(this, message);
+            }
+
+            return Task.FromResult(true);
         }
     }
 }

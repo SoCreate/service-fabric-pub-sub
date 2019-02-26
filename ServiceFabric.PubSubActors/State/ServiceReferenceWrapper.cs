@@ -1,11 +1,11 @@
-using System;
-using System.Fabric;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberServices;
+using System;
+using System.Fabric;
+using System.Runtime.Serialization;
+using System.Threading.Tasks;
 
 namespace ServiceFabric.PubSubActors.State
 {
@@ -15,7 +15,6 @@ namespace ServiceFabric.PubSubActors.State
     [DataContract]
     public class ServiceReferenceWrapper : ReferenceWrapper
     {
-        
         public override string Name
         {
             get { return ServiceReference.Description; }
@@ -39,7 +38,9 @@ namespace ServiceFabric.PubSubActors.State
         /// Creates a new instance using the provided <see cref="ServiceReference"/>.
         /// </summary>
         /// <param name="serviceReference"></param>
-        public ServiceReferenceWrapper(ServiceReference serviceReference)
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
+        public ServiceReferenceWrapper(ServiceReference serviceReference, string routingKey = null)
+            : base(routingKey)
         {
             ServiceReference = serviceReference ?? throw new ArgumentNullException(nameof(serviceReference));
         }
@@ -78,7 +79,7 @@ namespace ServiceFabric.PubSubActors.State
         {
             // ReSharper disable NonReadonlyMemberInGetHashCode - need to support Serialization.
             var identifier = GetServiceIdentifier();
-            return identifier.GetHashCode();
+            return unchecked((int)HashingHelper.HashString(identifier));
         }
 
         /// <summary>
@@ -121,15 +122,19 @@ namespace ServiceFabric.PubSubActors.State
         /// <inheritdoc />
         public override Task PublishAsync(MessageWrapper message)
         {
-            return MessageWrapperExtensions.PublishAsync(this, message);
+            if (string.IsNullOrWhiteSpace(RoutingKey)
+                || ShouldDeliverMessage(message))
+            {
+                return MessageWrapperExtensions.PublishAsync(this, message);
+            }
+
+            return Task.FromResult(true);
         }
     }
 
-
     internal static class MessageWrapperExtensions
     {
-        private static readonly Lazy<IServiceProxyFactory> ServiceProxyFactoryLazy = new Lazy<IServiceProxyFactory>(()=> new ServiceProxyFactory());
-
+        private static readonly Lazy<IServiceProxyFactory> ServiceProxyFactoryLazy = new Lazy<IServiceProxyFactory>(() => new ServiceProxyFactory());
 
         /// <summary>
         /// Attempts to publish the message to a listener.
