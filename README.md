@@ -66,7 +66,7 @@ https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces (for Actor 
 
 
 Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services).
-This is done using an intermediate, which is the BrokerActor or BrokerService.
+This is done using an intermediate, which is the BrokerService.
 Add this package to all Reliable Actor & Service projects that participate in the pub/sub messaging.
 Add the package 'ServiceFabric.PubSubActors.Interfaces' to all (*ReliableActor).Interfaces projects.
 
