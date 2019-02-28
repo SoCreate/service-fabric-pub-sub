@@ -80,7 +80,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 
                     //peek task description
                     var taskDescriptionMessage = await TimeoutRetryHelper
-                        .ExecuteInTransaction(StateManager, 
+                        .ExecuteInTransaction(StateManager,
                             (tran, token, state) => queue.TryPeekAsync(tran, TimeSpan.FromSeconds(4), token), cancellationToken: cancellationToken)
                         .ConfigureAwait(false);
                     if (!taskDescriptionMessage.HasValue)
@@ -89,7 +89,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
                     }
 
                     //deserialize task description, create task implementation
-                    var description = this.Deserialize<TaskDescription>(taskDescriptionMessage.Value);
+                    var description = taskDescriptionMessage.Value.CreateMessage<TaskDescription>();
                     var implementation = TaskDescription.ToTaskImplementation(_typeLocator, description);
                     if (implementation == null)
                     {
@@ -104,7 +104,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 
                     await implementation.ExecuteAsync().ConfigureAwait(false);
                     var taskDescriptionMessageDequeued = await TimeoutRetryHelper
-                        .ExecuteInTransaction(StateManager, 
+                        .ExecuteInTransaction(StateManager,
                             (tran, token, state) => queue.TryDequeueAsync(tran, TimeSpan.FromSeconds(4), token), cancellationToken: cancellationToken)
                         .ConfigureAwait(false);
 
@@ -147,9 +147,9 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         public async Task ReceiveMessageAsync(MessageWrapper message)
         {
             //assume that message contains 'TaskDescription'
-            var description = this.Deserialize<TaskDescription>(message);
+            var description = message.CreateMessage<TaskDescription>();
             if (description == null) return; //wrong message
-            
+
             var queue = await TimeoutRetryHelper.Execute((token, state) => StateManager.GetOrAddAsync<IReliableQueue<MessageWrapper>>(_queueName));
             await TimeoutRetryHelper
                 .ExecuteInTransaction(StateManager, (tran, token, state) => queue.EnqueueAsync(tran, message))
@@ -201,15 +201,15 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
     }
 
     /// <summary>
-    /// Helper class that maps type name to type for <see cref="TaskImplementation"/>.
+    /// Helper class that maps type name to type for <see cref="ITaskImplementation"/>.
     /// </summary>
     public class TypeLocator : ITypeLocator
     {
         private readonly Dictionary<string, Type> _registeredTaskTypes = new Dictionary<string, Type>();
 
         /// <summary>
-        /// Creates a new instance that scans the provided <see cref="Assembly"/> for concrete 
-        /// implementations of type <see cref="TaskImplementation"/>.
+        /// Creates a new instance that scans the provided <see cref="Assembly"/> for concrete
+        /// implementations of type <see cref="ITaskImplementation"/>.
         /// </summary>
         /// <param name="taskAssembly"></param>
         public TypeLocator(Assembly taskAssembly)
@@ -243,7 +243,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
     public interface ITaskImplementation
     {
         /// <summary>
-        /// Executes the task. 
+        /// Executes the task.
         /// </summary>
         /// <returns></returns>
         Task ExecuteAsync();

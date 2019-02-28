@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Runtime;
+using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Interfaces;
-using ServiceFabric.PubSubActors.PublisherActors;
 using ServiceFabric.PubSubActors.State;
 using ServiceFabric.PubSubActors.SubscriberServices;
 
 namespace ServiceFabric.PubSubActors
 {
     /// <remarks>
-    /// Base class for a <see cref="StatefulService"/> that serves as a Broker that accepts messages 
-    /// from Actors & Services calling <see cref="PublisherActorExtensions.PublishMessageAsync"/>
+    /// Base class for a <see cref="StatefulService"/> that serves as a Broker that accepts messages
+    /// from Actors & Services calling <see cref="BrokerClient.PublishMessageAsync"/>
     /// and forwards them to <see cref="ISubscriberActor"/> Actors and <see cref="ISubscriberService"/> Services without strict ordering, so more performant than <see cref="BrokerService"/>.
     /// Every message type is mapped to one of the partitions of this service.
     /// </remarks>

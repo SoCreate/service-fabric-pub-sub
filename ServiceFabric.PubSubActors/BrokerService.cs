@@ -7,15 +7,15 @@ using System;
 using System.Fabric;
 using System.Threading.Tasks;
 using System.Threading;
-using ServiceFabric.PubSubActors.PublisherActors;
+using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.SubscriberServices;
 
 namespace ServiceFabric.PubSubActors
 {
     /// <remarks>
-    /// Base class for a <see cref="StatefulService"/> that serves as a Broker that accepts messages 
-    /// from Actors & Services calling <see cref="PublisherActorExtensions.PublishMessageAsync"/>
-    /// and forwards them to <see cref="ISubscriberActor"/> Actors and <see cref="ISubscriberService"/> Services with strict ordering, so less performant than <see cref="BrokerServiceUnordered"/>. 
+    /// Base class for a <see cref="StatefulService"/> that serves as a Broker that accepts messages
+    /// from Actors & Services calling <see cref="BrokerClient.PublishMessageAsync"/>
+    /// and forwards them to <see cref="ISubscriberActor"/> Actors and <see cref="ISubscriberService"/> Services with strict ordering, so less performant than <see cref="BrokerServiceUnordered"/>.
     /// Every message type is mapped to one of the partitions of this service.
     /// </remarks>
     public abstract class BrokerService : BrokerServiceBase
