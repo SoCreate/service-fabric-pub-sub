@@ -24,9 +24,8 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="serviceContext"></param>
         /// <param name="enableAutoDiscovery"></param>
-        /// <param name="useRemotingV2">Use remoting v2? Ignored in netstandard.</param>
-        protected BrokerService(StatefulServiceContext serviceContext, bool enableAutoDiscovery = true, bool useRemotingV2 = false)
-            : base(serviceContext, enableAutoDiscovery, useRemotingV2)
+        protected BrokerService(StatefulServiceContext serviceContext, bool enableAutoDiscovery = true)
+            : base(serviceContext, enableAutoDiscovery)
         {
         }
 
@@ -36,9 +35,8 @@ namespace ServiceFabric.PubSubActors
         /// <param name="serviceContext"></param>
         /// <param name="reliableStateManagerReplica"></param>
         /// <param name="enableAutoDiscovery"></param>
-        /// <param name="useRemotingV2">Use remoting v2? Ignored in netstandard.</param>
-        protected BrokerService(StatefulServiceContext serviceContext, IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true, bool useRemotingV2 = false)
-            : base(serviceContext, reliableStateManagerReplica, enableAutoDiscovery, useRemotingV2)
+        protected BrokerService(StatefulServiceContext serviceContext, IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true)
+            : base(serviceContext, reliableStateManagerReplica, enableAutoDiscovery)
         {
         }
 

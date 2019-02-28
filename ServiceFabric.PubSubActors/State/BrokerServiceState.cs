@@ -91,13 +91,10 @@ namespace ServiceFabric.PubSubActors.State
 
         [DataMember] public readonly string QueueName;
 
-        [DataMember] public readonly string DeadLetterQueueName;
-
-        public Reference(ReferenceWrapper serviceOrActorReference, string queueName, string deadLetterQueueName)
+        public Reference(ReferenceWrapper serviceOrActorReference, string queueName)
         {
             ServiceOrActorReference = serviceOrActorReference;
             QueueName = queueName;
-            DeadLetterQueueName = deadLetterQueueName;
         }
     }
 }

@@ -28,10 +28,6 @@ namespace ServiceFabric.PubSubActors.State
 		[DataMember(IsRequired = false)]
 		public string PartitionName { get; set; }
 
-        [Obsolete("Don't use this member. It's here for backwards compat.", true)]
-		[DataMember(IsRequired = false)]
-		public long? PartitionID { get; set; }
-
         [DataMember(IsRequired = false)]
 		public Guid PartitionGuid { get; set; }
 

@@ -79,14 +79,6 @@ namespace ServiceFabric.PubSubActors.State
         {
             return GetHashCode().ToString();
         }
-        /// <summary>
-        /// Creates a dead-letter queue name to use for this reference. (not message specific)
-        /// </summary>
-        /// <returns></returns>
-        public string GetDeadLetterQueueName()
-        {
-            return $"DeadLetters_{GetQueueName()}";
-        }
 
         /// <summary>
         /// Determines whether to deliver the message to the subscriber, based on <see cref="RoutingKey"/> and <see cref="MessageWrapper.Payload"/>.

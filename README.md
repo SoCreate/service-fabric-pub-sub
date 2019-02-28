@@ -94,8 +94,8 @@ internal sealed class PubSubService : BrokerService
     public PubSubService(StatefulServiceContext context)
        : base(context)
     {
-    //optional: provide a logging callback
-    ServiceEventSourceMessageCallback = message => ServiceEventSource.Current.ServiceMessage(this, message);
+        //optional: provide a logging callback
+        ServiceEventSourceMessageCallback = message => ServiceEventSource.Current.ServiceMessage(this, message);
     }
 }
 ```
@@ -155,11 +155,6 @@ internal class SubscribingActor : Actor, ISubscriberActor
         await _brokerClient.SubscribeAsync(this, typeof(PublishedMessageOne), HandleMessageOne);
     }
 
-    protected override async Task OnDeactivateAsync()
-    {
-        await _brokerClient.UnsubscribeAsync(this, typeof(PublishedMessageOne), true);
-    }
-
     public Task ReceiveMessageAsync(MessageWrapper message)
     {
         return _brokerClient.ProcessMessageAsync(message);
@@ -186,7 +181,8 @@ Now open the file SubscribingStatelessService.cs in the project 'SubscribingStat
 ```csharp
 internal sealed class SubscribingStatelessService : SubscriberStatelessServiceBase
 {
-    public SubscribingStatelessService(StatelessServiceContext serviceContext, IBrokerClient brokerClient = null) : base(serviceContext, brokerClient)
+    public SubscribingStatelessService(StatelessServiceContext serviceContext, IBrokerClient brokerClient = null)
+        : base(serviceContext, brokerClient)
     {
     }
 
