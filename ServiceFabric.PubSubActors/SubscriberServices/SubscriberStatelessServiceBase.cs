@@ -16,7 +16,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
     /// Base class for a <see cref="StatelessService"/> that serves as a subscriber of messages from the broker.
     /// Subscribe to message types and define a handler callback by using the <see cref="SubscribeAttribute"/>.
     /// </remarks>
-    public abstract class SubscriberStatelessServiceBase : StatelessService, ISubscriberService, ISubscriber
+    public abstract class SubscriberStatelessServiceBase : StatelessService, ISubscriberService
     {
         private readonly IBrokerClient _brokerClient;
 

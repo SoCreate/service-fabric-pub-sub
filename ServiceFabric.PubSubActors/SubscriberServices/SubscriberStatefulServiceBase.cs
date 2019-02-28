@@ -13,7 +13,7 @@ using ServiceFabric.PubSubActors.Interfaces;
 
 namespace ServiceFabric.PubSubActors.SubscriberServices
 {
-    public class SubscriberStatefulServiceBase : StatefulService, ISubscriberService, ISubscriber
+    public class SubscriberStatefulServiceBase : StatefulService, ISubscriberService
     {
         private readonly IBrokerClient _brokerClient;
 

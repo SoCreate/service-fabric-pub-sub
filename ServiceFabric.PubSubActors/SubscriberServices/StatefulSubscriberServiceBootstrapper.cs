@@ -24,7 +24,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         private readonly StatefulServiceContext _context;
         private readonly Func<StatefulServiceContext, TService> _serviceFactory;
         private readonly Action<string> _loggingCallback;
-        private readonly ISubscriberServiceHelper _subscriberServiceHelper;
+        private readonly IBrokerClient _brokerClient;
         private readonly FabricClient _fabricClient;
         private long _filterId;
         private TService _service;
@@ -39,19 +39,19 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// </summary>
         /// <param name="context">Service context.</param>
         /// <param name="serviceFactory">Builds an instance of <typeparamref name="TService"/></param>
-        /// <param name="subscriberServiceHelper">Helps with subscriptions.</param>
+        /// <param name="brokerClient">Helps with subscriptions.</param>
         /// <param name="autoUnsubscribe">Indicates whether the created service subscription should be removed after the service is deleted.</param>
         /// <param name="loggingCallback">Optional logging callback.</param>
         public StatefulSubscriberServiceBootstrapper(StatefulServiceContext context,
             Func<StatefulServiceContext, TService> serviceFactory,
-            ISubscriberServiceHelper subscriberServiceHelper = null,
+            IBrokerClient brokerClient = null,
             bool autoUnsubscribe = false,
             Action<string> loggingCallback = null)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _serviceFactory = serviceFactory ?? throw new ArgumentNullException(nameof(serviceFactory));
             _loggingCallback = loggingCallback;
-            _subscriberServiceHelper = subscriberServiceHelper ?? new SubscriberServiceHelper();
+            _brokerClient = brokerClient ?? new BrokerClient();
             _fabricClient = new FabricClient(FabricClientRole.User);
             _fabricClient.ServiceManager.ServiceNotificationFilterMatched += ServiceNotificationFilterMatched;
             AutoUnsubscribe = autoUnsubscribe;
@@ -121,10 +121,10 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
             _loggingCallback?.Invoke($"Registering subscriptions for service '{_context.ServiceName}'.");
             try
             {
-                await _subscriberServiceHelper.SubscribeAsync(
-                        _subscriberServiceHelper.CreateServiceReference(_service),
-                        _subscriberServiceHelper.DiscoverMessageHandlers(_service).Keys)
-                    .ConfigureAwait(false);
+                foreach (var subscription in _service.DiscoverMessageHandlers())
+                {
+                    await _brokerClient.SubscribeAsync(_service, subscription.Key, subscription.Value).ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {
@@ -136,13 +136,13 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         private async Task UnregisterSubscriptions()
         {
             _loggingCallback?.Invoke($"Unregistering subscriptions for deleted service '{_context.ServiceName}'.");
-            
+
             try
             {
-                await _subscriberServiceHelper.SubscribeAsync(
-                        _subscriberServiceHelper.CreateServiceReference(_service),
-                        _subscriberServiceHelper.DiscoverMessageHandlers(_service).Keys)
-                    .ConfigureAwait(false);
+                foreach (var subscription in _service.DiscoverMessageHandlers())
+                {
+                    await _brokerClient.UnsubscribeAsync(_service, subscription.Key, false).ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {

@@ -175,7 +175,7 @@ Now open the file SubscribingStatelessService.cs in the project 'SubscribingStat
 ```csharp
 internal sealed class SubscribingStatelessService : SubscriberStatelessServiceBase
 {
-    public SubscribingStatelessService(StatelessServiceContext serviceContext, IBrokerClient brokerClient = null) : base(serviceContext, subscriberServiceHelper)
+    public SubscribingStatelessService(StatelessServiceContext serviceContext, IBrokerClient brokerClient = null) : base(serviceContext, brokerClient)
     {
     }
 
@@ -204,9 +204,9 @@ If you don't want to inherit from our base classes, you can use the `StatefulSub
 The code in `Program` will look like this:
 
 ```csharp
-    var helper = new SubscriberServiceHelper();
+    var brokerClient = new BrokerClient();
     ServiceRuntime.RegisterServiceAsync("SubscribingStatelessServiceType",
-        context => new StatelessSubscriberServiceBootstrapper<SubscribingStatelessService >(context, ctx => new SubscribingStatelessService (ctx, helper), helper).Build())
+        context => new StatelessSubscriberServiceBootstrapper<SubscribingStatelessService >(context, ctx => new SubscribingStatelessService (ctx, brokerClient), brokerClient).Build())
         .GetAwaiter().GetResult();
 ```
 
@@ -215,14 +215,17 @@ The service looks like this:
 ```csharp
 internal sealed class SubscribingStatelessService : StatelessService, ISubscriberService
 {
-    public SubscribingStatelessService(StatelessServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null) : base(serviceContext, subscriberServiceHelper)
+    private readonly IBrokerClient _brokerClient;
+
+    public SubscribingStatelessService(StatelessServiceContext serviceContext, IBrokerClient brokerClient = null) : base(serviceContext)
     {
+        _brokerClient = brokerClient;
     }
 
     public Task ReceiveMessageAsync(MessageWrapper messageWrapper)
     {
         // Automatically delegates work to annotated methods withing this class.
-        return _subscriberServiceHelper.ProccessMessageAsync(messageWrapper);
+        return _brokerClient.ProccessMessageAsync(messageWrapper);
     }
 
     protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()

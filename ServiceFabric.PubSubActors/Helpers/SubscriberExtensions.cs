@@ -3,16 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using ServiceFabric.PubSubActors.Interfaces;
+using ServiceFabric.PubSubActors.SubscriberServices;
 
 namespace ServiceFabric.PubSubActors.Helpers
 {
-    /// <summary>
-    /// Enables the below extension method that use the <see cref="SubscribeAttribute"/> to discover message handler methods.
-    /// </summary>
-    public interface ISubscriber
-    {
-    }
-
     /// <summary>
     /// Marks a service method as being capable of receiving messages.
     /// Follows convention that method has signature 'Task MethodName(MessageType message)'
@@ -25,7 +20,17 @@ namespace ServiceFabric.PubSubActors.Helpers
 
     public static class SubscriberExtensions
     {
-        public static Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers(this ISubscriber service)
+        public static Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers(this ISubscriberService service)
+        {
+            return DiscoverHandlers(service);
+        }
+
+        public static Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers(this ISubscriberActor service)
+        {
+            return DiscoverHandlers(service);
+        }
+
+        private static Dictionary<Type, Func<object, Task>> DiscoverHandlers(object service)
         {
             var handlers = new Dictionary<Type, Func<object, Task>>();
             var taskType = typeof(Task);

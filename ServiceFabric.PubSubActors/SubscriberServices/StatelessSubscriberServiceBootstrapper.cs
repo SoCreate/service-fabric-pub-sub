@@ -23,7 +23,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
     {
         private readonly StatelessServiceContext _context;
         private readonly Func<StatelessServiceContext, TService> _serviceFactory;
-        private readonly ISubscriberServiceHelper _subscriberServiceHelper;
+        private readonly IBrokerClient _brokerClient;
         private readonly Action<string> _loggingCallback;
         private readonly FabricClient _fabricClient;
         private long _filterId;
@@ -44,13 +44,13 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// <param name="loggingCallback">Optional logging callback.</param>
         public StatelessSubscriberServiceBootstrapper(StatelessServiceContext context,
             Func<StatelessServiceContext, TService> serviceFactory,
-            ISubscriberServiceHelper subscriberServiceHelper = null,
+            IBrokerClient subscriberServiceHelper = null,
             bool autoUnsubscribe = false,
             Action<string> loggingCallback = null)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _serviceFactory = serviceFactory ?? throw new ArgumentNullException(nameof(serviceFactory));
-            _subscriberServiceHelper = subscriberServiceHelper ?? new SubscriberServiceHelper();
+            _brokerClient = subscriberServiceHelper ?? new BrokerClient();
             _fabricClient = new FabricClient(FabricClientRole.User);
             _fabricClient.ServiceManager.ServiceNotificationFilterMatched += ServiceNotificationFilterMatched;
             _loggingCallback = loggingCallback;
@@ -121,10 +121,10 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
             _loggingCallback?.Invoke($"Registering subscriptions for service '{_context.ServiceName}'.");
             try
             {
-                await _subscriberServiceHelper.SubscribeAsync(
-                        _subscriberServiceHelper.CreateServiceReference(_service),
-                        _subscriberServiceHelper.DiscoverMessageHandlers(_service).Keys)
-                    .ConfigureAwait(false);
+                foreach (var subscription in _service.DiscoverMessageHandlers())
+                {
+                    await _brokerClient.SubscribeAsync(_service, subscription.Key, subscription.Value).ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {
@@ -139,10 +139,10 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
 
             try
             {
-                await _subscriberServiceHelper.SubscribeAsync(
-                        _subscriberServiceHelper.CreateServiceReference(_service),
-                        _subscriberServiceHelper.DiscoverMessageHandlers(_service).Keys)
-                    .ConfigureAwait(false);
+                foreach (var subscription in _service.DiscoverMessageHandlers())
+                {
+                    await _brokerClient.UnsubscribeAsync(_service, subscription.Key, false).ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {
