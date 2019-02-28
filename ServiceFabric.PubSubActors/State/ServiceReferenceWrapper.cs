@@ -1,7 +1,6 @@
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
-using ServiceFabric.PubSubActors.Interfaces;
-using ServiceFabric.PubSubActors.SubscriberServices;
+using ServiceFabric.PubSubActors.Subscriber;
 using System;
 using System.Fabric;
 using System.Runtime.Serialization;
@@ -15,10 +14,9 @@ namespace ServiceFabric.PubSubActors.State
     [DataContract]
     public class ServiceReferenceWrapper : ReferenceWrapper
     {
-        public override string Name
-        {
-            get { return ServiceReference.Description; }
-        }
+        private static readonly Lazy<IServiceProxyFactory> ServiceProxyFactoryLazy = new Lazy<IServiceProxyFactory>(()=> new ServiceProxyFactory());
+
+        public override string Name => ServiceReference.Description;
 
         /// <summary>
         /// Gets the wrapped <see cref="ServiceReference"/>
@@ -70,7 +68,7 @@ namespace ServiceFabric.PubSubActors.State
         }
 
         /// <summary>
-        /// Serves as a hash function for a particular type. 
+        /// Serves as a hash function for a particular type.
         /// </summary>
         /// <returns>
         /// A hash code for the current object.
@@ -122,57 +120,28 @@ namespace ServiceFabric.PubSubActors.State
         /// <inheritdoc />
         public override Task PublishAsync(MessageWrapper message)
         {
-            if (string.IsNullOrWhiteSpace(RoutingKey)
-                || ShouldDeliverMessage(message))
+            if (string.IsNullOrWhiteSpace(RoutingKey) || ShouldDeliverMessage(message))
             {
-                return MessageWrapperExtensions.PublishAsync(this, message);
+                ServicePartitionKey partitionKey;
+                switch (ServiceReference.PartitionKind)
+                {
+                    case ServicePartitionKind.Singleton:
+                        partitionKey = ServicePartitionKey.Singleton;
+                        break;
+                    case ServicePartitionKind.Int64Range:
+                        partitionKey = new ServicePartitionKey(ServiceReference.PartitionKey);
+                        break;
+                    case ServicePartitionKind.Named:
+                        partitionKey = new ServicePartitionKey(ServiceReference.PartitionName);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                var client = ServiceProxyFactoryLazy.Value.CreateServiceProxy<ISubscriberService>(ServiceReference.ServiceUri, partitionKey);
+                return client.ReceiveMessageAsync(message);
             }
 
             return Task.FromResult(true);
-        }
-    }
-
-    internal static class MessageWrapperExtensions
-    {
-        private static readonly Lazy<IServiceProxyFactory> ServiceProxyFactoryLazy = new Lazy<IServiceProxyFactory>(() => new ServiceProxyFactory());
-
-        /// <summary>
-        /// Attempts to publish the message to a listener.
-        /// </summary>
-        /// <param name="wrapper"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public static Task PublishAsync(this ServiceReferenceWrapper wrapper, MessageWrapper message)
-        {
-            ServicePartitionKey partitionKey;
-            switch (wrapper.ServiceReference.PartitionKind)
-            {
-                case ServicePartitionKind.Singleton:
-                    partitionKey = ServicePartitionKey.Singleton;
-                    break;
-                case ServicePartitionKind.Int64Range:
-                    partitionKey = new ServicePartitionKey(wrapper.ServiceReference.PartitionKey);
-                    break;
-                case ServicePartitionKind.Named:
-                    partitionKey = new ServicePartitionKey(wrapper.ServiceReference.PartitionName);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            var client = ServiceProxyFactoryLazy.Value.CreateServiceProxy<ISubscriberService>(wrapper.ServiceReference.ServiceUri, partitionKey);
-            return client.ReceiveMessageAsync(message);
-        }
-
-        /// <summary>
-        /// Attempts to publish the message to a listener.
-        /// </summary>
-        /// <param name="wrapper"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public static Task PublishAsync(this ActorReferenceWrapper wrapper, MessageWrapper message)
-        {
-            ISubscriberActor actor = (ISubscriberActor)wrapper.ActorReference.Bind(typeof(ISubscriberActor));
-            return actor.ReceiveMessageAsync(message);
         }
     }
 }

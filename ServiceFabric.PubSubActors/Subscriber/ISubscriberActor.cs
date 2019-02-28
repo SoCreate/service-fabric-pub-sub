@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
+using ServiceFabric.PubSubActors.State;
 
-namespace ServiceFabric.PubSubActors.Interfaces
+namespace ServiceFabric.PubSubActors.Subscriber
 {
 	/// <summary>
-	/// Defines a common interface for all Subscriber Actors. 
+	/// Defines a common interface for all Subscriber Actors.
 	/// Don't forget to mark implementing <see cref="Actor"/> classes with
 	/// the attribute <see cref="ActorServiceAttribute"/> like: [ActorService(Name = nameof(ISubscribingActor))] where ISubscribingActor is defined in your own project.
 	/// </summary>

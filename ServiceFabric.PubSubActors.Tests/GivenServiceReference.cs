@@ -1,6 +1,5 @@
 ﻿using Microsoft.ServiceFabric.Actors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.State;
 
 namespace ServiceFabric.PubSubActors.Tests

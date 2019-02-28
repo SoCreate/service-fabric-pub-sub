@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Services.Client;
 using ServiceFabric.PubSubActors.Helpers;
-using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.State;
 
 namespace ServiceFabric.PubSubActors.Tests
@@ -43,7 +42,7 @@ namespace ServiceFabric.PubSubActors.Tests
 
     public class MockBrokerService : IBrokerService
     {
-        public Task RegisterSubscriberAsync(ActorReference actor, string messageTypeName)
+        public Task RegisterSubscriberAsync(ActorReference actor, string messageTypeName, string routingKey = null)
         {
             return Task.CompletedTask;
         }
@@ -53,7 +52,7 @@ namespace ServiceFabric.PubSubActors.Tests
             return Task.CompletedTask;
         }
 
-        public Task RegisterServiceSubscriberAsync(ServiceReference service, string messageTypeName)
+        public Task RegisterServiceSubscriberAsync(ServiceReference service, string messageTypeName, string routingKey = null)
         {
             return Task.CompletedTask;
         }

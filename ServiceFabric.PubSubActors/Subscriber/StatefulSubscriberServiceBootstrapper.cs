@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 
-namespace ServiceFabric.PubSubActors.SubscriberServices
+namespace ServiceFabric.PubSubActors.Subscriber
 {
     /// <summary>
     /// Factory for Stateful subscriber services, automatically registers subscriptions for messages.
@@ -18,13 +18,13 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
     /// ctx =&gt; new SubscriberService(ctx)).Build())
     /// .GetAwaiter().GetResult();
     /// </example>
-    public sealed class StatelessSubscriberServiceBootstrapper<TService>
-        where TService : StatelessService, ISubscriberService
+    public sealed class StatefulSubscriberServiceBootstrapper<TService>
+        where TService : StatefulService, ISubscriberService
     {
-        private readonly StatelessServiceContext _context;
-        private readonly Func<StatelessServiceContext, TService> _serviceFactory;
-        private readonly IBrokerClient _brokerClient;
+        private readonly StatefulServiceContext _context;
+        private readonly Func<StatefulServiceContext, TService> _serviceFactory;
         private readonly Action<string> _loggingCallback;
+        private readonly IBrokerClient _brokerClient;
         private readonly FabricClient _fabricClient;
         private long _filterId;
         private TService _service;
@@ -37,23 +37,23 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// <summary>
         /// Creates a new instance.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="serviceFactory"></param>
-        /// <param name="subscriberServiceHelper"></param>
+        /// <param name="context">Service context.</param>
+        /// <param name="serviceFactory">Builds an instance of <typeparamref name="TService"/></param>
+        /// <param name="brokerClient">Helps with subscriptions.</param>
         /// <param name="autoUnsubscribe">Indicates whether the created service subscription should be removed after the service is deleted.</param>
         /// <param name="loggingCallback">Optional logging callback.</param>
-        public StatelessSubscriberServiceBootstrapper(StatelessServiceContext context,
-            Func<StatelessServiceContext, TService> serviceFactory,
-            IBrokerClient subscriberServiceHelper = null,
+        public StatefulSubscriberServiceBootstrapper(StatefulServiceContext context,
+            Func<StatefulServiceContext, TService> serviceFactory,
+            IBrokerClient brokerClient = null,
             bool autoUnsubscribe = false,
             Action<string> loggingCallback = null)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _serviceFactory = serviceFactory ?? throw new ArgumentNullException(nameof(serviceFactory));
-            _brokerClient = subscriberServiceHelper ?? new BrokerClient();
+            _loggingCallback = loggingCallback;
+            _brokerClient = brokerClient ?? new BrokerClient();
             _fabricClient = new FabricClient(FabricClientRole.User);
             _fabricClient.ServiceManager.ServiceNotificationFilterMatched += ServiceNotificationFilterMatched;
-            _loggingCallback = loggingCallback;
             AutoUnsubscribe = autoUnsubscribe;
         }
 

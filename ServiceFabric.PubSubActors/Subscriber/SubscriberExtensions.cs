@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using ServiceFabric.PubSubActors.Interfaces;
-using ServiceFabric.PubSubActors.SubscriberServices;
 
-namespace ServiceFabric.PubSubActors.Helpers
+namespace ServiceFabric.PubSubActors.Subscriber
 {
     /// <summary>
     /// Marks a service method as being capable of receiving messages.

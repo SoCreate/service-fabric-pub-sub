@@ -1,19 +1,22 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Fabric;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
-using ServiceFabric.PubSubActors.Interfaces;
+using ServiceFabric.PubSubActors.State;
 
-namespace ServiceFabric.PubSubActors.SubscriberServices
+namespace ServiceFabric.PubSubActors.Subscriber
 {
-    public class SubscriberStatefulServiceBase : StatefulService, ISubscriberService
+    /// <remarks>
+    /// Base class for a <see cref="StatelessService"/> that serves as a subscriber of messages from the broker.
+    /// Subscribe to message types and define a handler callback by using the <see cref="SubscribeAttribute"/>.
+    /// </remarks>
+    public abstract class SubscriberStatelessServiceBase : StatelessService, ISubscriberService
     {
         private readonly IBrokerClient _brokerClient;
 
@@ -27,32 +30,14 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// </summary>
         protected string ListenerName { get; set; }
 
-        /// <summary>
-        /// Creates a new instance using the provided context.
-        /// </summary>
-        /// <param name="serviceContext"></param>
-        /// <param name="brokerClient"></param>
-        protected SubscriberStatefulServiceBase(StatefulServiceContext serviceContext, IBrokerClient brokerClient = null)
+        protected SubscriberStatelessServiceBase(StatelessServiceContext serviceContext, IBrokerClient brokerClient = null)
             : base(serviceContext)
         {
             _brokerClient = brokerClient ?? new BrokerClient();
         }
 
-        /// <summary>
-        /// Creates a new instance using the provided context.
-        /// </summary>
-        /// <param name="serviceContext"></param>
-        /// <param name="reliableStateManagerReplica"></param>
-        /// <param name="brokerClient"></param>
-        protected SubscriberStatefulServiceBase(StatefulServiceContext serviceContext,
-            IReliableStateManagerReplica2 reliableStateManagerReplica, IBrokerClient brokerClient = null)
-            : base(serviceContext, reliableStateManagerReplica)
-        {
-            _brokerClient = brokerClient ?? new BrokerClient();
-        }
-
         /// <inheritdoc/>
-        protected override Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
+        protected override Task OnOpenAsync(CancellationToken cancellationToken)
         {
             return Subscribe();
         }
@@ -88,10 +73,10 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
             }
         }
 
-        /// <inheritdoc />
-        protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
+        /// <inheritdoc/>
+        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return this.CreateServiceRemotingReplicaListeners();
+            return this.CreateServiceRemotingInstanceListeners();
         }
 
         /// <summary>

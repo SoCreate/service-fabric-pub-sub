@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using ServiceFabric.PubSubActors.Interfaces;
+using ServiceFabric.PubSubActors.Helpers;
 
 namespace ServiceFabric.PubSubActors.State
 {
@@ -96,12 +96,12 @@ namespace ServiceFabric.PubSubActors.State
         /// <returns></returns>
         public bool ShouldDeliverMessage(MessageWrapper message)
         {
-            if (!(Interfaces.MessageWrapperExtensions.PayloadSerializer is DefaultPayloadSerializer))
+            if (!(MessageWrapperExtensions.PayloadSerializer is DefaultPayloadSerializer))
                 return true;
             if (_routingKeyValue == null)
                 return true;
 
-            var token = Interfaces.MessageWrapperExtensions.PayloadSerializer.Deserialize<JToken>(message.Payload);
+            var token = MessageWrapperExtensions.PayloadSerializer.Deserialize<JToken>(message.Payload);
             string value = (string)token.SelectToken(_routingKeyValue[0]);
 
             return string.Equals(_routingKeyValue[1], value, StringComparison.InvariantCultureIgnoreCase);

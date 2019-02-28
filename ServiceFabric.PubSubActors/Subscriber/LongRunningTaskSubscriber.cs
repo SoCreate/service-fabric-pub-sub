@@ -11,9 +11,10 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Newtonsoft.Json;
-using ServiceFabric.PubSubActors.Interfaces;
+using ServiceFabric.PubSubActors.Helpers;
+using ServiceFabric.PubSubActors.State;
 
-namespace ServiceFabric.PubSubActors.SubscriberServices
+namespace ServiceFabric.PubSubActors.Subscriber
 {
     /// <summary>
     /// Base implementation of a <see cref="ISubscriberService"/> that runs long running tasks without delaying <see cref="ISubscriberService.ReceiveMessageAsync"/>.

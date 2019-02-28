@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using ServiceFabric.PubSubActors.Interfaces;
+using ServiceFabric.PubSubActors.State;
 
 namespace ServiceFabric.PubSubActors.Helpers
 {

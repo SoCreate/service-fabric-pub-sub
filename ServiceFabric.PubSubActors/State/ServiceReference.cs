@@ -2,7 +2,7 @@
 using System.Fabric;
 using System.Runtime.Serialization;
 
-namespace ServiceFabric.PubSubActors.Interfaces
+namespace ServiceFabric.PubSubActors.State
 {
 	[DataContract]
 	public class ServiceReference

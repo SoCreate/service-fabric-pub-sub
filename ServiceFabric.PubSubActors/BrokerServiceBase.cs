@@ -12,9 +12,8 @@ using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
-using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.State;
-using ServiceFabric.PubSubActors.SubscriberServices;
+using ServiceFabric.PubSubActors.Subscriber;
 
 namespace ServiceFabric.PubSubActors
 {

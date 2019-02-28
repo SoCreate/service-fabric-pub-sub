@@ -58,7 +58,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Nuget:
 https://www.nuget.org/packages/ServiceFabric.PubSubActors
-https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces (for Actor interfaces)
+https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces (obsolete as of v8.0)
 
 
 ## Getting started
@@ -68,7 +68,6 @@ https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces (for Actor 
 Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services).
 This is done using an intermediate, which is the BrokerService.
 Add this package to all Reliable Actor & Service projects that participate in the pub/sub messaging.
-Add the package 'ServiceFabric.PubSubActors.Interfaces' to all (*ReliableActor).Interfaces projects.
 
 
 |    publisher  |     broker    |subscriber|
@@ -88,7 +87,6 @@ Add the package 'ServiceFabric.PubSubActors.Interfaces' to all (*ReliableActor).
 
 Add a new Stateful Reliable Service project. Call it 'PubSubService' (optional).
 Add Nuget package 'ServiceFabric.PubSubActors' to the 'PubSubActor' project
-Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to the project.
 Replace the code of PubSubService with the following code:
 ```csharp
 internal sealed class PubSubService : BrokerService
@@ -135,31 +133,45 @@ In this example, the Actor called 'SubscribingActor' subscribes to messages of T
 
 Add a Reliable Stateless Actor project called 'SubscribingActor'.
 Add Nuget package 'ServiceFabric.PubSubActors' to the 'SubscribingActor' project
-Add Nuget package 'ServiceFabric.PubSubActors.Interfaces' to the 'SubscribingActor.Interfaces' project.
 Add a project reference to the shared data contracts library ('DataContracts').
-
-Go to the SubscribingActor.Interfaces project, open the file 'ISubscribingActor' and replace the contents with this code:
-**notice this implements ISubscriberActor from the package 'ServiceFabric.PubSubActors.Interfaces' which adds a Receive method. The additional methods are to enable this actor to be manipulated from the outside.**
-```csharp
-public interface ISubscribingActor : ISubscriberActor
-    {
-        // allow external callers to manipulate register/unregister on this sample actor:
-        //for regular messaging:
-        Task RegisterAsync();
-        Task UnregisterAsync();
-        //for relayed messaging:
-        Task RegisterWithRelayAsync();
-        Task UnregisterWithRelayAsync();
-        //for service broker messaging:
-        Task RegisterWithBrokerServiceAsync();
-        Task UnregisterWithBrokerServiceAsync();
-    }
-```
 
 Open the file 'SubscribingActor.cs' and replace the contents with the code below.
 **notice that this Actor now implements 'ISubscriberActor' indirectly.**
-https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/SubscribingActor/SubscribingActor.cs
+```csharp
+[ActorService(Name = nameof(SubscribingActor))]
+[StatePersistence(StatePersistence.None)]
+internal class SubscribingActor : Actor, ISubscriberActor
+{
+    private readonly IBrokerClient _brokerClient;
 
+    public SubscribingActor(ActorService actorService, ActorId actorId, IBrokerClient brokerClient)
+        : base(actorService, actorId)
+    {
+        _brokerClient = brokerClient ?? new BrokerClient();
+    }
+
+    protected override async Task OnActivateAsync()
+    {
+        await _brokerClient.SubscribeAsync(this, typeof(PublishedMessageOne), HandleMessageOne);
+    }
+
+    protected override async Task OnDeactivateAsync()
+    {
+        await _brokerClient.UnsubscribeAsync(this, typeof(PublishedMessageOne), true);
+    }
+
+    public Task ReceiveMessageAsync(MessageWrapper message)
+    {
+        return _brokerClient.ProcessMessageAsync(message);
+    }
+
+    private Task HandleMessageOne(PublishedMessageOne message)
+    {
+        ActorEventSource.Current.ActorMessage(this, $"Received message: {message.Content}");
+        return Task.CompletedTask;
+    }
+}
+```
 
 ### Subscribing to messages using Services using our base class
 
@@ -168,7 +180,6 @@ In this example, the Service called 'SubscribingStatelessService' subscribes to 
 
 Add a Reliable Stateless Service project called 'SubscribingStatelessService'.
 Add Nuget package 'ServiceFabric.PubSubActors'.
-Add Nuget package 'ServiceFabric.PubSubActors.Interfaces'.
 Add a project reference to the shared data contracts library ('DataContracts').
 
 Now open the file SubscribingStatelessService.cs in the project 'SubscribingStatelessService' and replace the SubscribingStatelessService class with this code:
