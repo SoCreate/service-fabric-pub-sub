@@ -152,7 +152,7 @@ internal class SubscribingActor : Actor, ISubscriberActor
 
     protected override async Task OnActivateAsync()
     {
-        await _brokerClient.SubscribeAsync(this, typeof(PublishedMessageOne), HandleMessageOne);
+        await _brokerClient.SubscribeAsync<PublishedMessageOne(this, HandleMessageOne);
     }
 
     public Task ReceiveMessageAsync(MessageWrapper message)

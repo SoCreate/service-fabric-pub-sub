@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.State;
@@ -146,9 +147,8 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="reference"></param>
         /// <param name="messageTypeName"></param>
-        /// <param name="flushQueue"></param>
         /// <returns></returns>
-        public async Task UnsubscribeAsync(ReferenceWrapper reference, string messageTypeName, bool flushQueue)
+        public async Task UnsubscribeAsync(ReferenceWrapper reference, string messageTypeName)
         {
             await WaitForInitializeAsync(CancellationToken.None);
 
@@ -269,8 +269,7 @@ namespace ServiceFabric.PubSubActors
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
             //add the pubsub listener
-            yield return new ServiceReplicaListener(context =>
-                new Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime.FabricTransportServiceRemotingListener(context, this), ListenerName);
+            yield return new ServiceReplicaListener(context => new FabricTransportServiceRemotingListener(context, this), ListenerName);
         }
 
         /// <summary>

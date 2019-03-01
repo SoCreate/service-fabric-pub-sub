@@ -24,53 +24,29 @@ namespace ServiceFabric.PubSubActors.Helpers
             _brokerServiceLocator = brokerServiceLocator ?? new BrokerServiceLocator();
         }
 
-        /// <summary>
-        /// Publish a message.
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public async Task PublishMessageAsync(object message)
+        /// <inheritdoc />
+        public async Task PublishMessageAsync<T>(T message) where T : class
         {
             var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(message);
             await brokerService.PublishMessageAsync(message.CreateMessageWrapper());
         }
 
-        /// <inheritdoc/>
-        public Task SubscribeAsync<T>(StatelessService service, Type messageType, Func<T, Task> handler, string listenerName = null) where T : class
+        /// <inheritdoc />
+        public async Task SubscribeAsync<T>(ReferenceWrapper referenceWrapper, Type messageType, Func<T, Task> handler) where T : class
         {
-            return SubscribeAsync(CreateReferenceWrapper(service, listenerName), messageType, handler);
+            Handlers[messageType] = message => handler((T)message);
+            var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType);
+            await brokerService.SubscribeAsync(referenceWrapper, messageType.FullName);
         }
 
-        /// <inheritdoc/>
-        public Task SubscribeAsync<T>(StatefulService service, Type messageType, Func<T, Task> handler, string listenerName = null) where T : class
+        /// <inheritdoc />
+        public async Task UnsubscribeAsync(ReferenceWrapper referenceWrapper, Type messageType)
         {
-            return SubscribeAsync(CreateReferenceWrapper(service, listenerName), messageType, handler);
+            var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType);
+            await brokerService.UnsubscribeAsync(referenceWrapper, messageType.FullName);
         }
 
-        /// <inheritdoc/>
-        public Task SubscribeAsync<T>(ActorBase actor, Type messageType, Func<T, Task> handler) where T : class
-        {
-            return SubscribeAsync(CreateReferenceWrapper(actor), messageType, handler);
-        }
-
-        /// <inheritdoc/>
-        public Task UnsubscribeAsync(StatelessService service, Type messageType, bool flush)
-        {
-            return UnsubscribeAsync(CreateReferenceWrapper(service), messageType, flush);
-        }
-
-        /// <inheritdoc/>
-        public Task UnsubscribeAsync(StatefulService service, Type messageType, bool flush)
-        {
-            return UnsubscribeAsync(CreateReferenceWrapper(service), messageType, flush);
-        }
-
-        /// <inheritdoc/>
-        public Task UnsubscribeAsync(ActorBase actor, Type messageType, bool flush)
-        {
-            return UnsubscribeAsync(CreateReferenceWrapper(actor), messageType, flush);
-        }
-
+        /// <inheritdoc />
         public Task ProcessMessageAsync(MessageWrapper messageWrapper)
         {
             var messageType = Assembly.Load(messageWrapper.Assembly).GetType(messageWrapper.MessageType, true);
@@ -86,26 +62,113 @@ namespace ServiceFabric.PubSubActors.Helpers
 
             return Task.FromResult(true);
         }
+    }
+
+    public static class BrokerClientExtensions
+    {
+        // subscribe/unsubscribe using Generic type (useful when subscibing manually)
 
         /// <summary>
-        /// Registers a Service or Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
+        /// Registers this StatelessService as a subscriber for messages of type <typeparam name="T"/> with the <see cref="BrokerService"/>.
         /// </summary>
+        /// <param name="brokerClient"></param>
+        /// <param name="service"></param>
+        /// <param name="handler"></param>
+        /// <param name="listenerName"></param>
         /// <returns></returns>
-        private async Task SubscribeAsync<T>(ReferenceWrapper referenceWrapper, Type messageType, Func<T, Task> handler) where T : class
+        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatelessService service, Func<T, Task> handler, string listenerName = null) where T : class
         {
-            Handlers[messageType] = message => handler((T)message);
-            var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.FullName);
-            await brokerService.SubscribeAsync(referenceWrapper, messageType.FullName);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName), typeof(T), handler);
         }
 
         /// <summary>
-        /// Unregisters a Service or Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
+        /// Registers this StatefulService as a subscriber for messages of type <typeparam name="T"/> with the <see cref="BrokerService"/>.
         /// </summary>
+        /// <param name="brokerClient"></param>
+        /// <param name="service"></param>
+        /// <param name="handler"></param>
+        /// <param name="listenerName"></param>
         /// <returns></returns>
-        private async Task UnsubscribeAsync(ReferenceWrapper referenceWrapper, Type messageType, bool flushQueue)
+        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatefulService service, Func<T, Task> handler, string listenerName = null) where T : class
         {
-            var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.FullName);
-            await brokerService.UnsubscribeAsync(referenceWrapper, messageType.FullName, flushQueue);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName), typeof(T), handler);
+        }
+
+        /// <summary>
+        /// Registers this Actor as a subscriber for messages of type <typeparam name="T"/> with the <see cref="BrokerService"/>.
+        /// </summary>
+        /// <param name="brokerClient"></param>
+        /// <param name="actor"></param>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, ActorBase actor, Func<T, Task> handler) where T : class
+        {
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(actor), typeof(T), handler);
+        }
+
+        /// <summary>
+        /// Unregisters this StatelessService as a subscriber for messages of type <typeparam name="T"/> with the <see cref="BrokerService"/>.
+        /// </summary>
+        /// <param name="brokerClient"></param>
+        /// <param name="service"></param>
+        /// <returns></returns>
+        public static Task UnsubscribeAsync<T>(this IBrokerClient brokerClient, StatelessService service) where T : class
+        {
+            return brokerClient.UnsubscribeAsync(CreateReferenceWrapper(service), typeof(T));
+        }
+
+        /// <summary>
+        /// Unregisters this StatefulService as a subscriber for messages of type <typeparam name="T"/> with the <see cref="BrokerService"/>.
+        /// </summary>
+        /// <param name="brokerClient"></param>
+        /// <param name="service"></param>
+        /// <returns></returns>
+        public static Task UnsubscribeAsync<T>(this IBrokerClient brokerClient, StatefulService service) where T : class
+        {
+            return brokerClient.UnsubscribeAsync(CreateReferenceWrapper(service), typeof(T));
+        }
+
+        /// <summary>
+        /// Unregisters this Actor as a subscriber for messages of type <typeparam name="T"/> with the <see cref="BrokerService"/>.
+        /// </summary>
+        /// <param name="brokerClient"></param>
+        /// <param name="actor"></param>
+        /// <returns></returns>
+        public static Task UnsubscribeAsync<T>(this IBrokerClient brokerClient, ActorBase actor) where T : class
+        {
+            return brokerClient.UnsubscribeAsync(CreateReferenceWrapper(actor), typeof(T));
+        }
+
+        // subscribe/unsubscribe using Type (useful when processing Subscribe attributes)
+
+        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatelessService service, Type messageType, Func<T, Task> handler, string listenerName = null) where T : class
+        {
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName), messageType, handler);
+        }
+
+        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatefulService service, Type messageType, Func<T, Task> handler, string listenerName = null) where T : class
+        {
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName), messageType, handler);
+        }
+
+        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, ActorBase actor, Type messageType, Func<T, Task> handler) where T : class
+        {
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(actor), messageType, handler);
+        }
+
+        internal static Task UnsubscribeAsync(this IBrokerClient brokerClient, StatelessService service, Type messageType)
+        {
+            return brokerClient.UnsubscribeAsync(CreateReferenceWrapper(service), messageType);
+        }
+
+        internal static Task UnsubscribeAsync(this IBrokerClient brokerClient, StatefulService service, Type messageType)
+        {
+            return brokerClient.UnsubscribeAsync(CreateReferenceWrapper(service), messageType);
+        }
+
+        internal static Task UnsubscribeAsync(this IBrokerClient brokerClient, ActorBase actor, Type messageType)
+        {
+            return brokerClient.UnsubscribeAsync(CreateReferenceWrapper(actor), messageType);
         }
 
         /// <summary>
@@ -115,7 +178,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="listenerName"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private ReferenceWrapper CreateReferenceWrapper(StatelessService service, string listenerName = null)
+        private static ReferenceWrapper CreateReferenceWrapper(this StatelessService service, string listenerName = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
             var servicePartition = GetPropertyValue<StatelessService, IServicePartition>(service, "Partition");
@@ -129,7 +192,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="listenerName"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private ReferenceWrapper CreateReferenceWrapper(StatefulService service, string listenerName = null)
+        private static ReferenceWrapper CreateReferenceWrapper(this StatefulService service, string listenerName = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
             var servicePartition = GetPropertyValue<StatefulService, IServicePartition>(service, "Partition");
@@ -142,7 +205,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="actor"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private ReferenceWrapper CreateReferenceWrapper(ActorBase actor)
+        private static ReferenceWrapper CreateReferenceWrapper(this ActorBase actor)
         {
             if (actor == null) throw new ArgumentNullException(nameof(actor));
             return new ActorReferenceWrapper(ActorReference.Get(actor));
@@ -155,7 +218,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="info"></param>
         /// <param name="listenerName">(optional) The name of the listener that is used to communicate with the service</param>
         /// <returns></returns>
-        private ServiceReference CreateServiceReference(ServiceContext context, ServicePartitionInformation info, string listenerName = null)
+        private static ServiceReference CreateServiceReference(ServiceContext context, ServicePartitionInformation info, string listenerName = null)
         {
             var serviceReference = new ServiceReference
             {
@@ -178,11 +241,11 @@ namespace ServiceFabric.PubSubActors.Helpers
             return serviceReference;
         }
 
-        private TProperty GetPropertyValue<TClass, TProperty>(TClass instance, string propertyName)
+        private static TProperty GetPropertyValue<TClass, TProperty>(TClass instance, string propertyName)
         {
             return (TProperty)(typeof(TClass)
-                .GetProperty(propertyName, BindingFlags.Instance | BindingFlags.NonPublic)?
-                .GetValue(instance) ?? throw new ArgumentNullException($"Unable to find property: '{propertyName}' on: '{instance}'"));
+               .GetProperty(propertyName, BindingFlags.Instance | BindingFlags.NonPublic)?
+               .GetValue(instance) ?? throw new ArgumentNullException($"Unable to find property: '{propertyName}' on: '{instance}'"));
         }
     }
 }

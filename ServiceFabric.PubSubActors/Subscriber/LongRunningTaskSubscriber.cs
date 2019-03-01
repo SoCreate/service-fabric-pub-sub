@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
-using Microsoft.ServiceFabric.Services.Remoting.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Newtonsoft.Json;
 using ServiceFabric.PubSubActors.Helpers;
@@ -62,7 +62,7 @@ namespace ServiceFabric.PubSubActors.Subscriber
         /// <inheritdoc />
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return this.CreateServiceRemotingReplicaListeners(); //remoting listener
+            yield return new ServiceReplicaListener(context => new FabricTransportServiceRemotingListener(context, this)); //remoting listener
         }
 
         /// <inheritdoc />

@@ -21,8 +21,7 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="messageTypeName">The full type name of the message to subscribe to.</param>
         /// <param name="reference">Reference to the service or actor to unregister.</param>
-        /// <param name="flushQueue">Publish any remaining messages.</param>
-        Task UnsubscribeAsync(ReferenceWrapper reference, string messageTypeName, bool flushQueue);
+        Task UnsubscribeAsync(ReferenceWrapper reference, string messageTypeName);
 
         /// <summary>
         /// Takes a published message and forwards it (indirectly) to all Subscribers.

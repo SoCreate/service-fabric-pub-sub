@@ -128,8 +128,7 @@ namespace ServiceFabric.PubSubActors.Subscriber
             }
             catch (Exception ex)
             {
-                _loggingCallback?.Invoke(
-                    $"Failed to register subscriptions for service '{_context.ServiceName}'. Error: {ex}");
+                _loggingCallback?.Invoke($"Failed to register subscriptions for service '{_context.ServiceName}'. Error: {ex}");
             }
         }
 
@@ -141,7 +140,7 @@ namespace ServiceFabric.PubSubActors.Subscriber
             {
                 foreach (var subscription in _service.DiscoverMessageHandlers())
                 {
-                    await _brokerClient.UnsubscribeAsync(_service, subscription.Key, false).ConfigureAwait(false);
+                    await _brokerClient.UnsubscribeAsync(_service, subscription.Key).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)

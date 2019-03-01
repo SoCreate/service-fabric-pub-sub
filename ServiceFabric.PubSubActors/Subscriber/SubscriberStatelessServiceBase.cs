@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
-using Microsoft.ServiceFabric.Services.Remoting.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.State;
@@ -28,7 +28,7 @@ namespace ServiceFabric.PubSubActors.Subscriber
         /// <summary>
         /// Set the Listener name so the remote Broker can find this service when there are multiple listeners available.
         /// </summary>
-        protected string ListenerName { get; set; }
+        protected string ListenerName { get; set; } = "SubscriberStatelessServiceRemotingListener";
 
         protected SubscriberStatelessServiceBase(StatelessServiceContext serviceContext, IBrokerClient brokerClient = null)
             : base(serviceContext)
@@ -76,7 +76,7 @@ namespace ServiceFabric.PubSubActors.Subscriber
         /// <inheritdoc/>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return this.CreateServiceRemotingInstanceListeners();
+            yield return new ServiceInstanceListener(context => new FabricTransportServiceRemotingListener(context, this), ListenerName);
         }
 
         /// <summary>

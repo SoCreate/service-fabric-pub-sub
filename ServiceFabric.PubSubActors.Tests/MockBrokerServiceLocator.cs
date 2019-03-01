@@ -35,7 +35,7 @@ namespace ServiceFabric.PubSubActors.Tests
             return Task.CompletedTask;
         }
 
-        public Task UnsubscribeAsync(ReferenceWrapper reference, string messageTypeName, bool flushQueue)
+        public Task UnsubscribeAsync(ReferenceWrapper reference, string messageTypeName)
         {
             return Task.CompletedTask;
         }
