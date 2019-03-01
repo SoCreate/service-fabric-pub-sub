@@ -8,6 +8,7 @@ using System;
 using System.Fabric;
 using System.Fabric.Query;
 using System.Threading.Tasks;
+using ServiceFabric.PubSubActors.State;
 
 namespace ServiceFabric.PubSubActors.PublisherActors
 {
@@ -93,10 +94,11 @@ namespace ServiceFabric.PubSubActors.PublisherActors
         /// <param name="message">The message to publish</param>
         /// <param name="brokerServiceName"></param>
         /// <returns></returns>
-        public static async Task<ServicePartitionKey> GetPartitionForMessageAsync(object message, Uri brokerServiceName)
+        public static async Task<ServicePartitionKey> GetPartitionForMessageAsync(object message, Uri brokerServiceName, IHashingHelper hashingHelper = null)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             if (brokerServiceName == null) throw new ArgumentNullException(nameof(brokerServiceName));
+            if (hashingHelper == null) hashingHelper = new HashingHelper();
 
             string messageTypeName = message.GetType().FullName;
 
@@ -105,7 +107,12 @@ namespace ServiceFabric.PubSubActors.PublisherActors
                 var fabricClient = new FabricClient();
                 _cachedPartitions = await fabricClient.QueryManager.GetPartitionListAsync(brokerServiceName);
             }
-            int index = Math.Abs(messageTypeName.GetHashCode() % _cachedPartitions.Count);
+            int hashCode;
+            unchecked
+            {
+                hashCode = (int)hashingHelper.HashString(messageTypeName);
+            }
+            int index = Math.Abs(hashCode % _cachedPartitions.Count);
             var partition = _cachedPartitions[index];
             if (partition.PartitionInformation.Kind != ServicePartitionKind.Int64Range)
             {
