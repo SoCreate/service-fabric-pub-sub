@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
+using ServiceFabric.PubSubActors.State;
 
 namespace ServiceFabric.PubSubActors.Helpers
 {
     public class BrokerServiceLocator : IBrokerServiceLocator
     {
+        private readonly IHashingHelper _hashingHelper;
         private static ServicePartitionList _cachedPartitions;
         private readonly FabricClient _fabricClient;
         private const string _brokerName = nameof(BrokerService);
@@ -19,8 +21,9 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <summary>
         /// Creates a new default instance.
         /// </summary>
-        public BrokerServiceLocator(bool useRemotingV2 = false)
+        public BrokerServiceLocator(bool useRemotingV2 = false, IHashingHelper hashingHelper = null)
         {
+            _hashingHelper = hashingHelper ?? new HashingHelper();
             _fabricClient = new FabricClient();
 
 #if NETSTANDARD2_0
@@ -120,7 +123,13 @@ namespace ServiceFabric.PubSubActors.Helpers
             {
                 _cachedPartitions = await _fabricClient.QueryManager.GetPartitionListAsync(brokerServiceName);
             }
-            int index = Math.Abs(messageTypeName.GetHashCode() % _cachedPartitions.Count);
+
+            int hashCode;
+            unchecked
+            {
+                hashCode = (int) _hashingHelper.HashString(messageTypeName);
+            }
+            int index = Math.Abs(hashCode % _cachedPartitions.Count);
             var partition = _cachedPartitions[index];
             if (partition.PartitionInformation.Kind != ServicePartitionKind.Int64Range)
             {

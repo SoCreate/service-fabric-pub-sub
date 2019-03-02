@@ -215,3 +215,5 @@ ModelManifest.xml
 /ServiceFabric.PubSubActors.Packaged/PackagedBrokerService/packages*.txt
 /ServiceFabric.PubSubActors.snk
 /ServiceFabric.PubSubActors.Packaged/ServiceFabricBackup1/ServiceFabric.PubSubActors.Packaged.Test
+/ServiceFabric.PubSubActors.LoadDemo/ServiceFabricServicesBackup
+/ServiceFabric.PubSubActors.LoadDemo/ServiceFabricServicesBackup1

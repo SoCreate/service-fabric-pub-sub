@@ -13,7 +13,8 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="actor">Reference to the actor to register.</param>
         /// <param name="messageTypeName">The full type name of the message to subscribe to.</param>
-        Task RegisterSubscriberAsync(Microsoft.ServiceFabric.Actors.ActorReference actor, string messageTypeName);
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
+        Task RegisterSubscriberAsync(Microsoft.ServiceFabric.Actors.ActorReference actor, string messageTypeName, string routingKey = null);
 
         /// <summary>
         /// Unregisters an Actor as a subscriber for messages.
@@ -28,7 +29,8 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="messageTypeName">The full type name of the message to subscribe to.</param>
         /// <param name="service">Reference to the Service to register.</param>
-        Task RegisterServiceSubscriberAsync(Interfaces.ServiceReference service, string messageTypeName);
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
+        Task RegisterServiceSubscriberAsync(Interfaces.ServiceReference service, string messageTypeName, string routingKey = null);
 
         /// <summary>
         /// Unregisters a service as a subscriber for messages.
