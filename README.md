@@ -17,7 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
-- 7.5.1 Add routing key support, to support attribute based messaging. Fix hashing issue in dotnet core.
+- 7.6.0 Add routing key support, to support attribute based messaging. Fix hashing issue in dotnet core.
 - 7.5.0 Major upgrade. Added `SubscriberStatelessServiceBase`,`SubscriberStatefulServiceBase`, `StatefulSubscriberServiceBootstrapper` and `StatelessSubscriberServiceBootstrapper` classes to simplify managing subscriber services. Thanks @danadesrosiers.
 - 7.4.3 Broker actor is now obsolete. The interfaces library will be removed as well.
 - 7.4.2 BrokerServiceLocator located in other Application will now be found.
@@ -295,3 +295,32 @@ public interface IPublishingStatelessService : IService
 Open the file 'PublishingStatelessService.cs'. Replace the contents with the code below:
 
 https://github.com/loekd/ServiceFabric.PubSubActors/blob/master/ServiceFabric.PubSubActors.Demo/PublishingStatelessService/PublishingStatelessService.cs
+
+
+## Routing
+**This experimental feature works only when using the `DefaultPayloadSerializer`.**
+It adds support for an additional subscriber filter, based on message content.
+
+### Example 
+
+Given this message type:
+
+```csharp
+public class CustomerMessage
+{
+    public Customer Customer {get; set;}
+}
+
+public class Customer
+{
+    public string Name {get; set;}
+}
+```
+And given a subscriber that is interested in Customers named 'Customer1'.
+The subscription would be registered like this:
+
+```csharp
+await brokerService.RegisterServiceSubscriberAsync(serviceReference, typeof(CustomerMessage).FullName, "Customer.Name=Customer1");
+```
+
+The routing key is queried by using `JToken.SelectToken`. More info [here](https://www.newtonsoft.com/json/help/html/SelectToken.htm).

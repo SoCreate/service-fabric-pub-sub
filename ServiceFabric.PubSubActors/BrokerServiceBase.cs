@@ -115,9 +115,10 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="actor">Reference to the actor to register.</param>
         /// <param name="messageTypeName">Full type name of message object.</param>
-        public async Task RegisterSubscriberAsync(ActorReference actor, string messageTypeName)
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
+        public async Task RegisterSubscriberAsync(ActorReference actor, string messageTypeName, string routingKey = null)
         {
-            var actorReference = new ActorReferenceWrapper(actor);
+            var actorReference = new ActorReferenceWrapper(actor, routingKey);
             await RegisterSubscriberAsync(actorReference, messageTypeName);
         }
         /// <summary>
@@ -136,9 +137,10 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="messageTypeName">Full type name of message object.</param>
         /// <param name="service">Reference to the service to register.</param>
-        public async Task RegisterServiceSubscriberAsync(ServiceReference service, string messageTypeName)
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
+        public async Task RegisterServiceSubscriberAsync(ServiceReference service, string messageTypeName, string routingKey = null)
         {
-            var serviceReference = new ServiceReferenceWrapper(service);
+            var serviceReference = new ServiceReferenceWrapper(service, routingKey);
             await RegisterSubscriberAsync(serviceReference, messageTypeName);
         }
         /// <summary>
