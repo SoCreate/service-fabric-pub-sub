@@ -4,11 +4,6 @@ Do you need to reliably broadcast messages between Actors and Services?
 This code will help you do that.
 It supports both Actors and Services as publishers and subscribers.
 
-It uses extension methods to
-- Actor
-- StatelessService
-- StatefulService
-
 ## Contribute!
 Contributions are welcome.
 Please upgrade the package version with a minor tick if there are no breaking changes. And add a line to the readme.md, stating the changes, e.g. 'upgraded to SF version x.y.z'.
@@ -17,6 +12,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 8.0.0 Major cleanup and usability improvements.  Replaced Helper classes with a single `BrokerClient`.  Removed obsolete code (BrokerActor, RelayBrokerActor, extension methods).  Removed the `ServiceFabric.PubSubActors.Interfaces` library.  Simplified the BrokerService interface.
 - 7.6.2 Fix routing key issue.
 - 7.6.1 Fix hashing helper null ref issue.
 - 7.6.0 Add routing key support, to support attribute based messaging. Fix hashing issue in dotnet core.
@@ -58,7 +54,6 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Nuget:
 https://www.nuget.org/packages/ServiceFabric.PubSubActors
-https://www.nuget.org/packages/ServiceFabric.PubSubActors.Interfaces (obsolete as of v8.0)
 
 
 ## Getting started
@@ -213,7 +208,7 @@ The code in `Program` will look like this:
 ```csharp
     var brokerClient = new BrokerClient();
     ServiceRuntime.RegisterServiceAsync("SubscribingStatelessServiceType",
-        context => new StatelessSubscriberServiceBootstrapper<SubscribingStatelessService >(context, ctx => new SubscribingStatelessService (ctx, brokerClient), brokerClient).Build())
+        context => new StatelessSubscriberServiceBootstrapper<SubscribingStatelessService>(context, ctx => new SubscribingStatelessService (ctx, brokerClient), brokerClient).Build())
         .GetAwaiter().GetResult();
 ```
 
@@ -285,7 +280,33 @@ And given a subscriber that is interested in Customers named 'Customer1'.
 The subscription would be registered like this:
 
 ```csharp
-await brokerService.RegisterServiceSubscriberAsync(serviceReference, typeof(CustomerMessage).FullName, "Customer.Name=Customer1");
+await brokerClient.SubscribeAsync<CustomerMessage>(this, HandleMessageOne, routingKey: "Customer.Name=Customer1");
 ```
 
 The routing key is queried by using `JToken.SelectToken`. More info [here](https://www.newtonsoft.com/json/help/html/SelectToken.htm).
+
+
+## Upgrading to version 8
+Significant changes were made in v8.0.0, including breaking changes to interfaces and tools.
+* BrokerActor and RelayBrokerActor were removed.  Actors don't make a good Broker, use BrokerService instead.
+* ServiceFabric.PubSubActors.Interfaces library was removed.  Only the main library is required now.
+* Obsolete extension methods were removed.
+* Helper classes were removed and replaced with `BrokerClient`.
+* V2 is the only supported Service Fabric Remoting version.
+
+Here are some tips to help you through the upgrade process:
+1. Upgrade remoting to V2
+    * v8.0 only supports remoting V2.  If you are using .NET Standard, you should already be using V2 and you can skip this step.
+    * Refer to documentation here: [Upgrade From Remoting V1 to Remoting V2](https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-reliable-services-communication-remoting#upgrade-from-remoting-v1-to-remoting-v2)
+    * Upgrade the Broker first.  Override `BrokerService.CreateServiceReplicaListeners()` to use the extension method mentioned in the above link so you can use the assembly attribute to set up listening on V1 and V2.
+    * Upgrade Publisher and Subscriber services.  Use the `useRemotingV2` option when creating the BrokerServiceLocator that is used by Helper classes.
+2. Upgrade the Broker.
+   * Remove the ServiceFabric.PubSubActors.Interfaces library and upgrade the ServiceFabric.PubSubActors library to 8.0.
+   * Publish message and Receive message are backwards compatible, so update BrokerService first and publishers and subscribers should continue to function.
+3. Upgrade Subscribers.
+   * Register/Unregister has been replaced by Subscribe/Unsubscribe, so you won't be able to subscribe/unsubscribe until you update subscriber services.
+   * Remove the ServiceFabric.PubSubActors.Interfaces library and upgrade the ServiceFabric.PubSubActors library to 8.0.
+   * Extension methods and helper classes have been removed.  If you are using any of them in your Subscriber services, they will need to be refactored to use the BrokerClient or one of the Subscriber base classes (see documentation above).
+4. Upgrade Publishers. (Optional, publishing is backwards compatible)
+   * Remove the ServiceFabric.PubSubActors.Interfaces library and upgrade the ServiceFabric.PubSubActors library to 8.0.
+   * Extension method and helper classes have been removed.  Use BrokerClient.PublishMessageAsync() instead.
