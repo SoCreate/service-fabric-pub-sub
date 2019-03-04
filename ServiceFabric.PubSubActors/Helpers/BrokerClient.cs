@@ -75,10 +75,11 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="service"></param>
         /// <param name="handler"></param>
         /// <param name="listenerName"></param>
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
-        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatelessService service, Func<T, Task> handler, string listenerName = null) where T : class
+        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatelessService service, Func<T, Task> handler, string listenerName = null, string routingKey = null) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName), typeof(T), handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), typeof(T), handler);
         }
 
         /// <summary>
@@ -88,10 +89,11 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="service"></param>
         /// <param name="handler"></param>
         /// <param name="listenerName"></param>
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
-        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatefulService service, Func<T, Task> handler, string listenerName = null) where T : class
+        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatefulService service, Func<T, Task> handler, string listenerName = null, string routingKey = null) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName), typeof(T), handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), typeof(T), handler);
         }
 
         /// <summary>
@@ -100,10 +102,11 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="brokerClient"></param>
         /// <param name="actor"></param>
         /// <param name="handler"></param>
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
-        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, ActorBase actor, Func<T, Task> handler) where T : class
+        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, ActorBase actor, Func<T, Task> handler, string routingKey = null) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(actor), typeof(T), handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(actor, routingKey), typeof(T), handler);
         }
 
         /// <summary>
@@ -141,19 +144,19 @@ namespace ServiceFabric.PubSubActors.Helpers
 
         // subscribe/unsubscribe using Type (useful when processing Subscribe attributes)
 
-        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatelessService service, Type messageType, Func<T, Task> handler, string listenerName = null) where T : class
+        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatelessService service, Type messageType, Func<T, Task> handler, string listenerName = null, string routingKey = null) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName), messageType, handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), messageType, handler);
         }
 
-        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatefulService service, Type messageType, Func<T, Task> handler, string listenerName = null) where T : class
+        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatefulService service, Type messageType, Func<T, Task> handler, string listenerName = null, string routingKey = null) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName), messageType, handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), messageType, handler);
         }
 
-        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, ActorBase actor, Type messageType, Func<T, Task> handler) where T : class
+        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, ActorBase actor, Type messageType, Func<T, Task> handler, string routingKey = null) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(actor), messageType, handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(actor, routingKey), messageType, handler);
         }
 
         internal static Task UnsubscribeAsync(this IBrokerClient brokerClient, StatelessService service, Type messageType)
@@ -176,13 +179,14 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// </summary>
         /// <param name="service"></param>
         /// <param name="listenerName"></param>
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private static ReferenceWrapper CreateReferenceWrapper(this StatelessService service, string listenerName = null)
+        private static ReferenceWrapper CreateReferenceWrapper(this StatelessService service, string listenerName = null, string routingKey = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
             var servicePartition = GetPropertyValue<StatelessService, IServicePartition>(service, "Partition");
-            return new ServiceReferenceWrapper(CreateServiceReference(service.Context, servicePartition.PartitionInfo, listenerName));
+            return new ServiceReferenceWrapper(CreateServiceReference(service.Context, servicePartition.PartitionInfo, listenerName), routingKey);
         }
 
         /// <summary>
@@ -190,25 +194,27 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// </summary>
         /// <param name="service"></param>
         /// <param name="listenerName"></param>
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private static ReferenceWrapper CreateReferenceWrapper(this StatefulService service, string listenerName = null)
+        private static ReferenceWrapper CreateReferenceWrapper(this StatefulService service, string listenerName = null, string routingKey = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
             var servicePartition = GetPropertyValue<StatefulService, IServicePartition>(service, "Partition");
-            return new ServiceReferenceWrapper(CreateServiceReference(service.Context, servicePartition.PartitionInfo, listenerName));
+            return new ServiceReferenceWrapper(CreateServiceReference(service.Context, servicePartition.PartitionInfo, listenerName), routingKey);
         }
 
         /// <summary>
         /// Create a ReferenceWrapper object given this Actor.
         /// </summary>
         /// <param name="actor"></param>
+        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private static ReferenceWrapper CreateReferenceWrapper(this ActorBase actor)
+        private static ReferenceWrapper CreateReferenceWrapper(this ActorBase actor, string routingKey = null)
         {
             if (actor == null) throw new ArgumentNullException(nameof(actor));
-            return new ActorReferenceWrapper(ActorReference.Get(actor));
+            return new ActorReferenceWrapper(ActorReference.Get(actor), routingKey);
         }
 
         /// <summary>
