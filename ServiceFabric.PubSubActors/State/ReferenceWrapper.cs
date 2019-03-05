@@ -36,6 +36,9 @@ namespace ServiceFabric.PubSubActors.State
         /// <summary>
         /// Gets a logical name for this reference
         /// </summary>
+        public ulong TotalReceived { get; set; }
+        public ulong TotalDelivered { get; set; }
+
         public abstract string Name { get; }
 
         /// <summary>

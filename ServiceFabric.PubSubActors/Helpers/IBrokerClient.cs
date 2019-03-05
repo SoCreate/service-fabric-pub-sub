@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ServiceFabric.PubSubActors.State;
 
@@ -36,5 +37,20 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="messageWrapper"></param>
         /// <returns></returns>
         Task ProcessMessageAsync(MessageWrapper messageWrapper);
+
+        /// <summary>
+        /// Get the current stats from the Broker for each queue.  Includes information on how many messages have been
+        /// received and delivered.
+        /// </summary>
+        /// <returns></returns>
+        Task<Dictionary<string, List<QueueStats>>> GetBrokerStatsAsync();
+
+        /// <summary>
+        /// Deletes the queue <paramref name="queueName"/> from the Broker.  Useful for a Broker Monitor service to unsubscribe
+        /// a service or actor from a message type.  The queueName can be found with a call to <see cref="GetBrokerStatsAsync"/>.
+        /// </summary>
+        /// <param name="queueName"></param>
+        /// <returns></returns>
+        Task UnsubscribeByQueueNameAsync(string queueName);
     }
 }

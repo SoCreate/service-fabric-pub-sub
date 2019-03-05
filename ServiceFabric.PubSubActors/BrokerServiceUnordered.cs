@@ -67,6 +67,7 @@ namespace ServiceFabric.PubSubActors
                     if (result.HasValue)
                     {
                         await subscriber.PublishAsync(result.Value);
+                        subscriber.TotalDelivered++;
                     }
                 }, cancellationToken: cancellationToken);
             }
