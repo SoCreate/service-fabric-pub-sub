@@ -15,8 +15,23 @@ namespace ServiceFabric.PubSubActors.State
     public abstract class ReferenceWrapper : IEquatable<ReferenceWrapper>, IComparable<ReferenceWrapper>
     {
         private readonly string[] _routingKeyValue;
+        private IHashingHelper _hashingHelper;
 
-        protected HashingHelper HashingHelper { get; } = new HashingHelper();
+        /// <summary>
+        /// Gets a hash helper to determine consistent string hashes.
+        /// </summary>
+        protected IHashingHelper HashingHelper
+        {
+            get
+            {
+                if (_hashingHelper == null)
+                {
+                    _hashingHelper = new HashingHelper();
+                }
+
+                return _hashingHelper;
+            }
+        }
 
         /// <summary>
         /// Gets a logical name for this reference
