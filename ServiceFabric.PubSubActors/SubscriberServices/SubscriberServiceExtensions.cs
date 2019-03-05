@@ -187,7 +187,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// Registers this Service as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
         /// </summary>
         /// <returns></returns>
-        public static async Task RegisterMessageTypeWithBrokerServiceAsync(this StatelessService service, Type messageType, Uri brokerServiceName = null, string listenerName = null)
+        public static async Task RegisterMessageTypeWithBrokerServiceAsync(this StatelessService service, Type messageType, Uri brokerServiceName = null, string listenerName = null, string routingKey = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
@@ -201,7 +201,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
             }
             var brokerService = await PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
             var serviceReference = CreateServiceReference(service.Context, service.GetServicePartition().PartitionInfo, listenerName);
-            await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName);
+            await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName, routingKey);
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
         /// </summary>
         /// <returns></returns>
-        public static async Task RegisterMessageTypeWithBrokerServiceAsync(this StatefulService service, Type messageType, Uri brokerServiceName = null, string listenerName = null)
+        public static async Task RegisterMessageTypeWithBrokerServiceAsync(this StatefulService service, Type messageType, Uri brokerServiceName = null, string listenerName = null, string routingKey = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
@@ -243,7 +243,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
             }
             var brokerService = await PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
             var serviceReference = CreateServiceReference(service.Context, service.GetServicePartition().PartitionInfo, listenerName);
-            await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName);
+            await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName, routingKey);
         }
 
         /// <summary>

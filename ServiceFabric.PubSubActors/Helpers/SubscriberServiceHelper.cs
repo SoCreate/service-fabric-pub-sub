@@ -43,7 +43,7 @@ namespace ServiceFabric.PubSubActors.Helpers
             await RegisterMessageTypeAsync(serviceReference, messageType, brokerServiceName);
         }
 
-        private async Task RegisterMessageTypeAsync(ServiceReference serviceReference, Type messageType, Uri brokerServiceName = null)
+        private async Task RegisterMessageTypeAsync(ServiceReference serviceReference, Type messageType, Uri brokerServiceName = null, string routingKey = null)
         {
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
             if (brokerServiceName == null)
@@ -55,7 +55,7 @@ namespace ServiceFabric.PubSubActors.Helpers
                 }
             }
             var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
-            await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName);
+            await brokerService.RegisterServiceSubscriberAsync(serviceReference, messageType.FullName, routingKey);
         }
 
         /// <summary>

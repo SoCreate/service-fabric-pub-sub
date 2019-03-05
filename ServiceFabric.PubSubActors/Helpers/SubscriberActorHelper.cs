@@ -26,7 +26,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
         /// </summary>
         /// <returns></returns>
-        public async Task RegisterMessageTypeAsync(ActorBase actor, Type messageType, Uri brokerServiceName = null)
+        public async Task RegisterMessageTypeAsync(ActorBase actor, Type messageType, Uri brokerServiceName = null, string routingKey = null)
         {
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
             if (actor == null) throw new ArgumentNullException(nameof(actor));
@@ -39,7 +39,7 @@ namespace ServiceFabric.PubSubActors.Helpers
                 }
             }
             var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
-            await brokerService.RegisterSubscriberAsync(ActorReference.Get(actor), messageType.FullName);
+            await brokerService.RegisterSubscriberAsync(ActorReference.Get(actor), messageType.FullName, routingKey);
         }
 
         /// <summary>

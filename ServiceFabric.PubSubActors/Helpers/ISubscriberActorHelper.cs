@@ -10,7 +10,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// Registers this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.
         /// </summary>
         /// <returns></returns>
-        Task RegisterMessageTypeAsync(ActorBase actor, Type messageType, Uri brokerServiceName = null);
+        Task RegisterMessageTypeAsync(ActorBase actor, Type messageType, Uri brokerServiceName = null, string routingKey = null);
 
         /// <summary>
         /// Unregisters this Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.

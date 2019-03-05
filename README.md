@@ -17,6 +17,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 7.6.2 Fix routing key issue.
 - 7.6.1 Fix hashing helper null ref issue.
 - 7.6.0 Add routing key support, to support attribute based messaging. Fix hashing issue in dotnet core.
 - 7.5.0 Major upgrade. Added `SubscriberStatelessServiceBase`,`SubscriberStatefulServiceBase`, `StatefulSubscriberServiceBootstrapper` and `StatelessSubscriberServiceBootstrapper` classes to simplify managing subscriber services. Thanks @danadesrosiers.

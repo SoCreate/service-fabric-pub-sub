@@ -106,7 +106,7 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
 		/// </summary>
 		/// <returns></returns>
 		[Obsolete("Use ServiceFabric.PubSubActors.Helpers.SubscriberActorHelper for testability")]
-        public static async Task RegisterMessageTypeWithBrokerServiceAsync(this ActorBase actor, Type messageType, Uri brokerServiceName = null)
+        public static async Task RegisterMessageTypeWithBrokerServiceAsync(this ActorBase actor, Type messageType, Uri brokerServiceName = null, string routingKey = null)
         {
             if (messageType == null) throw new ArgumentNullException(nameof(messageType));
             if (actor == null) throw new ArgumentNullException(nameof(actor));
@@ -119,7 +119,7 @@ namespace ServiceFabric.PubSubActors.SubscriberActors
                 }
             }
             var brokerService = await PublisherActors.PublisherActorExtensions.GetBrokerServiceForMessageAsync(messageType.Name, brokerServiceName);
-            await brokerService.RegisterSubscriberAsync(ActorReference.Get(actor), messageType.FullName);
+            await brokerService.RegisterSubscriberAsync(ActorReference.Get(actor), messageType.FullName, routingKey);
         }
 
         /// <summary>
