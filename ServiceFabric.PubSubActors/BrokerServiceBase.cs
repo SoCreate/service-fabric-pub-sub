@@ -106,9 +106,8 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="reference">Reference to the Service or Actor to register.</param>
         /// <param name="messageTypeName">Full type name of message object.</param>
-        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
-        public async Task SubscribeAsync(ReferenceWrapper reference, string messageTypeName, string routingKey)
+        public async Task SubscribeAsync(ReferenceWrapper reference, string messageTypeName)
         {
             await WaitForInitializeAsync(CancellationToken.None);
 
