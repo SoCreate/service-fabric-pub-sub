@@ -201,8 +201,26 @@ namespace ServiceFabric.PubSubActors
                 foreach (var subscriber in subscribers)
                 {
                     await EnqueueMessageAsync(message, subscriber, tx);
+                    _queues[subscriber.QueueName].TotalReceived++;
                 }
                 ServiceEventSourceMessage($"Published message '{message.MessageType}' to {subscribers.Length} subscribers.");
+            });
+        }
+
+        public Task<QueueStatsWrapper> GetBrokerStatsAsync()
+        {
+            return Task.FromResult(new QueueStatsWrapper
+            {
+                Queues = _queues.ToDictionary(reference => reference.Key, reference => reference.Value),
+                Stats = _queues.Select(queue => new QueueStats
+                {
+                    QueueName = queue.Key,
+                    ServiceName = queue.Value.Name,
+                    Time = DateTime.UtcNow,
+                    TotalReceived = queue.Value.TotalReceived,
+                    TotalDelivered = queue.Value.TotalDelivered
+                })
+                .ToList()
             });
         }
 
