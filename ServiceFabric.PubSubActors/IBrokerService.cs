@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Remoting;
+using ServiceFabric.PubSubActors.State;
 
 namespace ServiceFabric.PubSubActors
 {
@@ -9,42 +10,24 @@ namespace ServiceFabric.PubSubActors
     public interface IBrokerService : IService
     {
         /// <summary>
-        /// Registers an Actor as a subscriber for messages.
+        /// Registers a Service or Actor as a subscriber for messages.
         /// </summary>
-        /// <param name="actor">Reference to the actor to register.</param>
+        /// <param name="reference">Reference to the service or actor to register.</param>
         /// <param name="messageTypeName">The full type name of the message to subscribe to.</param>
-        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
-        Task RegisterSubscriberAsync(Microsoft.ServiceFabric.Actors.ActorReference actor, string messageTypeName, string routingKey);
+        Task SubscribeAsync(ReferenceWrapper reference, string messageTypeName);
 
         /// <summary>
-        /// Unregisters an Actor as a subscriber for messages.
+        /// Unregisters a Service or Actor as a subscriber for messages.
         /// </summary>
         /// <param name="messageTypeName">The full type name of the message to subscribe to.</param>
-        /// <param name="actor">Reference to the actor to unregister.</param>
-        /// <param name="flushQueue">Publish any remaining messages.</param>
-        Task UnregisterSubscriberAsync(Microsoft.ServiceFabric.Actors.ActorReference actor, string messageTypeName, bool flushQueue);
-
-        /// <summary>
-        /// Registers a service as a subscriber for messages.
-        /// </summary>
-        /// <param name="messageTypeName">The full type name of the message to subscribe to.</param>
-        /// <param name="service">Reference to the Service to register.</param>
-        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
-        Task RegisterServiceSubscriberAsync(Interfaces.ServiceReference service, string messageTypeName, string routingKey);
-
-        /// <summary>
-        /// Unregisters a service as a subscriber for messages.
-        /// </summary>
-        /// <param name="messageTypeName">The full type name of the message to subscribe to.</param>
-        /// <param name="service">Reference to the Service to unregister.</param>
-        /// <param name="flushQueue">Publish any remaining messages.</param>
-        Task UnregisterServiceSubscriberAsync(Interfaces.ServiceReference service, string messageTypeName, bool flushQueue);
+        /// <param name="reference">Reference to the service or actor to unregister.</param>
+        Task UnsubscribeAsync(ReferenceWrapper reference, string messageTypeName);
 
         /// <summary>
         /// Takes a published message and forwards it (indirectly) to all Subscribers.
         /// </summary>
         /// <param name="message">The message to publish</param>
         /// <returns></returns>
-        Task PublishMessageAsync(Interfaces.MessageWrapper message);
+        Task PublishMessageAsync(MessageWrapper message);
     }
 }

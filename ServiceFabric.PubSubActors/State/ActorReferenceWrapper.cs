@@ -1,9 +1,11 @@
 ﻿using Microsoft.ServiceFabric.Actors;
 using Newtonsoft.Json.Linq;
-using ServiceFabric.PubSubActors.Interfaces;
 using System;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Actors;
+using ServiceFabric.PubSubActors.Helpers;
+using ServiceFabric.PubSubActors.Subscriber;
 
 namespace ServiceFabric.PubSubActors.State
 {
@@ -13,11 +15,7 @@ namespace ServiceFabric.PubSubActors.State
     [DataContract]
     public class ActorReferenceWrapper : ReferenceWrapper
     {
-
-        public override string Name
-        {
-            get { return $"{ActorReference.ServiceUri}\t{ActorReference.ActorId}"; }
-        }
+        public override string Name => $"{ActorReference.ServiceUri}\t{ActorReference.ActorId}";
 
         /// <summary>
         /// Gets the wrapped <see cref="Microsoft.ServiceFabric.Actors.ActorReference"/>
@@ -73,7 +71,7 @@ namespace ServiceFabric.PubSubActors.State
         }
 
         /// <summary>
-        /// Serves as a hash function for a particular type. 
+        /// Serves as a hash function for a particular type.
         /// </summary>
         /// <returns>
         /// A hash code for the current object.
@@ -108,10 +106,10 @@ namespace ServiceFabric.PubSubActors.State
         /// <inheritdoc />
         public override Task PublishAsync(MessageWrapper message)
         {
-            if (string.IsNullOrWhiteSpace(RoutingKey)
-                || ShouldDeliverMessage(message))
+            if (string.IsNullOrWhiteSpace(RoutingKey) || ShouldDeliverMessage(message))
             {
-                return MessageWrapperExtensions.PublishAsync(this, message);
+                var actor = (ISubscriberActor)ActorReference.Bind(typeof(ISubscriberActor));
+                return actor.ReceiveMessageAsync(message);
             }
 
             return Task.FromResult(true);

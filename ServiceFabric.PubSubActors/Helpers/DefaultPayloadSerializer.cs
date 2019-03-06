@@ -1,7 +1,8 @@
 ﻿using System;
 using Newtonsoft.Json;
+using ServiceFabric.PubSubActors.State;
 
-namespace ServiceFabric.PubSubActors.Interfaces
+namespace ServiceFabric.PubSubActors.Helpers
 {
 	/// <summary>
 	/// The default serializer to use for <see cref="MessageWrapper.Payload"/>

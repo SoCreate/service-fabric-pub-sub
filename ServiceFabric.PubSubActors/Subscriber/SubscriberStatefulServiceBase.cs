@@ -1,40 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Fabric;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
-using Microsoft.ServiceFabric.Services.Remoting.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
-using ServiceFabric.PubSubActors.Interfaces;
+using ServiceFabric.PubSubActors.State;
 
-namespace ServiceFabric.PubSubActors.SubscriberServices
+namespace ServiceFabric.PubSubActors.Subscriber
 {
     public class SubscriberStatefulServiceBase : StatefulService, ISubscriberService
     {
-        private readonly ISubscriberServiceHelper _subscriberServiceHelper;
+        private readonly IBrokerClient _brokerClient;
 
         /// <summary>
-        /// The message types that this service subscribes to and their respective handler methods.
+        /// When Set, this callback will be used to log messages to.
         /// </summary>
-        protected Dictionary<Type, Func<object, Task>> Handlers { get; set; } = new Dictionary<Type, Func<object, Task>>();
+        protected Action<string> Logger { get; set; }
 
         /// <summary>
         /// Set the Listener name so the remote Broker can find this service when there are multiple listeners available.
         /// </summary>
-        protected string ListenerName { get; set; }
+        protected string ListenerName { get; set; } = "SubscriberStatefulServiceRemotingListener";
 
         /// <summary>
         /// Creates a new instance using the provided context.
         /// </summary>
         /// <param name="serviceContext"></param>
-        /// <param name="subscriberServiceHelper"></param>
-        protected SubscriberStatefulServiceBase(StatefulServiceContext serviceContext, ISubscriberServiceHelper subscriberServiceHelper = null)
+        /// <param name="brokerClient"></param>
+        protected SubscriberStatefulServiceBase(StatefulServiceContext serviceContext, IBrokerClient brokerClient = null)
             : base(serviceContext)
         {
-            _subscriberServiceHelper = subscriberServiceHelper ?? new SubscriberServiceHelper(new BrokerServiceLocator());
+            _brokerClient = brokerClient ?? new BrokerClient();
         }
 
         /// <summary>
@@ -42,18 +43,17 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// </summary>
         /// <param name="serviceContext"></param>
         /// <param name="reliableStateManagerReplica"></param>
-        /// <param name="subscriberServiceHelper"></param>
+        /// <param name="brokerClient"></param>
         protected SubscriberStatefulServiceBase(StatefulServiceContext serviceContext,
-            IReliableStateManagerReplica2 reliableStateManagerReplica, ISubscriberServiceHelper subscriberServiceHelper = null)
+            IReliableStateManagerReplica2 reliableStateManagerReplica, IBrokerClient brokerClient = null)
             : base(serviceContext, reliableStateManagerReplica)
         {
-            _subscriberServiceHelper = subscriberServiceHelper ?? new SubscriberServiceHelper(new BrokerServiceLocator());
+            _brokerClient = brokerClient ?? new BrokerClient();
         }
 
         /// <inheritdoc/>
         protected override Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
         {
-            Handlers = _subscriberServiceHelper.DiscoverMessageHandlers(this);
             return Subscribe();
         }
 
@@ -64,7 +64,7 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// <returns></returns>
         public virtual Task ReceiveMessageAsync(MessageWrapper messageWrapper)
         {
-            return _subscriberServiceHelper.ProccessMessageAsync(messageWrapper, Handlers);
+            return _brokerClient.ProcessMessageAsync(messageWrapper);
         }
 
         /// <summary>
@@ -72,16 +72,36 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// This method can be overriden to subscribe manually based on custom logic.
         /// </summary>
         /// <returns></returns>
-        protected virtual Task Subscribe()
+        protected virtual async Task Subscribe()
         {
-            var serviceReference = _subscriberServiceHelper.CreateServiceReference(this, ListenerName);
-            return _subscriberServiceHelper.SubscribeAsync(serviceReference, Handlers.Keys);
+            foreach (var handler in this.DiscoverMessageHandlers())
+            {
+                try
+                {
+                    await _brokerClient.SubscribeAsync(this, handler.Key, handler.Value, ListenerName);
+                    LogMessage($"Registered Service:'{Context.ServiceName}' as Subscriber of {handler.Key}.");
+                }
+                catch (Exception ex)
+                {
+                    LogMessage($"Failed to register Service:'{Context.ServiceName}' as Subscriber of {handler.Key}. Error:'{ex.Message}'.");
+                }
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return this.CreateServiceRemotingReplicaListeners();
+            yield return new ServiceReplicaListener(context => new FabricTransportServiceRemotingListener(context, this), ListenerName);
+        }
+
+        /// <summary>
+        /// Outputs the provided message to the <see cref="Logger"/> if it's configured.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="caller"></param>
+        protected void LogMessage(string message, [CallerMemberName] string caller = "unknown")
+        {
+            Logger?.Invoke($"{caller} - {message}");
         }
     }
 }

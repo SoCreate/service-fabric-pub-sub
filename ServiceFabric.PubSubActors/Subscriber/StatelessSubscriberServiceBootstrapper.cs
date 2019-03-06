@@ -1,11 +1,11 @@
-﻿using Microsoft.ServiceFabric.Services.Runtime;
-using ServiceFabric.PubSubActors.Helpers;
-using System;
+﻿using System;
 using System.Fabric;
 using System.Fabric.Description;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Services.Runtime;
+using ServiceFabric.PubSubActors.Helpers;
 
-namespace ServiceFabric.PubSubActors.SubscriberServices
+namespace ServiceFabric.PubSubActors.Subscriber
 {
     /// <summary>
     /// Factory for Stateful subscriber services, automatically registers subscriptions for messages.
@@ -18,13 +18,13 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
     /// ctx =&gt; new SubscriberService(ctx)).Build())
     /// .GetAwaiter().GetResult();
     /// </example>
-    public sealed class StatefulSubscriberServiceBootstrapper<TService>
-        where TService : StatefulService, ISubscriberService
+    public sealed class StatelessSubscriberServiceBootstrapper<TService>
+        where TService : StatelessService, ISubscriberService
     {
-        private readonly StatefulServiceContext _context;
-        private readonly Func<StatefulServiceContext, TService> _serviceFactory;
+        private readonly StatelessServiceContext _context;
+        private readonly Func<StatelessServiceContext, TService> _serviceFactory;
+        private readonly IBrokerClient _brokerClient;
         private readonly Action<string> _loggingCallback;
-        private readonly ISubscriberServiceHelper _subscriberServiceHelper;
         private readonly FabricClient _fabricClient;
         private long _filterId;
         private TService _service;
@@ -37,23 +37,23 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         /// <summary>
         /// Creates a new instance.
         /// </summary>
-        /// <param name="context">Service context.</param>
-        /// <param name="serviceFactory">Builds an instance of <typeparamref name="TService"/></param>
-        /// <param name="subscriberServiceHelper">Helps with subscriptions.</param>
+        /// <param name="context"></param>
+        /// <param name="serviceFactory"></param>
+        /// <param name="subscriberServiceHelper"></param>
         /// <param name="autoUnsubscribe">Indicates whether the created service subscription should be removed after the service is deleted.</param>
         /// <param name="loggingCallback">Optional logging callback.</param>
-        public StatefulSubscriberServiceBootstrapper(StatefulServiceContext context,
-            Func<StatefulServiceContext, TService> serviceFactory,
-            ISubscriberServiceHelper subscriberServiceHelper = null,
+        public StatelessSubscriberServiceBootstrapper(StatelessServiceContext context,
+            Func<StatelessServiceContext, TService> serviceFactory,
+            IBrokerClient subscriberServiceHelper = null,
             bool autoUnsubscribe = false,
             Action<string> loggingCallback = null)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _serviceFactory = serviceFactory ?? throw new ArgumentNullException(nameof(serviceFactory));
-            _loggingCallback = loggingCallback;
-            _subscriberServiceHelper = subscriberServiceHelper ?? new SubscriberServiceHelper();
+            _brokerClient = subscriberServiceHelper ?? new BrokerClient();
             _fabricClient = new FabricClient(FabricClientRole.User);
             _fabricClient.ServiceManager.ServiceNotificationFilterMatched += ServiceNotificationFilterMatched;
+            _loggingCallback = loggingCallback;
             AutoUnsubscribe = autoUnsubscribe;
         }
 
@@ -121,28 +121,27 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
             _loggingCallback?.Invoke($"Registering subscriptions for service '{_context.ServiceName}'.");
             try
             {
-                await _subscriberServiceHelper.SubscribeAsync(
-                        _subscriberServiceHelper.CreateServiceReference(_service),
-                        _subscriberServiceHelper.DiscoverMessageHandlers(_service).Keys)
-                    .ConfigureAwait(false);
+                foreach (var subscription in _service.DiscoverMessageHandlers())
+                {
+                    await _brokerClient.SubscribeAsync(_service, subscription.Key, subscription.Value).ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {
-                _loggingCallback?.Invoke(
-                    $"Failed to register subscriptions for service '{_context.ServiceName}'. Error: {ex}");
+                _loggingCallback?.Invoke($"Failed to register subscriptions for service '{_context.ServiceName}'. Error: {ex}");
             }
         }
 
         private async Task UnregisterSubscriptions()
         {
             _loggingCallback?.Invoke($"Unregistering subscriptions for deleted service '{_context.ServiceName}'.");
-            
+
             try
             {
-                await _subscriberServiceHelper.SubscribeAsync(
-                        _subscriberServiceHelper.CreateServiceReference(_service),
-                        _subscriberServiceHelper.DiscoverMessageHandlers(_service).Keys)
-                    .ConfigureAwait(false);
+                foreach (var subscription in _service.DiscoverMessageHandlers())
+                {
+                    await _brokerClient.UnsubscribeAsync(_service, subscription.Key).ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {

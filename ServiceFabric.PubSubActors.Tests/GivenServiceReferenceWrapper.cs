@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.State;
 
 namespace ServiceFabric.PubSubActors.Tests

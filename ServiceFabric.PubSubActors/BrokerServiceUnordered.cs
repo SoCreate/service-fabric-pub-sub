@@ -5,16 +5,15 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Runtime;
-using ServiceFabric.PubSubActors.Interfaces;
-using ServiceFabric.PubSubActors.PublisherActors;
+using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.State;
-using ServiceFabric.PubSubActors.SubscriberServices;
+using ServiceFabric.PubSubActors.Subscriber;
 
 namespace ServiceFabric.PubSubActors
 {
     /// <remarks>
-    /// Base class for a <see cref="StatefulService"/> that serves as a Broker that accepts messages 
-    /// from Actors & Services calling <see cref="PublisherActorExtensions.PublishMessageAsync"/>
+    /// Base class for a <see cref="StatefulService"/> that serves as a Broker that accepts messages
+    /// from Actors & Services calling <see cref="BrokerClient.PublishMessageAsync"/>
     /// and forwards them to <see cref="ISubscriberActor"/> Actors and <see cref="ISubscriberService"/> Services without strict ordering, so more performant than <see cref="BrokerService"/>.
     /// Every message type is mapped to one of the partitions of this service.
     /// </remarks>
@@ -25,9 +24,8 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="serviceContext"></param>
         /// <param name="enableAutoDiscovery"></param>
-        /// <param name="useRemotingV2">Use remoting v2? Ignored in netstandard.</param>
-        protected BrokerServiceUnordered(StatefulServiceContext serviceContext, bool enableAutoDiscovery = true, bool useRemotingV2 = false)
-            : base(serviceContext, enableAutoDiscovery, useRemotingV2)
+        protected BrokerServiceUnordered(StatefulServiceContext serviceContext, bool enableAutoDiscovery = true)
+            : base(serviceContext, enableAutoDiscovery)
         {
         }
 
@@ -37,9 +35,8 @@ namespace ServiceFabric.PubSubActors
         /// <param name="serviceContext"></param>
         /// <param name="reliableStateManagerReplica"></param>
         /// <param name="enableAutoDiscovery"></param>
-        /// <param name="useRemotingV2">Use remoting v2? Ignored in netstandard.</param>
-        protected BrokerServiceUnordered(StatefulServiceContext serviceContext, IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true, bool useRemotingV2 = false)
-            : base(serviceContext, reliableStateManagerReplica, enableAutoDiscovery, useRemotingV2)
+        protected BrokerServiceUnordered(StatefulServiceContext serviceContext, IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true)
+            : base(serviceContext, reliableStateManagerReplica, enableAutoDiscovery)
         {
         }
 

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data;
 
-namespace ServiceFabric.PubSubActors
+namespace ServiceFabric.PubSubActors.Helpers
 {
     /// <summary>
     /// Provides retry support when using the <see cref="ReliableStateManager"/>.

@@ -10,7 +10,6 @@
     <PackageReference Include="ServiceFabric.Mocks" Version="3.4.7" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ServiceFabric.PubSubActors.Interfaces\ServiceFabric.PubSubActors.Interfaces.csproj" />
     <ProjectReference Include="..\ServiceFabric.PubSubActors\ServiceFabric.PubSubActors.csproj" />
   </ItemGroup>
 </Project>

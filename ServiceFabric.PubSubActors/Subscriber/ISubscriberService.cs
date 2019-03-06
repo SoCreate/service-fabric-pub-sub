@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Remoting;
-using ServiceFabric.PubSubActors.Interfaces;
+using ServiceFabric.PubSubActors.State;
 
-namespace ServiceFabric.PubSubActors.SubscriberServices
+namespace ServiceFabric.PubSubActors.Subscriber
 {
     /// <summary>
-    /// Defines a common interface for all Subscriber Services. 
+    /// Defines a common interface for all Subscriber Services.
     /// </summary>
     public interface ISubscriberService : IService
     {

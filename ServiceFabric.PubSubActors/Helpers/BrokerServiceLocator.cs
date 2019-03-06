@@ -14,31 +14,19 @@ namespace ServiceFabric.PubSubActors.Helpers
     {
         private readonly IHashingHelper _hashingHelper;
         private static ServicePartitionList _cachedPartitions;
+        private static Uri _cachedBrokerUri;
         private readonly FabricClient _fabricClient;
-        private const string _brokerName = nameof(BrokerService);
+        private const string BrokerName = nameof(BrokerService);
         private readonly IServiceProxyFactory _serviceProxyFactory;
 
         /// <summary>
         /// Creates a new default instance.
         /// </summary>
-        public BrokerServiceLocator(bool useRemotingV2 = false, IHashingHelper hashingHelper = null)
+        public BrokerServiceLocator(IHashingHelper hashingHelper = null)
         {
             _hashingHelper = hashingHelper ?? new HashingHelper();
             _fabricClient = new FabricClient();
-
-#if NETSTANDARD2_0
-
             _serviceProxyFactory = new ServiceProxyFactory(c => new FabricTransportServiceRemotingClientFactory());
-#else
-            if (useRemotingV2)
-            {
-                _serviceProxyFactory = new ServiceProxyFactory(c => new FabricTransportServiceRemotingClientFactory());
-            }
-            else
-            {
-                _serviceProxyFactory = new ServiceProxyFactory();
-            }
-#endif
         }
 
 
@@ -46,12 +34,34 @@ namespace ServiceFabric.PubSubActors.Helpers
         public async Task RegisterAsync(Uri brokerServiceName)
         {
             var activationContext = FabricRuntime.GetActivationContext();
-            await _fabricClient.PropertyManager.PutPropertyAsync(new Uri(activationContext.ApplicationName), _brokerName, brokerServiceName.ToString());
+            await _fabricClient.PropertyManager.PutPropertyAsync(new Uri(activationContext.ApplicationName), BrokerName, brokerServiceName.ToString());
+        }
+
+        /// <inheritdoc />
+        public async Task<IBrokerService> GetBrokerServiceForMessageAsync(object message, Uri brokerServiceName = null)
+        {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            var resolvedPartition = await GetPartitionForMessageAsync(message, brokerServiceName);
+            return _serviceProxyFactory.CreateServiceProxy<IBrokerService>(
+                brokerServiceName ?? await LocateAsync(), resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
+        }
+
+        /// <inheritdoc />
+        public async Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName, Uri brokerServiceName = null)
+        {
+            var resolvedPartition = await GetPartitionForMessageAsync(messageTypeName, brokerServiceName);
+            return _serviceProxyFactory.CreateServiceProxy<IBrokerService>(
+                brokerServiceName ?? await LocateAsync(), resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
         }
 
         /// <inheritdoc />
         public async Task<Uri> LocateAsync()
         {
+            if (_cachedBrokerUri != null)
+            {
+                return _cachedBrokerUri;
+            }
+
             try
             {
                 // check current context
@@ -62,8 +72,8 @@ namespace ServiceFabric.PubSubActors.Helpers
                 {
                     // try to find broker name in other application types
                     bool hasPages = true;
-                    
-                    var query = new ApplicationQueryDescription() { MaxResults = 50 };
+
+                    var query = new ApplicationQueryDescription { MaxResults = 50 };
 
                     while (hasPages)
                     {
@@ -77,20 +87,24 @@ namespace ServiceFabric.PubSubActors.Helpers
                         {
                             var found = await LocateAsync(app.ApplicationName);
                             if (found != null)
-                                return found;
+                            {
+                                _cachedBrokerUri = found;
+                                return _cachedBrokerUri;
+                            }
                         }
                     }
                 }
                 else
                 {
-                    return new Uri(property.GetValue<string>());
+                    _cachedBrokerUri = new Uri(property.GetValue<string>());
+                    return _cachedBrokerUri;
                 }
             }
             catch
             {
                 ;
             }
-            return null;
+            throw new InvalidOperationException("No brokerService was discovered in the cluster.");
         }
 
         private async Task<Uri> LocateAsync(Uri applicationName)
@@ -99,15 +113,17 @@ namespace ServiceFabric.PubSubActors.Helpers
 
             return property != null ? new Uri(property.GetValue<string>()) : null;
         }
+
         private async Task<NamedProperty> GetBrokerPropertyOrNull(string applicationName)
         {
             return await GetBrokerPropertyOrNull(new Uri(applicationName));
         }
+
         private async Task<NamedProperty> GetBrokerPropertyOrNull(Uri applicationName)
         {
             try
             {
-                return await _fabricClient.PropertyManager.GetPropertyAsync(applicationName, _brokerName);
+                return await _fabricClient.PropertyManager.GetPropertyAsync(applicationName, BrokerName);
             }
             catch
             {
@@ -116,12 +132,17 @@ namespace ServiceFabric.PubSubActors.Helpers
             return null;
         }
 
-        /// <inheritdoc />
-        public async Task<ServicePartitionKey> GetPartitionForMessageAsync(string messageTypeName, Uri brokerServiceName)
+        /// <summary>
+        /// Resolves the <see cref="ServicePartitionKey"/> to send the message to, based on message type name.
+        /// </summary>
+        /// <param name="messageTypeName">Full type name of message object.</param>
+        /// <param name="brokerServiceName"></param>
+        /// <returns></returns>
+        private async Task<ServicePartitionKey> GetPartitionForMessageAsync(string messageTypeName, Uri brokerServiceName)
         {
             if (_cachedPartitions == null)
             {
-                _cachedPartitions = await _fabricClient.QueryManager.GetPartitionListAsync(brokerServiceName);
+                _cachedPartitions = await _fabricClient.QueryManager.GetPartitionListAsync(brokerServiceName ?? await LocateAsync());
             }
 
             int hashCode;
@@ -142,30 +163,17 @@ namespace ServiceFabric.PubSubActors.Helpers
             return resolvedPartition;
         }
 
-        /// <inheritdoc />
-        public Task<ServicePartitionKey> GetPartitionForMessageAsync(object message, Uri brokerServiceName)
+        /// <summary>
+        /// Resolves the <see cref="ServicePartitionKey"/> to send the message to, based on message's type.
+        /// </summary>
+        /// <param name="message">The message to publish</param>
+        /// <param name="brokerServiceName"></param>
+        /// <returns></returns>
+        private Task<ServicePartitionKey> GetPartitionForMessageAsync(object message, Uri brokerServiceName)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
-            if (brokerServiceName == null) throw new ArgumentNullException(nameof(brokerServiceName));
-
             string messageTypeName = message.GetType().FullName;
             return GetPartitionForMessageAsync(messageTypeName, brokerServiceName);
-        }
-
-        /// <inheritdoc />
-        public async Task<IBrokerService> GetBrokerServiceForMessageAsync(object message, Uri brokerServiceName)
-        {
-            var resolvedPartition = await GetPartitionForMessageAsync(message, brokerServiceName);
-            var brokerService = _serviceProxyFactory.CreateServiceProxy<IBrokerService>(brokerServiceName, resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
-            return brokerService;
-        }
-
-        /// <inheritdoc />
-        public async Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName, Uri brokerServiceName)
-        {
-            var resolvedPartition = await GetPartitionForMessageAsync(messageTypeName, brokerServiceName);
-            var brokerService = _serviceProxyFactory.CreateServiceProxy<IBrokerService>(brokerServiceName, resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
-            return brokerService;
         }
     }
 }

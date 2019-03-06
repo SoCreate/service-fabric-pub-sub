@@ -2,7 +2,7 @@
 using System.Fabric;
 using System.Runtime.Serialization;
 
-namespace ServiceFabric.PubSubActors.Interfaces
+namespace ServiceFabric.PubSubActors.State
 {
 	[DataContract]
 	public class ServiceReference
@@ -27,10 +27,6 @@ namespace ServiceFabric.PubSubActors.Interfaces
 
 		[DataMember(IsRequired = false)]
 		public string PartitionName { get; set; }
-
-        [Obsolete("Don't use this member. It's here for backwards compat.", true)]
-		[DataMember(IsRequired = false)]
-		public long? PartitionID { get; set; }
 
         [DataMember(IsRequired = false)]
 		public Guid PartitionGuid { get; set; }
