@@ -13,6 +13,7 @@ using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.State;
+using ServiceFabric.PubSubActors.Stats;
 using ServiceFabric.PubSubActors.Subscriber;
 
 namespace ServiceFabric.PubSubActors
@@ -29,6 +30,7 @@ namespace ServiceFabric.PubSubActors
             new ConcurrentDictionary<string, ReferenceWrapper>();
 
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+        protected readonly IStatsCollector StatsCollector;
 
         /// <summary>
         /// Gets the state key for all subscriber queues.
@@ -70,7 +72,8 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="serviceContext"></param>
         /// <param name="enableAutoDiscovery"></param>
-        protected BrokerServiceBase(StatefulServiceContext serviceContext, bool enableAutoDiscovery = true)
+        /// <param name="statsCollector"></param>
+        protected BrokerServiceBase(StatefulServiceContext serviceContext, bool enableAutoDiscovery = true, IStatsCollector statsCollector = null)
             : base(serviceContext)
         {
             if (enableAutoDiscovery)
@@ -80,6 +83,8 @@ namespace ServiceFabric.PubSubActors
                     .GetAwaiter()
                     .GetResult();
             }
+
+            StatsCollector = statsCollector ?? new StatsCollector();
         }
 
         /// <summary>
@@ -88,8 +93,9 @@ namespace ServiceFabric.PubSubActors
         /// <param name="serviceContext"></param>
         /// <param name="reliableStateManagerReplica"></param>
         /// <param name="enableAutoDiscovery"></param>
+        /// <param name="statsCollector"></param>
         protected BrokerServiceBase(StatefulServiceContext serviceContext,
-            IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true)
+            IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true, IStatsCollector statsCollector = null)
             : base(serviceContext, reliableStateManagerReplica)
         {
             if (enableAutoDiscovery)
@@ -99,6 +105,8 @@ namespace ServiceFabric.PubSubActors
                     .GetAwaiter()
                     .GetResult();
             }
+
+            StatsCollector = statsCollector ?? new StatsCollector();
         }
 
         /// <summary>
@@ -201,7 +209,7 @@ namespace ServiceFabric.PubSubActors
                 foreach (var subscriber in subscribers)
                 {
                     await EnqueueMessageAsync(message, subscriber, tx);
-                    _queues[subscriber.QueueName].TotalReceived++;
+                    await StatsCollector.OnMessageReceived(_queues[subscriber.QueueName], message);
                 }
                 ServiceEventSourceMessage($"Published message '{message.MessageType}' to {subscribers.Length} subscribers.");
             });
