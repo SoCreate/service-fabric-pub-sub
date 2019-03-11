@@ -11,7 +11,7 @@ namespace ServiceFabric.PubSubActors.Events
         event Func<string, ReferenceWrapper, string, Task> Unsubscribed;
         event Func<string, ReferenceWrapper, MessageWrapper, Task> MessageReceived;
         event Func<string, ReferenceWrapper, MessageWrapper, Task> MessageDelivered;
-        event Func<string, ReferenceWrapper, MessageWrapper, Exception, Task> MessageDeliveryFailure;
+        event Func<string, ReferenceWrapper, MessageWrapper, Exception, Task> MessageDeliveryFailed;
     }
 
     public interface IBrokerEventsManager : IBrokerEvents

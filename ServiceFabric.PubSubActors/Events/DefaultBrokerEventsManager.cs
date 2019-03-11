@@ -12,7 +12,7 @@ namespace ServiceFabric.PubSubActors.Events
         public event Func<string, ReferenceWrapper, string, Task> Unsubscribed;
         public event Func<string, ReferenceWrapper, MessageWrapper, Task> MessageReceived;
         public event Func<string, ReferenceWrapper, MessageWrapper, Task> MessageDelivered;
-        public event Func<string, ReferenceWrapper, MessageWrapper, Exception, Task> MessageDeliveryFailure;
+        public event Func<string, ReferenceWrapper, MessageWrapper, Exception, Task> MessageDeliveryFailed;
 
         private readonly Dictionary<string, QueueStats> _stats = new Dictionary<string, QueueStats>();
 
@@ -58,9 +58,9 @@ namespace ServiceFabric.PubSubActors.Events
 
         public async Task OnMessageDeliveryFailedAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper, Exception exception)
         {
-            if (MessageDeliveryFailure != null)
+            if (MessageDeliveryFailed != null)
             {
-                await MessageDeliveryFailure?.Invoke(queueName, subscriber, messageWrapper, exception);
+                await MessageDeliveryFailed?.Invoke(queueName, subscriber, messageWrapper, exception);
             }
             _stats[queueName].TotalDeliveryFailures++;
         }
