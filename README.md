@@ -1,4 +1,4 @@
-# Service Fabric Pub/Sub (Not just for Actors anymore!)
+# Service Fabric Pub/Sub
 Do you want to create an Event Driven Architecture while using Azure Service Fabric?  
 Do you need to reliably broadcast messages between Actors and Services?  
 This code will help you do that.  
@@ -12,7 +12,7 @@ Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
-- 8.1.0 Add `GetBrokerStatsAsync()` and `UnsubscribeByQueueNameAsync()` to `BrokerClient` to help with monitoring and managing the Broker Service.
+- 8.1.0 Add `GetBrokerStatsAsync()` and `UnsubscribeByQueueNameAsync()` to `BrokerClient` to help with monitoring and managing the Broker Service.  Add BrokerEventManager allowing users to add custom callbacks on Broker events to implement custom logging and/or monitoring functionality.
 - 8.0.0 Major cleanup and usability improvements.  Replaced Helper classes with a single `BrokerClient`.  Removed obsolete code (BrokerActor, RelayBrokerActor, extension methods).  Removed the `ServiceFabric.PubSubActors.Interfaces` library.  Simplified the BrokerService interface.
 - 7.6.2 Fix routing key issue.
 - 7.6.1 Fix hashing helper null ref issue.
@@ -287,6 +287,8 @@ await brokerClient.SubscribeAsync<CustomerMessage>(this, HandleMessageOne, routi
 The routing key is queried by using `JToken.SelectToken`. More info [here](https://www.newtonsoft.com/json/help/html/SelectToken.htm).
 
 ## Monitoring the Broker
+
+### Broker Stats
 The `BrokerClient` offers a way to get some basic information about what is going on in the BrokerService.  Calling `BrokerClient.GetBrokerStats()` provides a Dictionary with one item for each queue (subscription) that the Broker is managing.  The key is the name of the queue and the value is a list of QueueStat objects.  Each QueueStat object is a snapshot of the state of the queue at the time the request was made.  The QueueStat object includes the name of the service, the total number of messages received, the total number of messages delivered, and time the snapshot was taken.  The totals are cumulative from the moment the queue was created.
 
 A new snapshot is added each time `BrokerClient.GetBrokerStats()` is called, so the user has control over the polling frequency.  The `BrokerClient` keeps a fixed number of snapshots per queue defined by `BrokerClient.QueueStatCapacity`, which defaults to 100.  When the 101st snapshot is created, the oldest one will be trimmed from the list.
@@ -298,6 +300,38 @@ What information can you get:
 * With a little extra processing, the number of messages received and delivered in a given time period can be calculated.  A UI could graph this data to show the load on each queue over time.
 
 Armed with a list of queueNames, you can use `BrokerClient.UnsubscribeByQueueNameAsync()` to unsubscribe on behalf of another service.
+
+### Broker Events
+The following events can be subscribed to by the user to implement additional logging or other functionality.
+* Subscribe
+* Unsubscribe
+* MessageReceived
+* MessageDelivered
+* MessageDeliveryFailure
+
+To suscribe to events, override the `SetUpEvents()` method.
+```csharp
+internal sealed class MyBrokerService : BrokerService
+{
+    public MyBrokerService(StatefulServiceContext context) : base(context)
+    {
+    }
+
+    protected override void SetupEvents(IBrokerEvents events)
+    {
+        events.Subscribe += (queueName, subscriber, messageType) =>
+        {
+            // TODO: Do something when subscribe happens.
+            return Task.CompletedTask;
+        };
+        events.MessageDeliveryFailure += (queueName, subscriber, messageWrapper, exception) =>
+        {
+            // TODO: Log a delivery failure.
+            return Task.CompletedTask;
+        };
+    }
+}
+```
 
 ## Upgrading to version 8
 Significant changes were made in v8.0.0, including breaking changes to interfaces and tools.
