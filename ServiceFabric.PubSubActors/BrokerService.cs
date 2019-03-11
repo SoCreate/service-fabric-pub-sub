@@ -7,13 +7,14 @@ using System.Fabric;
 using System.Threading.Tasks;
 using System.Threading;
 using ServiceFabric.PubSubActors.Helpers;
+using ServiceFabric.PubSubActors.Events;
 using ServiceFabric.PubSubActors.Subscriber;
 
 namespace ServiceFabric.PubSubActors
 {
     /// <remarks>
     /// Base class for a <see cref="StatefulService"/> that serves as a Broker that accepts messages
-    /// from Actors & Services calling <see cref="BrokerClient.PublishMessageAsync"/>
+    /// from Actors & Services calling <see cref="IBrokerClient.PublishMessageAsync{T}"/>
     /// and forwards them to <see cref="ISubscriberActor"/> Actors and <see cref="ISubscriberService"/> Services with strict ordering, so less performant than <see cref="BrokerServiceUnordered"/>.
     /// Every message type is mapped to one of the partitions of this service.
     /// </remarks>
@@ -24,8 +25,9 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="serviceContext"></param>
         /// <param name="enableAutoDiscovery"></param>
-        protected BrokerService(StatefulServiceContext serviceContext, bool enableAutoDiscovery = true)
-            : base(serviceContext, enableAutoDiscovery)
+        /// <param name="brokerEventsManager"></param>
+        protected BrokerService(StatefulServiceContext serviceContext, bool enableAutoDiscovery = true, IBrokerEventsManager brokerEventsManager = null)
+            : base(serviceContext, enableAutoDiscovery, brokerEventsManager)
         {
         }
 
@@ -35,8 +37,9 @@ namespace ServiceFabric.PubSubActors
         /// <param name="serviceContext"></param>
         /// <param name="reliableStateManagerReplica"></param>
         /// <param name="enableAutoDiscovery"></param>
-        protected BrokerService(StatefulServiceContext serviceContext, IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true)
-            : base(serviceContext, reliableStateManagerReplica, enableAutoDiscovery)
+        /// <param name="brokerEventsManager"></param>
+        protected BrokerService(StatefulServiceContext serviceContext, IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true, IBrokerEventsManager brokerEventsManager = null)
+            : base(serviceContext, reliableStateManagerReplica, enableAutoDiscovery, brokerEventsManager)
         {
         }
 
@@ -66,8 +69,16 @@ namespace ServiceFabric.PubSubActors
                     var message = await queue.TryDequeueAsync(tx);
                     if (message.HasValue)
                     {
-                        await subscriber.PublishAsync(message.Value);
-                        await StatsCollector.OnMessageDelivered(subscriber, message.Value);
+                        try
+                        {
+                            await subscriber.PublishAsync(message.Value);
+                            await BrokerEventsManager.OnMessageDeliveredAsync(queueName, subscriber, message.Value);
+                        }
+                        catch (Exception ex)
+                        {
+                            await BrokerEventsManager.OnMessageDeliveryFailedAsync(queueName, subscriber, message.Value, ex);
+                            throw;
+                        }
                     }
                 }, cancellationToken: cancellationToken);
             }

@@ -17,6 +17,8 @@ namespace ServiceFabric.PubSubActors.State
         public ulong TotalReceived { get; set; }
         [DataMember]
         public ulong TotalDelivered { get; set; }
+        [DataMember]
+        public ulong TotalDeliveryFailures { get; set; }
     }
 
     [DataContract]

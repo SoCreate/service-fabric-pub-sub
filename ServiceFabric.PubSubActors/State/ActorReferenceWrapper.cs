@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Actors;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Subscriber;
 
