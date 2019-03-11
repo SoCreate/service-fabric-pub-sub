@@ -303,11 +303,11 @@ Armed with a list of queueNames, you can use `BrokerClient.UnsubscribeByQueueNam
 
 ### Broker Events
 The following events can be subscribed to by the user to implement additional logging or other functionality.
-* Subscribe
-* Unsubscribe
+* Subscribed
+* Unsubscribed
 * MessageReceived
 * MessageDelivered
-* MessageDeliveryFailure
+* MessageDeliveryFailed
 
 To suscribe to events, override the `SetUpEvents()` method.
 ```csharp
@@ -319,7 +319,7 @@ internal sealed class MyBrokerService : BrokerService
 
     protected override void SetupEvents(IBrokerEvents events)
     {
-        events.Subscribe += (queueName, subscriber, messageType) =>
+        events.Subscribed += (queueName, subscriber, messageType) =>
         {
             // TODO: Do something when subscribe happens.
             return Task.CompletedTask;
