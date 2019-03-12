@@ -10,9 +10,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		ServiceFabric.PubSubActors.pfx = ServiceFabric.PubSubActors.pfx
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabric.PubSubActors", "ServiceFabric.PubSubActors\ServiceFabric.PubSubActors.csproj", "{266D0C63-57EE-4C0D-873F-B3235B062CF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabric.PubSubActors", "src\ServiceFabric.PubSubActors\ServiceFabric.PubSubActors.csproj", "{266D0C63-57EE-4C0D-873F-B3235B062CF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceFabric.PubSubActors.Tests", "ServiceFabric.PubSubActors.Tests\ServiceFabric.PubSubActors.Tests.csproj", "{29169DCB-AA96-4B25-8395-32DC00473F34}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceFabric.PubSubActors.Tests", "tests\ServiceFabric.PubSubActors.Tests\ServiceFabric.PubSubActors.Tests.csproj", "{29169DCB-AA96-4B25-8395-32DC00473F34}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CE60A581-FAAD-474F-8AAE-9D68C59C71FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4729B3D3-4F02-481F-B834-FC2B9979DF44}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{4266FF61-7F71-4E97-90F0-218E4BF979C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,5 +50,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5FBF19E-4755-4441-8C64-DB8E4A040B44}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{29169DCB-AA96-4B25-8395-32DC00473F34} = {4729B3D3-4F02-481F-B834-FC2B9979DF44}
+		{266D0C63-57EE-4C0D-873F-B3235B062CF4} = {CE60A581-FAAD-474F-8AAE-9D68C59C71FC}
 	EndGlobalSection
 EndGlobal
