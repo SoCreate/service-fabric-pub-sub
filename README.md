@@ -1,17 +1,18 @@
-# Service Fabric Pub/Sub (Not just for Actors anymore!)
-Do you want to create an Event Driven Architecture while using Azure Service Fabric?
-Do you need to reliably broadcast messages between Actors and Services?
-This code will help you do that.
+# Service Fabric Pub/Sub
+Do you want to create an Event Driven Architecture while using Azure Service Fabric?  
+Do you need to reliably broadcast messages between Actors and Services?  
+This code will help you do that.  
 It supports both Actors and Services as publishers and subscribers.
 
 ## Contribute!
-Contributions are welcome.
-Please upgrade the package version with a minor tick if there are no breaking changes. And add a line to the readme.md, stating the changes, e.g. 'upgraded to SF version x.y.z'.
-Doing so will allow me to simply accept the PR, which will automatically trigger the release of a new package.
+Contributions are welcome.  
+Please upgrade the package version with a minor tick if there are no breaking changes. And add a line to the readme.md, stating the changes, e.g. 'upgraded to SF version x.y.z'.  
+Doing so will allow me to simply accept the PR, which will automatically trigger the release of a new package.  
 Please also make sure all feature additions have a corresponding unit test.
 
 ## Release notes:
 
+- 8.1.0 Add `GetBrokerStatsAsync()` and `UnsubscribeByQueueNameAsync()` to `BrokerClient` to help with monitoring and managing the Broker Service.  Add BrokerEventManager allowing users to add custom callbacks on Broker events to implement custom logging and/or monitoring functionality.
 - 8.0.0 Major cleanup and usability improvements.  Replaced Helper classes with a single `BrokerClient`.  Removed obsolete code (BrokerActor, RelayBrokerActor, extension methods).  Removed the `ServiceFabric.PubSubActors.Interfaces` library.  Simplified the BrokerService interface.
 - 7.6.2 Fix routing key issue.
 - 7.6.1 Fix hashing helper null ref issue.
@@ -60,8 +61,8 @@ https://www.nuget.org/packages/ServiceFabric.PubSubActors
 
 
 
-Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services).
-This is done using an intermediate, which is the BrokerService.
+Using this package you can reliably send messages from Publishers (Actors/Services) to many Subscribers (Actors/Services).  
+This is done using an intermediate, which is the BrokerService.  
 Add this package to all Reliable Actor & Service projects that participate in the pub/sub messaging.
 
 
@@ -80,8 +81,8 @@ Add this package to all Reliable Actor & Service projects that participate in th
 ## How to use:
 
 
-Add a new Stateful Reliable Service project. Call it 'PubSubService' (optional).
-Add Nuget package 'ServiceFabric.PubSubActors' to the 'PubSubActor' project
+Add a new Stateful Reliable Service project. Call it 'PubSubService' (optional).  
+Add Nuget package 'ServiceFabric.PubSubActors' to the 'PubSubActor' project.  
 Replace the code of PubSubService with the following code:
 ```csharp
 internal sealed class PubSubService : BrokerService
@@ -123,15 +124,15 @@ brokerClient.PublishMessageAsync(new PublishedMessageOne { Content = "Hello PubS
 ```
 
 ### Subscribing to messages using Actors
-*Create a sample Actor that implements 'ISubscriberActor', to become a subscriber to messages.*
-In this example, the Actor called 'SubscribingActor' subscribes to messages of Type 'PublishedMessageOne'.
+*Create a sample Actor that implements 'ISubscriberActor', to become a subscriber to messages.*  
+In this example, the Actor called 'SubscribingActor' subscribes to messages of Type 'PublishedMessageOne'.  
 
-Add a Reliable Stateless Actor project called 'SubscribingActor'.
-Add Nuget package 'ServiceFabric.PubSubActors' to the 'SubscribingActor' project
+Add a Reliable Stateless Actor project called 'SubscribingActor'.  
+Add Nuget package 'ServiceFabric.PubSubActors' to the 'SubscribingActor' project.  
 Add a project reference to the shared data contracts library ('DataContracts').
 
-Open the file 'SubscribingActor.cs' and replace the contents with the code below.
-**notice that this Actor now implements 'ISubscriberActor' indirectly.**
+Open the file 'SubscribingActor.cs' and replace the contents with the code below.  
+**notice that this Actor implement 'ISubscriberActor'.**
 ```csharp
 [ActorService(Name = nameof(SubscribingActor))]
 [StatePersistence(StatePersistence.None)]
@@ -165,11 +166,11 @@ internal class SubscribingActor : Actor, ISubscriberActor
 
 ### Subscribing to messages using Services using our base class
 
-*Create a sample Service that extends SubscriberStatelessServiceBase.*
+*Create a sample Service that extends SubscriberStatelessServiceBase.*  
 In this example, the Service called 'SubscribingStatelessService' subscribes to messages of Type 'PublishedMessageOne' and 'PublishedMessageTwo'.
 
-Add a Reliable Stateless Service project called 'SubscribingStatelessService'.
-Add Nuget package 'ServiceFabric.PubSubActors'.
+Add a Reliable Stateless Service project called 'SubscribingStatelessService'.  
+Add Nuget package 'ServiceFabric.PubSubActors'.  
 Add a project reference to the shared data contracts library ('DataContracts').
 
 Now open the file SubscribingStatelessService.cs in the project 'SubscribingStatelessService' and replace the SubscribingStatelessService class with this code:
@@ -196,7 +197,7 @@ internal sealed class SubscribingStatelessService : SubscriberStatelessServiceBa
     }
 }
 ```
-The SubscriberStatelessServiceBase class automatically handles subscribing to the message types that were registered using the `Subscribe` attribute when the service is 'opened'.
+The SubscriberStatelessServiceBase class automatically handles subscribing to the message types that were registered using the `Subscribe` attribute when the service is 'opened'.  
 *To subscribe from a Stateful Service, extend `SubscriberStatefulServiceBase` instead of `SubscribingStatelessServiceBase`*
 
 ### Subscribing to messages using Services without using our base class
@@ -251,14 +252,14 @@ internal sealed class SubscribingStatelessService : StatelessService, ISubscribe
 }
 ```
 
-Once the service gets an endpoint, it will automatically create subscriptions for all methods annotated with the `Subscribe` attribute.
+Once the service gets an endpoint, it will automatically create subscriptions for all methods annotated with the `Subscribe` attribute.  
 For stateful services, use the `StatefulSubscriberServiceBootstrapper`.
 
 *Check the Demo project for a working reference implementation.*
 
 
 ## Routing
-**This experimental feature works only when using the `DefaultPayloadSerializer`.**
+**This experimental feature works only when using the `DefaultPayloadSerializer`.**  
 It adds support for an additional subscriber filter, based on message content.
 
 ### Example
@@ -276,7 +277,7 @@ public class Customer
     public string Name {get; set;}
 }
 ```
-And given a subscriber that is interested in Customers named 'Customer1'.
+And given a subscriber that is interested in Customers named 'Customer1'.  
 The subscription would be registered like this:
 
 ```csharp
@@ -285,6 +286,52 @@ await brokerClient.SubscribeAsync<CustomerMessage>(this, HandleMessageOne, routi
 
 The routing key is queried by using `JToken.SelectToken`. More info [here](https://www.newtonsoft.com/json/help/html/SelectToken.htm).
 
+## Monitoring the Broker
+
+### Broker Stats
+The `BrokerClient` offers a way to get some basic information about what is going on in the BrokerService.  Calling `BrokerClient.GetBrokerStats()` provides a Dictionary with one item for each queue (subscription) that the Broker is managing.  The key is the name of the queue and the value is a list of QueueStat objects.  Each QueueStat object is a snapshot of the state of the queue at the time the request was made.  The QueueStat object includes the name of the service, the total number of messages received, the total number of messages delivered, and time the snapshot was taken.  The totals are cumulative from the moment the queue was created.
+
+A new snapshot is added each time `BrokerClient.GetBrokerStats()` is called, so the user has control over the polling frequency.  The `BrokerClient` keeps a fixed number of snapshots per queue defined by `BrokerClient.QueueStatCapacity`, which defaults to 100.  When the 101st snapshot is created, the oldest one will be trimmed from the list.
+
+What information can you get:
+* A list of all queues (subscriptions) and the subscriber services they serve.
+* The total number of messages received and delivered for each queue.
+* If the difference between the total received and the total delivered is growing, the queue is taking in messages faster than they can be delivered (or the subscriber is down).
+* With a little extra processing, the number of messages received and delivered in a given time period can be calculated.  A UI could graph this data to show the load on each queue over time.
+
+Armed with a list of queueNames, you can use `BrokerClient.UnsubscribeByQueueNameAsync()` to unsubscribe on behalf of another service.
+
+### Broker Events
+The following events can be subscribed to by the user to implement additional logging or other functionality.
+* Subscribed
+* Unsubscribed
+* MessageReceived
+* MessageDelivered
+* MessageDeliveryFailed
+
+To suscribe to events, override the `SetUpEvents()` method.
+```csharp
+internal sealed class MyBrokerService : BrokerService
+{
+    public MyBrokerService(StatefulServiceContext context) : base(context)
+    {
+    }
+
+    protected override void SetupEvents(IBrokerEvents events)
+    {
+        events.Subscribed += (queueName, subscriber, messageType) =>
+        {
+            // TODO: Do something when subscribe happens.
+            return Task.CompletedTask;
+        };
+        events.MessageDeliveryFailure += (queueName, subscriber, messageWrapper, exception) =>
+        {
+            // TODO: Log a delivery failure.
+            return Task.CompletedTask;
+        };
+    }
+}
+```
 
 ## Upgrading to version 8
 Significant changes were made in v8.0.0, including breaking changes to interfaces and tools.

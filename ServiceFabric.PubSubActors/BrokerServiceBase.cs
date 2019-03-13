@@ -13,6 +13,7 @@ using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.State;
+using ServiceFabric.PubSubActors.Events;
 using ServiceFabric.PubSubActors.Subscriber;
 
 namespace ServiceFabric.PubSubActors
@@ -29,6 +30,7 @@ namespace ServiceFabric.PubSubActors
             new ConcurrentDictionary<string, ReferenceWrapper>();
 
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+        protected readonly IBrokerEventsManager BrokerEventsManager;
 
         /// <summary>
         /// Gets the state key for all subscriber queues.
@@ -70,7 +72,8 @@ namespace ServiceFabric.PubSubActors
         /// </summary>
         /// <param name="serviceContext"></param>
         /// <param name="enableAutoDiscovery"></param>
-        protected BrokerServiceBase(StatefulServiceContext serviceContext, bool enableAutoDiscovery = true)
+        /// <param name="brokerEventsManager"></param>
+        protected BrokerServiceBase(StatefulServiceContext serviceContext, bool enableAutoDiscovery = true, IBrokerEventsManager brokerEventsManager = null)
             : base(serviceContext)
         {
             if (enableAutoDiscovery)
@@ -80,6 +83,8 @@ namespace ServiceFabric.PubSubActors
                     .GetAwaiter()
                     .GetResult();
             }
+
+            BrokerEventsManager = brokerEventsManager ?? new DefaultBrokerEventsManager();
         }
 
         /// <summary>
@@ -88,8 +93,9 @@ namespace ServiceFabric.PubSubActors
         /// <param name="serviceContext"></param>
         /// <param name="reliableStateManagerReplica"></param>
         /// <param name="enableAutoDiscovery"></param>
+        /// <param name="brokerEvents"></param>
         protected BrokerServiceBase(StatefulServiceContext serviceContext,
-            IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true)
+            IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true, IBrokerEventsManager brokerEvents = null)
             : base(serviceContext, reliableStateManagerReplica)
         {
             if (enableAutoDiscovery)
@@ -99,6 +105,12 @@ namespace ServiceFabric.PubSubActors
                     .GetAwaiter()
                     .GetResult();
             }
+
+            BrokerEventsManager = brokerEvents ?? new DefaultBrokerEventsManager();
+        }
+
+        protected virtual void SetupEvents(IBrokerEvents events)
+        {
         }
 
         /// <summary>
@@ -138,6 +150,7 @@ namespace ServiceFabric.PubSubActors
 
                 _queues.AddOrUpdate(queueName, reference, (key, old) => reference);
                 ServiceEventSourceMessage($"Registered subscriber: {reference.Name}");
+                await BrokerEventsManager.OnSubscribedAsync(queueName, reference, messageTypeName);
             }, cancellationToken: CancellationToken.None);
         }
 
@@ -168,6 +181,7 @@ namespace ServiceFabric.PubSubActors
 
                 ServiceEventSourceMessage($"Unregistered subscriber: {reference.Name}");
                 _queues.TryRemove(queueName, out reference);
+                await BrokerEventsManager.OnUnsubscribedAsync(queueName, reference, messageTypeName);
             });
         }
 
@@ -201,9 +215,19 @@ namespace ServiceFabric.PubSubActors
                 foreach (var subscriber in subscribers)
                 {
                     await EnqueueMessageAsync(message, subscriber, tx);
+                    await BrokerEventsManager.OnMessageReceivedAsync(subscriber.QueueName, _queues[subscriber.QueueName], message);
                 }
                 ServiceEventSourceMessage($"Published message '{message.MessageType}' to {subscribers.Length} subscribers.");
             });
+        }
+
+        public async Task<QueueStatsWrapper> GetBrokerStatsAsync()
+        {
+            return new QueueStatsWrapper
+            {
+                Queues = _queues.ToDictionary(reference => reference.Key, reference => reference.Value),
+                Stats = await BrokerEventsManager.GetStatsAsync()
+            };
         }
 
         protected abstract Task EnqueueMessageAsync(MessageWrapper message, Reference subscriber, ITransaction tx);
@@ -293,6 +317,7 @@ namespace ServiceFabric.PubSubActors
             if (_initializer.IsSet) return;
             try
             {
+                SetupEvents(BrokerEventsManager);
                 _semaphore.Wait(cancellationToken);
 
                 if (_initializer.IsSet) return;

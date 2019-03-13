@@ -29,5 +29,12 @@ namespace ServiceFabric.PubSubActors
         /// <param name="message">The message to publish</param>
         /// <returns></returns>
         Task PublishMessageAsync(MessageWrapper message);
+
+        /// <summary>
+        /// Returns a list of <see cref="QueueStats"/> objects providing the total number of messages received and
+        /// delivered for each queue.
+        /// </summary>
+        /// <returns></returns>
+        Task<QueueStatsWrapper> GetBrokerStatsAsync();
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Fabric;
 using System.Fabric.Description;
-using System.Fabric.Query;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
@@ -13,7 +13,7 @@ namespace ServiceFabric.PubSubActors.Helpers
     public class BrokerServiceLocator : IBrokerServiceLocator
     {
         private readonly IHashingHelper _hashingHelper;
-        private static ServicePartitionList _cachedPartitions;
+        private static List<ServicePartitionKey> _cachedPartitionKeys = new List<ServicePartitionKey>();
         private static Uri _cachedBrokerUri;
         private readonly FabricClient _fabricClient;
         private const string BrokerName = nameof(BrokerService);
@@ -52,6 +52,19 @@ namespace ServiceFabric.PubSubActors.Helpers
             var resolvedPartition = await GetPartitionForMessageAsync(messageTypeName, brokerServiceName);
             return _serviceProxyFactory.CreateServiceProxy<IBrokerService>(
                 brokerServiceName ?? await LocateAsync(), resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<IBrokerService>> GetBrokerServicesForAllPartitionsAsync(Uri brokerServiceName = null)
+        {
+            var serviceProxies = new List<IBrokerService>();
+            foreach (var partition in await GetBrokerPartitionKeys(brokerServiceName))
+            {
+                serviceProxies.Add(_serviceProxyFactory.CreateServiceProxy<IBrokerService>(
+                    brokerServiceName ?? await LocateAsync(), partition, listenerName: BrokerServiceBase.ListenerName));
+            }
+
+            return serviceProxies;
         }
 
         /// <inheritdoc />
@@ -140,27 +153,15 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <returns></returns>
         private async Task<ServicePartitionKey> GetPartitionForMessageAsync(string messageTypeName, Uri brokerServiceName)
         {
-            if (_cachedPartitions == null)
-            {
-                _cachedPartitions = await _fabricClient.QueryManager.GetPartitionListAsync(brokerServiceName ?? await LocateAsync());
-            }
+            var partitionKeys = await GetBrokerPartitionKeys(brokerServiceName);
 
             int hashCode;
             unchecked
             {
                 hashCode = (int) _hashingHelper.HashString(messageTypeName);
             }
-            int index = Math.Abs(hashCode % _cachedPartitions.Count);
-            var partition = _cachedPartitions[index];
-            if (partition.PartitionInformation.Kind != ServicePartitionKind.Int64Range)
-            {
-                throw new InvalidOperationException("Sorry, only Int64 Range Partitions are supported.");
-            }
-
-            var info = (Int64RangePartitionInformation)partition.PartitionInformation;
-            var resolvedPartition = new ServicePartitionKey(info.LowKey);
-
-            return resolvedPartition;
+            int index = Math.Abs(hashCode % partitionKeys.Count);
+            return partitionKeys[index];
         }
 
         /// <summary>
@@ -174,6 +175,25 @@ namespace ServiceFabric.PubSubActors.Helpers
             if (message == null) throw new ArgumentNullException(nameof(message));
             string messageTypeName = message.GetType().FullName;
             return GetPartitionForMessageAsync(messageTypeName, brokerServiceName);
+        }
+
+        private async Task<List<ServicePartitionKey>> GetBrokerPartitionKeys(Uri brokerServiceName = null)
+        {
+            if (_cachedPartitionKeys.Count == 0)
+            {
+                foreach (var partition in await _fabricClient.QueryManager.GetPartitionListAsync(brokerServiceName ?? await LocateAsync()))
+                {
+                    if (partition.PartitionInformation.Kind != ServicePartitionKind.Int64Range)
+                    {
+                        throw new InvalidOperationException("Sorry, only Int64 Range Partitions are supported.");
+                    }
+
+                    var info = (Int64RangePartitionInformation)partition.PartitionInformation;
+                    _cachedPartitionKeys.Add(new ServicePartitionKey(info.LowKey));
+                }
+            }
+
+            return _cachedPartitionKeys;
         }
     }
 }

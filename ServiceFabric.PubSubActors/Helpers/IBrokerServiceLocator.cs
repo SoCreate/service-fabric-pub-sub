@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Client;
 
 namespace ServiceFabric.PubSubActors.Helpers
 {
@@ -34,5 +34,12 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="brokerServiceName">Uri of BrokerService instance</param>
         /// <returns></returns>
         Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName, Uri brokerServiceName = null);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IBrokerService"/> ServiceProxy instances, one for each partition.
+        /// </summary>
+        /// <param name="brokerServiceName"></param>
+        /// <returns></returns>
+        Task<IEnumerable<IBrokerService>> GetBrokerServicesForAllPartitionsAsync(Uri brokerServiceName = null);
     }
 }
