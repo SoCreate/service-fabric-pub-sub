@@ -42,7 +42,7 @@ namespace ServiceFabric.PubSubActors.Events
         {
             if (MessageReceived != null)
             {
-                await MessageReceived?.Invoke(queueName, subscriber, messageWrapper);
+                await MessageReceived.Invoke(queueName, subscriber, messageWrapper);
             }
             _stats[queueName].TotalReceived++;
         }
@@ -51,7 +51,7 @@ namespace ServiceFabric.PubSubActors.Events
         {
             if (MessageDelivered != null)
             {
-                await MessageDelivered?.Invoke(queueName, subscriber, messageWrapper);
+                await MessageDelivered.Invoke(queueName, subscriber, messageWrapper);
             }
             _stats[queueName].TotalDelivered++;
         }
@@ -60,7 +60,7 @@ namespace ServiceFabric.PubSubActors.Events
         {
             if (MessageDeliveryFailed != null)
             {
-                await MessageDeliveryFailed?.Invoke(queueName, subscriber, messageWrapper, exception);
+                await MessageDeliveryFailed.Invoke(queueName, subscriber, messageWrapper, exception);
             }
             _stats[queueName].TotalDeliveryFailures++;
         }
