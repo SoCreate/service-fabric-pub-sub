@@ -30,12 +30,12 @@
     <None Include="Scripts\Deploy-FabricApplication.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PubSubDemo.Api\PubSubDemo.Api.csproj" />
-    <ProjectReference Include="..\PubSubDemo.Broker\PubSubDemo.Broker.csproj" />
-    <ProjectReference Include="..\PubSubDemo.LoadTest\PubSubDemo.LoadTest.csproj" />
-    <ProjectReference Include="..\PubSubDemo.SampleActorSubscriber\PubSubDemo.SampleActorSubscriber.csproj" />
-    <ProjectReference Include="..\PubSubDemo.SampleStatefulSubscriber\PubSubDemo.SampleStatefulSubscriber.csproj" />
-    <ProjectReference Include="..\PubSubDemo.SampleStatelessSubscriber\PubSubDemo.SampleStatelessSubscriber.csproj" />
+    <ProjectReference Include="..\SoCreate.ServiceFabric.PubSubDemo.Api\SoCreate.ServiceFabric.PubSubDemo.Api.csproj" />
+    <ProjectReference Include="..\SoCreate.ServiceFabric.PubSubDemo.Broker\SoCreate.ServiceFabric.PubSubDemo.Broker.csproj" />
+    <ProjectReference Include="..\SoCreate.ServiceFabric.PubSubDemo.LoadTest\SoCreate.ServiceFabric.PubSubDemo.LoadTest.csproj" />
+    <ProjectReference Include="..\SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber\SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.csproj" />
+    <ProjectReference Include="..\SoCreate.ServiceFabric.PubSubDemo.SampleStatefulSubscriber\SoCreate.ServiceFabric.PubSubDemo.SampleStatefulSubscriber.csproj" />
+    <ProjectReference Include="..\SoCreate.ServiceFabric.PubSubDemo.SampleStatelessSubscriber\SoCreate.ServiceFabric.PubSubDemo.SampleStatelessSubscriber.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <PropertyGroup>

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <UpdateServiceFabricManifestEnabled>True</UpdateServiceFabricManifestEnabled>
+    <ServicePackagePath>PackageRoot</ServicePackagePath>
+    <ServicePackagePrefix>$(MSBuildProjectName)</ServicePackagePrefix>
+    <FabActUtilWorkingDir>$(BaseIntermediateOutputPath)\FabActUtilTemp</FabActUtilWorkingDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SoCreate.ServiceFabric.PubSub\SoCreate.ServiceFabric.PubSub.csproj" />
+    <ProjectReference Include="..\SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.Interfaces\SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.Interfaces.csproj" />
+    <ProjectReference Include="..\SoCreate.ServiceFabric.PubSubDemo.SampleEvents\SoCreate.ServiceFabric.PubSubDemo.SampleEvents.csproj" />
+  </ItemGroup>
+
+</Project>
