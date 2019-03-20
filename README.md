@@ -1,4 +1,4 @@
-# [![Service Fabric Pub/Sub](./assets/microsoft-service-fabric-pub-sub.png)](./assets/microsoft-service-fabric-pub-sub.png)
+# [![Service Fabric Pub/Sub](./assets/service-fabric-pub-sub.png)](./assets/service-fabric-pub-sub.png)
 
 # Service Fabric Pub/Sub
 Do you want to create an Event Driven Architecture while using Azure Service Fabric?
