@@ -62,13 +62,14 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <inheritdoc />
         public Task ProcessMessageAsync(MessageWrapper messageWrapper)
         {
-            var messageType = Assembly.Load(messageWrapper.Assembly).GetType(messageWrapper.MessageType, true);
+            var message = messageWrapper.CreateMessage();
+            var messageType = message.GetType();
 
             while (messageType != null)
             {
                 if (Handlers.TryGetValue(messageType, out var handler))
                 {
-                    return handler(messageWrapper.CreateMessage());
+                    return handler(message);
                 }
                 messageType = messageType.BaseType;
             }
@@ -236,7 +237,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private static ReferenceWrapper CreateReferenceWrapper(this StatelessService service, string listenerName = null, string routingKey = null)
+        public static ReferenceWrapper CreateReferenceWrapper(this StatelessService service, string listenerName = null, string routingKey = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
             var servicePartition = GetPropertyValue<StatelessService, IServicePartition>(service, "Partition");
@@ -251,7 +252,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private static ReferenceWrapper CreateReferenceWrapper(this StatefulService service, string listenerName = null, string routingKey = null)
+        public static ReferenceWrapper CreateReferenceWrapper(this StatefulService service, string listenerName = null, string routingKey = null)
         {
             if (service == null) throw new ArgumentNullException(nameof(service));
             var servicePartition = GetPropertyValue<StatefulService, IServicePartition>(service, "Partition");
@@ -265,7 +266,7 @@ namespace ServiceFabric.PubSubActors.Helpers
         /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private static ReferenceWrapper CreateReferenceWrapper(this ActorBase actor, string routingKey = null)
+        public static ReferenceWrapper CreateReferenceWrapper(this ActorBase actor, string routingKey = null)
         {
             if (actor == null) throw new ArgumentNullException(nameof(actor));
             return new ActorReferenceWrapper(ActorReference.Get(actor), routingKey);

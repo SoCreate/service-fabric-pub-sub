@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace PubSubDemo.Broker
+namespace PubSubDemo.LoadTest
 {
     internal static class Program
     {
@@ -19,10 +19,10 @@ namespace PubSubDemo.Broker
                 // When Service Fabric creates an instance of this service type,
                 // an instance of the class is created in this host process.
 
-                ServiceRuntime.RegisterServiceAsync("BrokerType",
-                    context => new Broker(context)).GetAwaiter().GetResult();
+                ServiceRuntime.RegisterServiceAsync("LoadTestType",
+                    context => new LoadTest(context)).GetAwaiter().GetResult();
 
-                ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(Broker).Name);
+                ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(LoadTest).Name);
 
                 // Prevents this host process from terminating so services keep running.
                 Thread.Sleep(Timeout.Infinite);

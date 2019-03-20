@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.ServiceFabric.Actors;
-using Microsoft.ServiceFabric.Actors.Client;
-using PubSubDemo.SampleActorSubscriber.Interfaces;
 using PubSubDemo.SampleEvents;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.State;
@@ -43,6 +41,7 @@ namespace PubSubDemo.Api.Controllers
             try
             {
                 var tasks = new List<Task>(num);
+                Stopwatch sw = Stopwatch.StartNew();
                 for (var i = 1; i <= num; i++)
                 {
                     tasks.Add(_brokerClient.PublishMessageAsync(new SampleEvent
@@ -52,7 +51,8 @@ namespace PubSubDemo.Api.Controllers
                 }
 
                 await Task.WhenAll(tasks);
-                return "";
+                sw.Stop();
+                return $"Published {num} messages in {sw.ElapsedMilliseconds}ms";
             }
             catch (Exception e)
             {

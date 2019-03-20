@@ -32,6 +32,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PubSubDemo.Api\PubSubDemo.Api.csproj" />
     <ProjectReference Include="..\PubSubDemo.Broker\PubSubDemo.Broker.csproj" />
+    <ProjectReference Include="..\PubSubDemo.LoadTest\PubSubDemo.LoadTest.csproj" />
     <ProjectReference Include="..\PubSubDemo.SampleActorSubscriber\PubSubDemo.SampleActorSubscriber.csproj" />
     <ProjectReference Include="..\PubSubDemo.SampleStatefulSubscriber\PubSubDemo.SampleStatefulSubscriber.csproj" />
     <ProjectReference Include="..\PubSubDemo.SampleStatelessSubscriber\PubSubDemo.SampleStatelessSubscriber.csproj" />
