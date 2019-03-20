@@ -1,4 +1,4 @@
-# Contributing to Playground for Angular
+# Contributing to Service Fabric Pub Sub
 
  - [Issues and Bugs](#issue)
  - [Request/Add a Feature](#feature)
@@ -22,7 +22,7 @@ and help you to craft the change so that it is successfully accepted into the pr
 ### <a name="submit-pr"></a> Submitting a Pull Request (PR)
 Before you submit your Pull Request (PR) consider the following guidelines:
 
-* Search [GitHub](https://github.com/socreate/angular-playground/pulls) for an open or closed PR
+* Search [GitHub](https://github.com/socreate/service-fabric-pub-sub/pulls) for an open or closed PR
   that relates to your submission. You don't want to duplicate effort.
 * Make your changes in a new git branch:
 

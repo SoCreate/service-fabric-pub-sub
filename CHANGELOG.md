@@ -6,7 +6,9 @@
 * **Demo App**: Updated Demo app to .NET Core 2.2.  Integrated LoadDemo into the Demo app.
 * **Organization**: Reorganized the repository to group projects into src, test, and examples directories.
 ### Breaking Changes
-* **Rename**: Changed the project name to ServiceFabric.PubSub.  Updated namespaces accordingly.  The new Nuget package is: https://www.nuget.org/packages/ServiceFabric.PubSub.
+* **Rename**: Changed the project name to ServiceFabric.PubSub.  Updated namespaces accordingly.  The new Nuget package is: https://www.nuget.org/packages/SoCreate.ServiceFabric.PubSub.
+### Dependencies
+* **Nuget**: Update Nuget packages (SF 3.3.644)
 
 # 8.0.0 (2019-03-05)
 ### Features
