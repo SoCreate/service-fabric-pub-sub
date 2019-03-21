@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using SoCreate.ServiceFabric.PubSub.Helpers;
 using SoCreate.ServiceFabric.PubSub.State;
 
-namespace SoCreate.ServiceFabric.PubSub.Helpers
+namespace SoCreate.ServiceFabric.PubSub
 {
     public class BrokerClient : IBrokerClient
     {

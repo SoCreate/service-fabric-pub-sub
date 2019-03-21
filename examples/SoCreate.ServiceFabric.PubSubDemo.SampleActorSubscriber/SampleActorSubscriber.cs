@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
+using SoCreate.ServiceFabric.PubSub;
 using SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.Interfaces;
 using SoCreate.ServiceFabric.PubSubDemo.SampleEvents;
-using SoCreate.ServiceFabric.PubSub.Helpers;
 using SoCreate.ServiceFabric.PubSub.State;
 
 namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber

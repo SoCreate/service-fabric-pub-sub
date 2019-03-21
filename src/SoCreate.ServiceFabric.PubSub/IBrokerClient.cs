@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SoCreate.ServiceFabric.PubSub.State;
 
-namespace SoCreate.ServiceFabric.PubSub.Helpers
+namespace SoCreate.ServiceFabric.PubSub
 {
     public interface IBrokerClient
     {

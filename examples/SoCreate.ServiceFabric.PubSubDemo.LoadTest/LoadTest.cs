@@ -7,8 +7,8 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
+using SoCreate.ServiceFabric.PubSub;
 using SoCreate.ServiceFabric.PubSubDemo.SampleEvents;
-using SoCreate.ServiceFabric.PubSub.Helpers;
 using SoCreate.ServiceFabric.PubSub.State;
 using SoCreate.ServiceFabric.PubSub.Subscriber;
 

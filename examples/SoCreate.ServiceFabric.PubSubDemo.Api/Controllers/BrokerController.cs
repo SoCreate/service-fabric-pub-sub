@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using SoCreate.ServiceFabric.PubSub;
 using SoCreate.ServiceFabric.PubSubDemo.SampleEvents;
-using SoCreate.ServiceFabric.PubSub.Helpers;
 using SoCreate.ServiceFabric.PubSub.State;
 
 namespace SoCreate.ServiceFabric.PubSubDemo.Api.Controllers
@@ -36,7 +38,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.Api.Controllers
         // Publish {num} SampleEvents to the BrokerService
         // POST api/broker/publish/5
         [HttpPost("publish/{num}")]
-        public async Task<string> Publish(int num)
+        public async Task<IActionResult> Publish(int num)
         {
             try
             {
@@ -52,26 +54,60 @@ namespace SoCreate.ServiceFabric.PubSubDemo.Api.Controllers
 
                 await Task.WhenAll(tasks);
                 sw.Stop();
-                return $"Published {num} messages in {sw.ElapsedMilliseconds}ms";
+                return Ok($"Published {num} messages in {sw.ElapsedMilliseconds}ms");
             }
             catch (Exception e)
             {
-                return e.Message;
+                return BadRequest(e.Message);
             }
+        }
+
+        // Publish the given event to the BrokerService.
+        // Provide the message body in json and the Message-Type (FullName of message type) and Assembly-Name in headers.
+        // POST api/broker/publish
+        [HttpPost("publish")]
+        public async Task<IActionResult> Publish([FromBody] object messageBody)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(messageBody);
+                if (!Request.Headers.TryGetValue("Message-Type", out var typeString))
+                {
+                    return BadRequest("Message-Type header is required");
+                }
+                if (!Request.Headers.TryGetValue("Assembly-Name", out var assemblyName))
+                {
+                    assemblyName = typeString.ToString().Remove(typeString.ToString().LastIndexOf('.'));
+                }
+
+                var type = Assembly.Load(assemblyName).GetType(typeString, false);
+                if (type == null)
+                {
+                    return BadRequest($"Unable to find type {typeString} in assembly {assemblyName}");
+                }
+
+                await _brokerClient.PublishMessageAsync(JsonConvert.DeserializeObject(json, type));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            return Ok();
         }
 
         // DELETE api/broker/queue/SoCreate.ServiceFabric.PubSubDemo.SampleEvents.SampleEvent_-746413431
         [HttpDelete("queue/{queueName}")]
-        public async Task<string> Delete(string queueName)
+        public async Task<IActionResult> Delete(string queueName)
         {
             try
             {
                 await _brokerClient.UnsubscribeByQueueNameAsync(queueName);
-                return "";
+                return Ok();
             }
             catch (Exception e)
             {
-                return e.Message;
+                return BadRequest(e.Message);
             }
         }
      }
