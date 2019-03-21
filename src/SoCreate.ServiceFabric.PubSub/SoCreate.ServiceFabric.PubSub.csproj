@@ -14,7 +14,7 @@
     <PackageLicenseUrl>https://github.com/SoCreate/service-fabric-pub-sub/blob/master/LICENSE</PackageLicenseUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/SoCreate/service-fabric-pub-sub.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/SoCreate/service-fabric-pub-sub</RepositoryUrl>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
