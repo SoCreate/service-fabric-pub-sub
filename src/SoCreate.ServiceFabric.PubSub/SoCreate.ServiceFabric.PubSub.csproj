@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>SoCreate.ServiceFabric.PubSub adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. Documentation: https://service-fabric-pub-sub.socreate.it</Description>
-    <Copyright>2019</Copyright>
+    <Copyright>© SoCreate. All rights reserved.</Copyright>
     <AssemblyTitle>SoCreate.ServiceFabric.PubSub</AssemblyTitle>
     <Version>9.0.0</Version>
     <Authors>Loek Duys, SoCreate</Authors>
