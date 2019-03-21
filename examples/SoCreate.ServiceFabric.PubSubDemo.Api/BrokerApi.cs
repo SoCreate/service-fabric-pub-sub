@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using SoCreate.ServiceFabric.PubSub.Helpers;
+using SoCreate.ServiceFabric.PubSub;
 
 namespace SoCreate.ServiceFabric.PubSubDemo.Api
 {
