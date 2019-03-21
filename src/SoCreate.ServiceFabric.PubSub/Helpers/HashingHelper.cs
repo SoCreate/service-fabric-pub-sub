@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace SoCreate.ServiceFabric.PubSub.State
+namespace SoCreate.ServiceFabric.PubSub.Helpers
 {
     public class HashingHelper : IHashingHelper
     {
