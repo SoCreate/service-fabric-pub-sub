@@ -10,7 +10,7 @@
     <Platform>x64</Platform>
     <PackageId>SoCreate.ServiceFabric.PubSub</PackageId>
     <PackageTags>ServiceFabric;Service;Fabric;PubSub;Pub;Sub;Reliable;Asynchronous;Messaging;Event</PackageTags>
-    <PackageProjectUrl>https://github.com/SoCreate/service-fabric-pub-sub</PackageProjectUrl>
+    <PackageProjectUrl>http://service-fabric-pub-sub.socreate.it</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/SoCreate/service-fabric-pub-sub/blob/master/LICENSE</PackageLicenseUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
