@@ -6,7 +6,7 @@ Do you need to reliably broadcast messages between Actors and Services?
 This code will help you do that.
 It supports both Actors and Services as publishers and subscribers.
 
-[![Build status](https://dev.azure.com/SoCreate/Service%20Fabric%20PubSub/_apis/build/status/Service%20Fabric%20PubSub)](https://dev.azure.com/SoCreate/Service%20Fabric%20PubSub/_build/latest?definitionId=6)
+[![Build status](https://dev.azure.com/SoCreate/Service%20Fabric%20Pub%20Sub/_apis/build/status/Service%20Fabric%20Pub%20Sub)](https://dev.azure.com/SoCreate/Service%20Fabric%20Pub%20Sub/_build/latest?definitionId=9)
 [![NuGet Badge](https://buildstats.info/nuget/SoCreate.ServiceFabric.PubSub)](https://www.nuget.org/packages/SoCreate.ServiceFabric.PubSub/)
 
 ## Documentation (<http://service-fabric-pub-sub.socreate.it/>)
