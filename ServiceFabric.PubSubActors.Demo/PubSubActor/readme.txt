@@ -1,1 +1,0 @@
-﻿Please check out the readme.md file, that should now be in your project.

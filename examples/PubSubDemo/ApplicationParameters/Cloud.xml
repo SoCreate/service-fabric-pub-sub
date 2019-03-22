@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="fabric:/PubSubDemo" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <Parameters>
+    <Parameter Name="LoadTest_InstanceCount" Value="-1" />
+    <Parameter Name="Broker_MinReplicaSetSize" Value="3" />
+    <Parameter Name="Broker_PartitionCount" Value="1" />
+    <Parameter Name="Broker_TargetReplicaSetSize" Value="3" />
+    <Parameter Name="Api_InstanceCount" Value="-1" />
+    <Parameter Name="SampleStatefulSubscriber_PartitionCount" Value="1" />
+    <Parameter Name="SampleStatefulSubscriber_MinReplicaSetSize" Value="3" />
+    <Parameter Name="SampleStatefulSubscriber_TargetReplicaSetSize" Value="3" />
+    <Parameter Name="SampleStatelessSubscriber_InstanceCount" Value="-1" />
+    <Parameter Name="SampleActorSubscriber_PartitionCount" Value="10" />
+    <Parameter Name="SampleActorSubscriber_MinReplicaSetSize" Value="3" />
+    <Parameter Name="SampleActorSubscriber_TargetReplicaSetSize" Value="3" />
+  </Parameters>
+</Application>
