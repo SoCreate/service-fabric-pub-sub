@@ -1,4 +1,4 @@
-# 9.0.0 (2019-03-?)
+# 9.0.0 (2019-03-21)
 ### Features
 * **Broker Stats**: Added `GetBrokerStatsAsync()` and `UnsubscribeByQueueNameAsync()` to `BrokerClient` to help with monitoring and managing the Broker Service.
 * **BrokerEvents**: Added BrokerEventsManager allowing users to add custom callbacks on Broker events to implement custom logging and/or monitoring functionality.
