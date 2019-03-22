@@ -78,7 +78,7 @@ namespace SoCreate.ServiceFabric.PubSub
         {
             if (enableAutoDiscovery)
             {
-                new BrokerServiceLocator().RegisterAsync(Context.ServiceName)
+                new BrokerServiceLocator(brokerServiceUri: Context.ServiceName).RegisterAsync()
                     .ConfigureAwait(false)
                     .GetAwaiter()
                     .GetResult();
@@ -100,7 +100,7 @@ namespace SoCreate.ServiceFabric.PubSub
         {
             if (enableAutoDiscovery)
             {
-                new BrokerServiceLocator().RegisterAsync(Context.ServiceName)
+                new BrokerServiceLocator(brokerServiceUri: Context.ServiceName).RegisterAsync()
                     .ConfigureAwait(false)
                     .GetAwaiter()
                     .GetResult();

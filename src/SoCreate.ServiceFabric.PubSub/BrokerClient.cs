@@ -33,6 +33,10 @@ namespace SoCreate.ServiceFabric.PubSub
 
         public int QueueStatCapacity { get; set; } = 100;
 
+        /// <summary>
+        /// Create a BrokerClient
+        /// </summary>
+        /// <param name="brokerServiceLocator"></param>
         public BrokerClient(IBrokerServiceLocator brokerServiceLocator = null)
         {
             _brokerServiceLocator = brokerServiceLocator ?? new BrokerServiceLocator();
@@ -122,7 +126,7 @@ namespace SoCreate.ServiceFabric.PubSub
 
     public static class BrokerClientExtensions
     {
-        // subscribe/unsubscribe using Generic type (useful when subscibing manually)
+        // subscribe/unsubscribe using Generic type (useful when subscribing manually)
 
         /// <summary>
         /// Registers this StatelessService as a subscriber for messages of type <typeparam name="T"/> with the <see cref="BrokerService"/>.

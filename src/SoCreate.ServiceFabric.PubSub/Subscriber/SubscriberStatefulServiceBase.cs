@@ -52,9 +52,25 @@ namespace SoCreate.ServiceFabric.PubSub.Subscriber
         }
 
         /// <inheritdoc/>
-        protected override Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
+        protected override async Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
         {
-            return Subscribe();
+            for (var attempt = 0; ; attempt++)
+            {
+                try
+                {
+                    await Subscribe();
+                    break;
+                }
+                catch (BrokerNotFoundException)
+                {
+                    if (attempt > 10)
+                    {
+                        throw;
+                    }
+
+                    await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+                }
+            }
         }
 
         /// <summary>
@@ -84,6 +100,7 @@ namespace SoCreate.ServiceFabric.PubSub.Subscriber
                 catch (Exception ex)
                 {
                     LogMessage($"Failed to register Service:'{Context.ServiceName}' as Subscriber of {handler.Key}. Error:'{ex.Message}'.");
+                    throw;
                 }
             }
         }
