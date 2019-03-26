@@ -21,7 +21,7 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
         /// <summary>
         /// Creates a new default instance.
         /// </summary>
-        public BrokerServiceLocator(IHashingHelper hashingHelper = null, Uri brokerServiceUri = null)
+        public BrokerServiceLocator(Uri brokerServiceUri = null, IHashingHelper hashingHelper = null)
         {
             _hashingHelper = hashingHelper ?? new HashingHelper();
             _fabricClient = new FabricClient();
