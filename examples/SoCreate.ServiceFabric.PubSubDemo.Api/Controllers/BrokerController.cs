@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -23,11 +24,14 @@ namespace SoCreate.ServiceFabric.PubSubDemo.Api.Controllers
 
         // GET api/broker/stats
         [HttpGet("stats")]
-        public async Task<ActionResult<Dictionary<string, List<QueueStats>>>> Get()
+        public async Task<ActionResult<Dictionary<string, IEnumerable<QueueStats>>>> Get([FromQuery] BrokerStatsQueryParams queryParams)
         {
             try
             {
-                return await _brokerClient.GetBrokerStatsAsync();
+                return (await _brokerClient.GetBrokerStatsAsync())
+                    .Where(item => queryParams.MessageType == null || item.Key.Contains(queryParams.MessageType))
+                    .ToDictionary(item => item.Key, item => item.Value.Where(i => i.Time > queryParams.FromTime &&
+                        (queryParams.ServiceName == null || i.ServiceName.Contains(queryParams.ServiceName))));
             }
             catch (Exception ex)
             {
@@ -111,4 +115,11 @@ namespace SoCreate.ServiceFabric.PubSubDemo.Api.Controllers
             }
         }
      }
+
+    public class BrokerStatsQueryParams
+    {
+        public DateTime FromTime { get; set; }
+        public string ServiceName { get; set; }
+        public string MessageType { get; set; }
+    }
 }

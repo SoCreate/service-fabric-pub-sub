@@ -76,7 +76,7 @@ namespace SoCreate.ServiceFabric.PubSub
                         }
                         catch (Exception ex)
                         {
-                            await BrokerEventsManager.OnMessageDeliveryFailedAsync(queueName, subscriber, message.Value, ex);
+                            await BrokerEventsManager.OnMessageDeliveryFailedAsync(queueName, subscriber, message.Value, ex, ThrottleFactor);
                             throw;
                         }
                     }

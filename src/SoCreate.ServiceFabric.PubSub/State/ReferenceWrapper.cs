@@ -44,6 +44,8 @@ namespace SoCreate.ServiceFabric.PubSub.State
         [DataMember]
         public string RoutingKey { get; private set; }
 
+        public int SkipCount { get; set; }
+
         /// <inheritdoc />
         public abstract bool Equals(ReferenceWrapper other);
 
@@ -97,6 +99,16 @@ namespace SoCreate.ServiceFabric.PubSub.State
             string value = (string)token.SelectToken(_routingKeyValue[0]);
 
             return string.Equals(_routingKeyValue[1], value, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public bool ShouldProcessMessages()
+        {
+            if (SkipCount > 0)
+            {
+                SkipCount--;
+                return false;
+            }
+            return true;
         }
     }
 }

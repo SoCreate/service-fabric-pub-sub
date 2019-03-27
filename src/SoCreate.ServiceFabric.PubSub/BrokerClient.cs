@@ -24,7 +24,7 @@ namespace SoCreate.ServiceFabric.PubSub
         /// <summary>
         /// A list of QueueStats for each queue on the Broker Service.  Hold up to <see cref="QueueStatCapacity"/> items at a time.
         /// </summary>
-        private Dictionary<string, List<QueueStats>> _queueStats = new Dictionary<string, List<QueueStats>>();
+        private readonly Dictionary<string, List<QueueStats>> _queueStats = new Dictionary<string, List<QueueStats>>();
 
         /// <summary>
         /// A dictionary of Reference Wrappers, keyed by queue name, representing all queues on the Broker Service.
@@ -85,11 +85,7 @@ namespace SoCreate.ServiceFabric.PubSub
         /// <inheritdoc />
         public async Task<Dictionary<string, List<QueueStats>>> GetBrokerStatsAsync()
         {
-            var tasks = from brokerService in await _brokerServiceLocator.GetBrokerServicesForAllPartitionsAsync()
-                        select brokerService.GetBrokerStatsAsync();
-
-            var allStats = await Task.WhenAll(tasks.ToList());
-            foreach (var stat in allStats.SelectMany(stat => stat.Stats))
+            foreach (var stat in await GetAllBrokerStatsAsync())
             {
                 if (!_queueStats.ContainsKey(stat.QueueName))
                 {
@@ -102,8 +98,6 @@ namespace SoCreate.ServiceFabric.PubSub
                 }
             }
 
-            _subscriberReferences = allStats.SelectMany(stat => stat.Queues).ToDictionary(i => i.Key, i => i.Value);
-
             return _queueStats;
         }
 
@@ -112,7 +106,7 @@ namespace SoCreate.ServiceFabric.PubSub
         {
             if (!_subscriberReferences.ContainsKey(queueName))
             {
-                await GetBrokerStatsAsync();
+                await GetAllBrokerStatsAsync();
             }
 
             if (_subscriberReferences.TryGetValue(queueName, out var referenceWrapper))
@@ -120,7 +114,21 @@ namespace SoCreate.ServiceFabric.PubSub
                 var messageType = queueName.Split('_')[0];
                 var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType);
                 await brokerService.UnsubscribeAsync(referenceWrapper, messageType);
+                _subscriberReferences.Remove(queueName);
+                _queueStats.Remove(queueName);
             }
+        }
+
+        private async Task<IEnumerable<QueueStats>> GetAllBrokerStatsAsync()
+        {
+            var tasks = from brokerService in await _brokerServiceLocator.GetBrokerServicesForAllPartitionsAsync()
+                select brokerService.GetBrokerStatsAsync();
+
+            var allStats = await Task.WhenAll(tasks.ToList());
+
+            _subscriberReferences = allStats.SelectMany(stat => stat.Queues).ToDictionary(i => i.Key, i => i.Value);
+
+            return allStats.SelectMany(stat => stat.Stats);
         }
     }
 

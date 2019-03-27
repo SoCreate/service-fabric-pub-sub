@@ -55,7 +55,12 @@ namespace SoCreate.ServiceFabric.PubSub
         /// <summary>
         /// Gets or sets the interval to wait between batches of publishing messages. (Default: 5s)
         /// </summary>
-        protected TimeSpan Period { get; set; } = TimeSpan.FromSeconds(5);
+        protected TimeSpan Period { get; set; } = TimeSpan.FromSeconds(1);
+
+        /// <summary>
+        /// Gets or sets the interval to wait between batches of publishing messages. (Default: 5s)
+        /// </summary>
+        protected int ThrottleFactor { get; set; } = 10;
 
         /// <summary>
         /// Get or Sets the maximum period to process messages before allowing enqueuing
@@ -252,18 +257,15 @@ namespace SoCreate.ServiceFabric.PubSub
                 //process messages for given time, then allow other transactions to enqueue messages
                 var cts = new CancellationTokenSource(MaxProcessingPeriod);
                 var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken);
+                var timeoutCancellationToken = linkedTokenSource.Token;
                 try
                 {
-                    var elements = _queues.ToArray();
-                    var tasks = new List<Task>(elements.Length);
-
-                    foreach (var element in elements)
-                    {
-                        var subscriber = element.Value;
-                        string queueName = element.Key;
-                        tasks.Add(ProcessQueues(linkedTokenSource.Token, subscriber, queueName));
-                    }
-                    await Task.WhenAll(tasks);
+                    await Task.WhenAll(
+                        from subscription in _queues
+                        let queueName = subscription.Key
+                        let subscriber = subscription.Value
+                        where subscriber.ShouldProcessMessages()
+                        select ProcessQueues(timeoutCancellationToken, subscriber, queueName));
                 }
                 catch (TaskCanceledException)
                 {//swallow and move on..
