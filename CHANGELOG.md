@@ -1,7 +1,9 @@
-# 9.1.0 (2019-03-26)
+# 9.1.0 (2019-04-01)
 ### Features
 * **Subscribe Retry**: Added a retry strategy for when a subscriber fails to subscribe because the Broker doesn't exist yet.
 * **BrokerServiceUri**: We recently lost the ability to specify the BrokerUri when publishing/subscribing.  Added the ability to pass the BrokerUri to the BrokerServiceLocator class.
+* **Throttle on Failure**: Added a config to slow down the processing loop when errors occur.
+* **Filter Broker Stats**: Added ability to filter on time, Service name, or message type using query parameters in the GET broker/stats API in the demo app.
 
 # 9.0.0 (2019-03-21)
 ### Features
