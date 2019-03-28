@@ -53,12 +53,12 @@ namespace SoCreate.ServiceFabric.PubSub
         protected TimeSpan DueTime { get; set; } = TimeSpan.FromSeconds(5);
 
         /// <summary>
-        /// Gets or sets the interval to wait between batches of publishing messages. (Default: 5s)
+        /// Gets or sets the interval to wait between batches of publishing messages. (Default: 1s)
         /// </summary>
         protected TimeSpan Period { get; set; } = TimeSpan.FromSeconds(1);
 
         /// <summary>
-        /// Gets or sets the interval to wait between batches of publishing messages. (Default: 5s)
+        /// Gets or sets the amount to throttle queue processing when deliveries are failing.  Slow down queue processing by a factor of X. (Default 10) (Default: 10)
         /// </summary>
         protected int ThrottleFactor { get; set; } = 10;
 
