@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SoCreate.ServiceFabric.PubSub.Helpers;
 using SoCreate.ServiceFabric.PubSub.State;
@@ -8,27 +7,22 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
 {
     public class MockBrokerServiceLocator : IBrokerServiceLocator
     {
-        public Task<Uri> LocateAsync()
-        {
-            return Task.FromResult(new Uri("mockUri"));
-        }
-
-        public Task RegisterAsync(Uri brokerServiceName)
+        public Task RegisterAsync()
         {
             return Task.CompletedTask;
         }
 
-        public Task<IBrokerService> GetBrokerServiceForMessageAsync(object message, Uri brokerServiceName = null)
+        public Task<IBrokerService> GetBrokerServiceForMessageAsync(object message)
         {
             return Task.FromResult<IBrokerService>(new MockBrokerService());
         }
 
-        public virtual Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName, Uri brokerServiceName = null)
+        public virtual Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName)
         {
             return Task.FromResult<IBrokerService>(new MockBrokerService());
         }
 
-        public virtual Task<IEnumerable<IBrokerService>> GetBrokerServicesForAllPartitionsAsync(Uri brokerServiceName = null)
+        public virtual Task<IEnumerable<IBrokerService>> GetBrokerServicesForAllPartitionsAsync()
         {
             return Task.FromResult<IEnumerable<IBrokerService>>(new List<IBrokerService>
             {

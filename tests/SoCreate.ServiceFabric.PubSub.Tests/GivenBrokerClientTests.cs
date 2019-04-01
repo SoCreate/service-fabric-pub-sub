@@ -83,12 +83,12 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
                 new MockBrokerServicePartitionTwo()
             };
         }
-        public override Task<IEnumerable<IBrokerService>> GetBrokerServicesForAllPartitionsAsync(Uri brokerServiceName = null)
+        public override Task<IEnumerable<IBrokerService>> GetBrokerServicesForAllPartitionsAsync()
         {
             return Task.FromResult<IEnumerable<IBrokerService>>(_brokers);
         }
 
-        public override Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName, Uri brokerServiceName = null)
+        public override Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName)
         {
             return Task.FromResult(_brokers.First());
         }

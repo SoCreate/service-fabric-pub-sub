@@ -22,14 +22,14 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
         /// <param name="operation">Operation to execute with retry.</param>
         /// <param name="state">State passed to callback. (optional)</param>
         /// <param name="cancellationToken">Cancellation support. (optional)</param>
-        /// <param name="maxAttempts">#Attempts to execute <paramref name="operation"/> (optional)</param> 
+        /// <param name="maxAttempts">#Attempts to execute <paramref name="operation"/> (optional)</param>
         /// <param name="initialDelay">First delay between attempts. Later on this will be exponentially grow. (optional)</param>
         /// <returns></returns>
-        public static async Task<TResult> ExecuteInTransaction<TResult>(IReliableStateManager stateManager, 
-            Func<ITransaction, CancellationToken, object, Task<TResult>> operation, 
-            object state = null, 
-            CancellationToken cancellationToken = default(CancellationToken), 
-            int maxAttempts = DefaultMaxAttempts, 
+        public static async Task<TResult> ExecuteInTransaction<TResult>(IReliableStateManager stateManager,
+            Func<ITransaction, CancellationToken, object, Task<TResult>> operation,
+            object state = null,
+            CancellationToken cancellationToken = default(CancellationToken),
+            int maxAttempts = DefaultMaxAttempts,
             TimeSpan? initialDelay = null)
         {
             if (stateManager == null) throw new ArgumentNullException(nameof(stateManager));
@@ -68,10 +68,10 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
         /// <param name="operation">Operation to execute with retry.</param>
         /// <param name="state">State passed to callback. (optional)</param>
         /// <param name="cancellationToken">Cancellation support. (optional)</param>
-        /// <param name="maxAttempts">#Attempts to execute <paramref name="operation"/> (optional)</param> 
+        /// <param name="maxAttempts">#Attempts to execute <paramref name="operation"/> (optional)</param>
         /// <param name="initialDelay">First delay between attempts. Later on this will be exponentially grow. (optional)</param>
         /// <returns></returns>
-        public static async Task ExecuteInTransaction(IReliableStateManager stateManager, Func<ITransaction, CancellationToken, 
+        public static async Task ExecuteInTransaction(IReliableStateManager stateManager, Func<ITransaction, CancellationToken,
             object, Task> operation,
             object state = null,
             CancellationToken cancellationToken = default(CancellationToken),
@@ -112,11 +112,11 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
         /// <param name="operation">Operation to execute with retry.</param>
         /// <param name="state">State passed to callback. (optional)</param>
         /// <param name="cancellationToken">Cancellation support. (optional)</param>
-        /// <param name="maxAttempts">#Attempts to execute <paramref name="operation"/> (optional)</param> 
+        /// <param name="maxAttempts">#Attempts to execute <paramref name="operation"/> (optional)</param>
         /// <param name="initialDelay">First delay between attempts. Later on this will be exponentially grow. (optional)</param>
         /// <returns></returns>
-        public static async Task<TResult> Execute<TResult>(Func<CancellationToken, object, Task<TResult>> operation, 
-            object state = null, 
+        public static async Task<TResult> Execute<TResult>(Func<CancellationToken, object, Task<TResult>> operation,
+            object state = null,
             CancellationToken cancellationToken = default(CancellationToken),
             int maxAttempts = DefaultMaxAttempts,
             TimeSpan? initialDelay = null)
@@ -136,7 +136,7 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
                 }
                 catch (TimeoutException)
                 {
-                    if (attempts == DefaultMaxAttempts)
+                    if (attempts == maxAttempts)
                     {
                         throw;
                     }

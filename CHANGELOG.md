@@ -1,3 +1,8 @@
+# 9.1.0 (2019-03-26)
+### Features
+* **Subscribe Retry**: Added a retry strategy for when a subscriber fails to subscribe because the Broker doesn't exist yet.
+* **BrokerServiceUri**: We recently lost the ability to specify the BrokerUri when publishing/subscribing.  Added the ability to pass the BrokerUri to the BrokerServiceLocator class.
+
 # 9.0.0 (2019-03-21)
 ### Features
 * **Broker Stats**: Added `GetBrokerStatsAsync()` and `UnsubscribeByQueueNameAsync()` to `BrokerClient` to help with monitoring and managing the Broker Service.
