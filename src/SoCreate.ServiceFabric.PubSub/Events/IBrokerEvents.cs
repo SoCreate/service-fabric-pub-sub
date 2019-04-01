@@ -20,7 +20,7 @@ namespace SoCreate.ServiceFabric.PubSub.Events
         Task OnUnsubscribedAsync(string queueName, ReferenceWrapper subscriber, string messageTypeName);
         Task OnMessageReceivedAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper);
         Task OnMessageDeliveredAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper);
-        Task OnMessageDeliveryFailedAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper, Exception exception);
+        Task OnMessageDeliveryFailedAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper, Exception exception, int throttleFactor = 0);
         Task<List<QueueStats>> GetStatsAsync();
     }
 }

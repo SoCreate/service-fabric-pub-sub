@@ -56,12 +56,14 @@ namespace SoCreate.ServiceFabric.PubSub.Events
             _stats[queueName].TotalDelivered++;
         }
 
-        public async Task OnMessageDeliveryFailedAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper, Exception exception)
+        public async Task OnMessageDeliveryFailedAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper, Exception exception, int throttleFactor)
         {
             if (MessageDeliveryFailed != null)
             {
                 await MessageDeliveryFailed.Invoke(queueName, subscriber, messageWrapper, exception);
             }
+
+            subscriber.SkipCount = throttleFactor;
             _stats[queueName].TotalDeliveryFailures++;
         }
 
