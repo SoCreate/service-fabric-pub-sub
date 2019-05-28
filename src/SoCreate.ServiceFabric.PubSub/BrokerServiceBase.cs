@@ -189,7 +189,9 @@ namespace SoCreate.ServiceFabric.PubSub
                 await BrokerEventsManager.OnUnsubscribedAsync(queueName, reference, messageTypeName);
             });
         }
-
+        
+        protected virtual Task OnPublishMessageAsync(MessageWrapper message) { return Task.CompletedTask; }
+        
         /// <summary>
         /// Takes a published message and forwards it (indirectly) to all Subscribers.
         /// </summary>
@@ -198,6 +200,8 @@ namespace SoCreate.ServiceFabric.PubSub
         public async Task PublishMessageAsync(MessageWrapper message)
         {
             await WaitForInitializeAsync(CancellationToken.None);
+
+            await OnPublishMessageAsync(message);
 
             var myDictionary = await TimeoutRetryHelper.Execute((token, state) => StateManager.GetOrAddAsync<IReliableDictionary<string, BrokerServiceState>>(message.MessageType));
 
