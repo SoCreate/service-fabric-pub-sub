@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,57 +15,75 @@ namespace SoCreate.ServiceFabric.PubSub.Events
         public event Func<string, ReferenceWrapper, MessageWrapper, Task> MessageDelivered;
         public event Func<string, ReferenceWrapper, MessageWrapper, Exception, Task> MessageDeliveryFailed;
 
-        private readonly Dictionary<string, QueueStats> _stats = new Dictionary<string, QueueStats>();
+        private readonly ConcurrentDictionary<string, QueueStats> _stats = new ConcurrentDictionary<string, QueueStats>();
 
         public async Task OnSubscribedAsync(string queueName, ReferenceWrapper subscriber, string messageTypeName)
         {
-            if (Subscribed != null)
+            var onSubscribed = Subscribed;
+            if (onSubscribed != null)
             {
-                await Subscribed.Invoke(queueName, subscriber, messageTypeName);
+                await onSubscribed.Invoke(queueName, subscriber, messageTypeName);
             }
-            _stats[queueName] = new QueueStats
+
+            var stats = new QueueStats
             {
                 QueueName = queueName,
                 ServiceName = subscriber.Name
             };
+            _stats.TryAdd(queueName, stats);
         }
 
         public async Task OnUnsubscribedAsync(string queueName, ReferenceWrapper subscriber, string messageTypeName)
         {
-            if (Unsubscribed != null)
+            var onUnsubscribed = Unsubscribed;
+            if (onUnsubscribed != null)
             {
-                await Unsubscribed.Invoke(queueName, subscriber, messageTypeName);
+                await onUnsubscribed.Invoke(queueName, subscriber, messageTypeName);
             }
-            _stats.Remove(queueName);
+            _stats.TryRemove(queueName, out _);
         }
 
         public async Task OnMessageReceivedAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper)
         {
-            if (MessageReceived != null)
+            var onMessageReceived = MessageReceived;
+            if (onMessageReceived != null)
             {
-                await MessageReceived.Invoke(queueName, subscriber, messageWrapper);
+                await onMessageReceived.Invoke(queueName, subscriber, messageWrapper);
             }
-            _stats[queueName].TotalReceived++;
+
+            if (_stats.TryGetValue(queueName, out var stats))
+            {
+                stats.TotalReceived++;
+            }
         }
 
         public async Task OnMessageDeliveredAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper)
         {
-            if (MessageDelivered != null)
+            var onMessageDelivered = MessageDelivered;
+            if (onMessageDelivered != null)
             {
-                await MessageDelivered.Invoke(queueName, subscriber, messageWrapper);
+                await onMessageDelivered.Invoke(queueName, subscriber, messageWrapper);
             }
-            _stats[queueName].TotalDelivered++;
+
+            if (_stats.TryGetValue(queueName, out var stats))
+            {
+                stats.TotalDelivered++;
+            }
         }
 
         public async Task OnMessageDeliveryFailedAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper, Exception exception, int throttleFactor)
         {
-            if (MessageDeliveryFailed != null)
+            var onMessageDeliveryFailed = MessageDeliveryFailed;
+            if (onMessageDeliveryFailed != null)
             {
-                await MessageDeliveryFailed.Invoke(queueName, subscriber, messageWrapper, exception);
+                await onMessageDeliveryFailed.Invoke(queueName, subscriber, messageWrapper, exception);
             }
 
             subscriber.SkipCount = throttleFactor;
-            _stats[queueName].TotalDeliveryFailures++;
+            if (_stats.TryGetValue(queueName, out var stats))
+            {
+                stats.TotalDeliveryFailures++;
+            }
         }
 
         public Task<List<QueueStats>> GetStatsAsync()

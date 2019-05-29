@@ -1,3 +1,7 @@
+# 9.1.1 (2019-05-28)
+### Bug fix
+* **Broker Stats**: Use concurrent dictionary to allow concurrent write access to stats.
+
 # 9.1.0 (2019-04-01)
 ### Features
 * **Subscribe Retry**: Added a retry strategy for when a subscriber fails to subscribe because the Broker doesn't exist yet.
