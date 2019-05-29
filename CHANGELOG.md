@@ -1,3 +1,7 @@
+# 9.1.1 (2019-05-29)
+### Features
+* **OnPublishMessageAsync**: Added extension point in BrokerServiceBase class to do actions before or after the events have been published to the subscribers.
+
 # 9.1.0 (2019-04-01)
 ### Features
 * **Subscribe Retry**: Added a retry strategy for when a subscriber fails to subscribe because the Broker doesn't exist yet.

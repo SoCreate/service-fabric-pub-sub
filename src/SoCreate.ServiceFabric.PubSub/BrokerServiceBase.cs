@@ -189,20 +189,15 @@ namespace SoCreate.ServiceFabric.PubSub
                 await BrokerEventsManager.OnUnsubscribedAsync(queueName, reference, messageTypeName);
             });
         }
-        
-        protected virtual Task OnPublishMessageAsync(MessageWrapper message) { return Task.CompletedTask; }
-        
+
         /// <summary>
-        /// Takes a published message and forwards it (indirectly) to all Subscribers.
+        /// Forwards the published messages (indirectly) to all Subscribers.
+        /// If you overwrite this method do not forget to call the base implementation.
         /// </summary>
         /// <param name="message">The message to publish</param>
         /// <returns></returns>
-        public async Task PublishMessageAsync(MessageWrapper message)
+        protected virtual async Task OnPublishMessageAsync(MessageWrapper message)
         {
-            await WaitForInitializeAsync(CancellationToken.None);
-
-            await OnPublishMessageAsync(message);
-
             var myDictionary = await TimeoutRetryHelper.Execute((token, state) => StateManager.GetOrAddAsync<IReliableDictionary<string, BrokerServiceState>>(message.MessageType));
 
             var subscribers = await TimeoutRetryHelper.ExecuteInTransaction(StateManager, async (tx, token, state) =>
@@ -228,6 +223,18 @@ namespace SoCreate.ServiceFabric.PubSub
                 }
                 ServiceEventSourceMessage($"Published message '{message.MessageType}' to {subscribers.Length} subscribers.");
             });
+        }
+
+        /// <summary>
+        /// Takes a published message and forwards it (indirectly) to all Subscribers.
+        /// </summary>
+        /// <param name="message">The message to publish</param>
+        /// <returns></returns>
+        public async Task PublishMessageAsync(MessageWrapper message)
+        {
+            await WaitForInitializeAsync(CancellationToken.None);
+
+            await OnPublishMessageAsync(message);
         }
 
         public async Task<QueueStatsWrapper> GetBrokerStatsAsync()
