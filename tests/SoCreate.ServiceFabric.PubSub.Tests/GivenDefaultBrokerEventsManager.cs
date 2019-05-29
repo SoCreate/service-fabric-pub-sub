@@ -2,7 +2,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SoCreate.ServiceFabric.PubSub.Events;
 using SoCreate.ServiceFabric.PubSub.State;
-using System.Collections.Generic;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SoCreate.ServiceFabric.PubSub.Tests
@@ -11,32 +12,55 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
     public class GivenDefaultBrokerEventsManager
     {
         [TestMethod]
-        public async Task WhenInsertingConcurrently_ThenAllCallbacksAreMadeCorrectly()
+        public void WhenInsertingConcurrently_ThenAllCallbacksAreMadeCorrectly()
         {
-            int callCount = 0;
+            bool hasCrashed = false;
             var manager = new DefaultBrokerEventsManager();
+            ManualResetEvent mr = new ManualResetEvent(false);
+            ManualResetEvent mr2 = new ManualResetEvent(false);
+
             manager.Subscribed += (s, e, t) =>
             {
-                lock (manager)
-                {
-                    callCount++;
-                }
-
+                mr.WaitOne();
                 return Task.CompletedTask;
-
             };
-            const int attempts = 20;
-            var tasks = new List<Task>(attempts);
+
+            const int attempts = 2000;
 
             for (int i = 0; i < attempts; i++)
             {
-                var actorReference = new ActorReference{ ActorId =  ActorId.CreateRandom() };
-                tasks.Add(manager.OnSubscribedAsync("Key", new ActorReferenceWrapper(actorReference), "MessageType"));
+                ThreadPool.QueueUserWorkItem(async j =>
+                {
+                    var actorReference = new ActorReference { ActorId = ActorId.CreateRandom() };
+                    try
+                    {
+                        await manager.OnSubscribedAsync("Key" + (int) j % 5, new ActorReferenceWrapper(actorReference),
+                            "MessageType");
+                    }
+                    catch (NullReferenceException)
+                    {
+                        hasCrashed = true;
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        hasCrashed = true;
+                    }
+                    finally
+                    {
+                        if ((int)j == attempts - 1)
+                        {
+                            mr2.Set();
+                        }
+                    }
+                }, i);
+
+                
             }
 
-            await Task.WhenAll(tasks);
+            mr.Set();
 
-            Assert.AreEqual(attempts, callCount);
+            Assert.IsTrue(mr2.WaitOne(TimeSpan.FromSeconds(10)), "Failed to run within time limits.");
+            Assert.IsFalse(hasCrashed, "Should not crash.");
         }
     }
 }
