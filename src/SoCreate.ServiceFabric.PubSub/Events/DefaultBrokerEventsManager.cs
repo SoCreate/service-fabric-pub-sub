@@ -11,7 +11,8 @@ namespace SoCreate.ServiceFabric.PubSub.Events
     {
         public event Func<string, ReferenceWrapper, string, Task> Subscribed;
         public event Func<string, ReferenceWrapper, string, Task> Unsubscribed;
-        public event Func<string, ReferenceWrapper, MessageWrapper, Task> MessageReceived;
+        public event Func<MessageWrapper, Task> MessagePublished;
+        public event Func<string, ReferenceWrapper, MessageWrapper, Task> MessageQueuedToSubscriber;
         public event Func<string, ReferenceWrapper, MessageWrapper, Task> MessageDelivered;
         public event Func<string, ReferenceWrapper, MessageWrapper, Exception, Task> MessageDeliveryFailed;
 
@@ -43,12 +44,21 @@ namespace SoCreate.ServiceFabric.PubSub.Events
             _stats.TryRemove(queueName, out _);
         }
 
-        public async Task OnMessageReceivedAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper)
+        public async Task OnMessagePublishedAsync(MessageWrapper messageWrapper)
         {
-            var onMessageReceived = MessageReceived;
-            if (onMessageReceived != null)
+            var onMessagePublished = MessagePublished;
+            if (onMessagePublished != null)
             {
-                await onMessageReceived.Invoke(queueName, subscriber, messageWrapper);
+                await onMessagePublished.Invoke(messageWrapper);
+            }
+        }
+
+        public async Task OnMessageQueuedToSubscriberAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper)
+        {
+            var onMessageQueuedToSubscriber = MessageQueuedToSubscriber;
+            if (onMessageQueuedToSubscriber != null)
+            {
+                await onMessageQueuedToSubscriber.Invoke(queueName, subscriber, messageWrapper);
             }
 
             if (_stats.TryGetValue(queueName, out var stats))
