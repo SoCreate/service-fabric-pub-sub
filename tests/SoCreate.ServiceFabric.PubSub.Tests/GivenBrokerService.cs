@@ -62,7 +62,7 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
 
             await broker.PublishMessageAsync(new TestMessage().CreateMessageWrapper());
 
-            await ExecuteRunAsync(broker);
+            await ExecuteProcessAllQueuesAsync(broker);
             Assert.AreEqual(2, broker.MessageDeliveredEventCount);
             Assert.AreEqual(0, broker.MessageDeliveryFailedEventCount);
         }
@@ -76,21 +76,16 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
 
             await broker.PublishMessageAsync(new TestMessage().CreateMessageWrapper());
 
-            await ExecuteRunAsync(broker);
+            await Assert.ThrowsExceptionAsync<Exception>(() => ExecuteProcessAllQueuesAsync(broker));
             Assert.AreEqual(1, broker.MessageDeliveredEventCount);
             Assert.AreEqual(1, broker.MessageDeliveryFailedEventCount);
         }
 
-        private async Task ExecuteRunAsync(BrokerService broker)
+        private Task ExecuteProcessAllQueuesAsync(BrokerService broker)
         {
             // Execute RunAsync to process queues.
-            var processQueuesMethod = typeof(MockBrokerServiceWithEvents).GetMethod("RunAsync", BindingFlags.NonPublic | BindingFlags.Instance);
-            var cancellationToken = new CancellationToken();
-            var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            processQueuesMethod.Invoke(broker, new object[] { cancellationToken });
-            // Wait long enough for the queues to be processed, then kill it so it doesn't loop forever.
-            await Task.Delay(TimeSpan.FromMilliseconds(50));
-            cancellationSource.Cancel();
+            var processQueuesMethod = typeof(MockBrokerServiceWithEvents).GetMethod("ProcessAllQueuesAsync", BindingFlags.NonPublic | BindingFlags.Instance);
+            return (Task)processQueuesMethod.Invoke(broker, new object[] { CancellationToken.None });
         }
 
         private ReferenceWrapper GetMockReferenceWrapper(string name = "Subscriber", bool isBroken = false)
@@ -119,7 +114,7 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
         {
             if (_isBroken)
             {
-                throw new Exception("The subscriber threw and exception");
+                throw new Exception("The subscriber threw an exception");
             }
             return Task.CompletedTask;
         }

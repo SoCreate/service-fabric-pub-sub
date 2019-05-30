@@ -1,6 +1,6 @@
 # 10.0.0 (2019-05-30)
 ### Features
-* **Broker Events**: Added MessagePublished event.
+* **Broker Events**: Added MessagePublished event.  Thanks to @BoeseB for suggesting this feature!
 ### Breaking Changes
 * **Broker Events**: Renamed MessageReceived event to MessageQueuedToSubscriber.
 
