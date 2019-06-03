@@ -1,3 +1,9 @@
+# 10.0.0 (2019-05-30)
+### Features
+* **Broker Events**: Added MessagePublished event.  Thanks to @BoeseB for suggesting this feature!
+### Breaking Changes
+* **Broker Events**: Renamed MessageReceived event to MessageQueuedToSubscriber.
+
 # 9.1.1 (2019-05-28)
 ### Bug fix
 * **Broker Stats**: Use concurrent dictionary to allow concurrent write access to stats.

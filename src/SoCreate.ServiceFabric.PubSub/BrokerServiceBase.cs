@@ -199,6 +199,8 @@ namespace SoCreate.ServiceFabric.PubSub
         {
             await WaitForInitializeAsync(CancellationToken.None);
 
+            await BrokerEventsManager.OnMessagePublishedAsync(message);
+
             var myDictionary = await TimeoutRetryHelper.Execute((token, state) => StateManager.GetOrAddAsync<IReliableDictionary<string, BrokerServiceState>>(message.MessageType));
 
             var subscribers = await TimeoutRetryHelper.ExecuteInTransaction(StateManager, async (tx, token, state) =>
@@ -220,7 +222,7 @@ namespace SoCreate.ServiceFabric.PubSub
                 foreach (var subscriber in subscribers)
                 {
                     await EnqueueMessageAsync(message, subscriber, tx);
-                    await BrokerEventsManager.OnMessageReceivedAsync(subscriber.QueueName, _queues[subscriber.QueueName], message);
+                    await BrokerEventsManager.OnMessageQueuedToSubscriberAsync(subscriber.QueueName, _queues[subscriber.QueueName], message);
                 }
                 ServiceEventSourceMessage($"Published message '{message.MessageType}' to {subscribers.Length} subscribers.");
             });
@@ -260,12 +262,7 @@ namespace SoCreate.ServiceFabric.PubSub
                 var timeoutCancellationToken = linkedTokenSource.Token;
                 try
                 {
-                    await Task.WhenAll(
-                        from subscription in _queues
-                        let queueName = subscription.Key
-                        let subscriber = subscription.Value
-                        where subscriber.ShouldProcessMessages()
-                        select ProcessQueues(timeoutCancellationToken, subscriber, queueName));
+                    await ProcessAllQueuesAsync(timeoutCancellationToken);
                 }
                 catch (TaskCanceledException)
                 {//swallow and move on..
@@ -288,6 +285,16 @@ namespace SoCreate.ServiceFabric.PubSub
                 await Task.Delay(Period, cancellationToken);
             }
             // ReSharper disable once FunctionNeverReturns
+        }
+
+        protected async Task ProcessAllQueuesAsync(CancellationToken timeoutCancellationToken)
+        {
+            await Task.WhenAll(
+                from subscription in _queues
+                let queueName = subscription.Key
+                let subscriber = subscription.Value
+                where subscriber.ShouldProcessMessages()
+                select ProcessQueues(timeoutCancellationToken, subscriber, queueName));
         }
 
         /// <inheritdoc />

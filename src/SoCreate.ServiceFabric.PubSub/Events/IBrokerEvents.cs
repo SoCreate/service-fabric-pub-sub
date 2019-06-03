@@ -9,7 +9,8 @@ namespace SoCreate.ServiceFabric.PubSub.Events
     {
         event Func<string, ReferenceWrapper, string, Task> Subscribed;
         event Func<string, ReferenceWrapper, string, Task> Unsubscribed;
-        event Func<string, ReferenceWrapper, MessageWrapper, Task> MessageReceived;
+        event Func<MessageWrapper, Task> MessagePublished;
+        event Func<string, ReferenceWrapper, MessageWrapper, Task> MessageQueuedToSubscriber;
         event Func<string, ReferenceWrapper, MessageWrapper, Task> MessageDelivered;
         event Func<string, ReferenceWrapper, MessageWrapper, Exception, Task> MessageDeliveryFailed;
     }
@@ -18,7 +19,8 @@ namespace SoCreate.ServiceFabric.PubSub.Events
     {
         Task OnSubscribedAsync(string queueName, ReferenceWrapper subscriber, string messageTypeName);
         Task OnUnsubscribedAsync(string queueName, ReferenceWrapper subscriber, string messageTypeName);
-        Task OnMessageReceivedAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper);
+        Task OnMessagePublishedAsync(MessageWrapper messageWrapper);
+        Task OnMessageQueuedToSubscriberAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper);
         Task OnMessageDeliveredAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper);
         Task OnMessageDeliveryFailedAsync(string queueName, ReferenceWrapper subscriber, MessageWrapper messageWrapper, Exception exception, int throttleFactor = 0);
         Task<List<QueueStats>> GetStatsAsync();
