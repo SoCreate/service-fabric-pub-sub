@@ -1,0 +1,46 @@
+trigger:
+  - master
+pr: none
+pool:
+  vmImage: Ubuntu-16.04
+variables:
+  buildConfiguration: Release
+  projectPaths: src/**/*.csproj
+  testProjectPaths: 'tests/**/*[Tt]ests/*.csproj'
+steps:
+  - task: DotNetCoreCLI@2
+    displayName: Test
+    inputs:
+      command: test
+      projects: $(testProjectPaths)
+      arguments: '--configuration $(BuildConfiguration)'
+  - task: DotNetCoreCLI@2
+    displayName: Restore
+    inputs:
+      command: restore
+      projects: $(projectPaths)
+  - task: DotNetCoreCLI@2
+    displayName: Build
+    inputs:
+      projects: $(projectPaths)
+      arguments: '--configuration $(buildConfiguration)'
+  - task: DotNetCoreCLI@2
+    displayName: Pack
+    inputs:
+      command: pack
+      packagesToPack: $(projectPaths)
+      nobuild: true
+  - task: NuGetToolInstaller@0
+    displayName: Use NuGet 4.9.3
+    inputs:
+      versionSpec: 4.9.3
+  - task: NuGetCommand@2
+    displayName: NuGet push
+    inputs:
+      command: push
+      nuGetFeedType: external
+      publishFeedCredentials: Public Nuget
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Artifact
+    inputs:
+      PathtoPublish: $(build.artifactstagingdirectory)
