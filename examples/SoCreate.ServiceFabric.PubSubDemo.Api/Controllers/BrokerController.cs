@@ -66,6 +66,33 @@ namespace SoCreate.ServiceFabric.PubSubDemo.Api.Controllers
             }
         }
 
+        // Publish {num} SampleUnorderedEvents to the BrokerService
+        // POST api/broker/unordered/publish/5
+        [HttpPost("unordered/publish/{num}")]
+        public async Task<IActionResult> PublishUnordered(int num)
+        {
+            try
+            {
+                var tasks = new List<Task>(num);
+                Stopwatch sw = Stopwatch.StartNew();
+                for (var i = 1; i <= num; i++)
+                {
+                    tasks.Add(_brokerClient.PublishMessageAsync(new SampleUnorderedEvent
+                    {
+                        Message = $"SampleUnorderedEvent #{i}"
+                    }));
+                }
+
+                await Task.WhenAll(tasks);
+                sw.Stop();
+                return Ok($"Published {num} messages in {sw.ElapsedMilliseconds}ms");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         // Publish the given event to the BrokerService.
         // Provide the message body in json and the Message-Type (FullName of message type) and Assembly-Name in headers.
         // POST api/broker/publish

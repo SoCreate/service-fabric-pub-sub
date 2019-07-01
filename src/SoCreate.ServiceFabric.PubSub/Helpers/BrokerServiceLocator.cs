@@ -43,7 +43,7 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
             if (message == null) throw new ArgumentNullException(nameof(message));
             var resolvedPartition = await GetPartitionForMessageAsync(message);
             return _serviceProxyFactory.CreateServiceProxy<IBrokerService>(
-                await LocateAsync(), resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
+                await LocateAsync(), resolvedPartition, listenerName: BrokerService.ListenerName);
         }
 
         /// <inheritdoc />
@@ -51,7 +51,7 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
         {
             var resolvedPartition = await GetPartitionForMessageAsync(messageTypeName);
             return _serviceProxyFactory.CreateServiceProxy<IBrokerService>(
-                await LocateAsync(), resolvedPartition, listenerName: BrokerServiceBase.ListenerName);
+                await LocateAsync(), resolvedPartition, listenerName: BrokerService.ListenerName);
         }
 
         /// <inheritdoc />
@@ -62,7 +62,7 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
             foreach (var partition in await GetBrokerPartitionKeys())
             {
                 serviceProxies.Add(_serviceProxyFactory.CreateServiceProxy<IBrokerService>(
-                    brokerServiceUri, partition, listenerName: BrokerServiceBase.ListenerName));
+                    brokerServiceUri, partition, listenerName: BrokerService.ListenerName));
             }
 
             return serviceProxies;

@@ -33,7 +33,7 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
 
     public class MockBrokerService : IBrokerService
     {
-        public Task SubscribeAsync(ReferenceWrapper reference, string messageTypeName)
+        public Task SubscribeAsync(ReferenceWrapper reference, string messageTypeName, bool isOrdered)
         {
             return Task.CompletedTask;
         }

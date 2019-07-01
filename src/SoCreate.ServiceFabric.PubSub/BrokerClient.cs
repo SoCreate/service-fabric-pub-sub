@@ -50,11 +50,11 @@ namespace SoCreate.ServiceFabric.PubSub
         }
 
         /// <inheritdoc />
-        public async Task SubscribeAsync<T>(ReferenceWrapper referenceWrapper, Type messageType, Func<T, Task> handler) where T : class
+        public async Task SubscribeAsync<T>(ReferenceWrapper referenceWrapper, Type messageType, Func<T, Task> handler, bool isOrdered = true) where T : class
         {
             Handlers[messageType] = message => handler((T)message);
             var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType);
-            await brokerService.SubscribeAsync(referenceWrapper, messageType.FullName);
+            await brokerService.SubscribeAsync(referenceWrapper, messageType.FullName, isOrdered);
         }
 
         /// <inheritdoc />
@@ -142,12 +142,13 @@ namespace SoCreate.ServiceFabric.PubSub
         /// <param name="brokerClient"></param>
         /// <param name="service"></param>
         /// <param name="handler"></param>
+        /// <param name="isOrdered"></param>
         /// <param name="listenerName"></param>
         /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
-        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatelessService service, Func<T, Task> handler, string listenerName = null, string routingKey = null) where T : class
+        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatelessService service, Func<T, Task> handler, bool isOrdered = true, string listenerName = null, string routingKey = null) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), typeof(T), handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), typeof(T), handler, isOrdered);
         }
 
         /// <summary>
@@ -156,12 +157,13 @@ namespace SoCreate.ServiceFabric.PubSub
         /// <param name="brokerClient"></param>
         /// <param name="service"></param>
         /// <param name="handler"></param>
+        /// <param name="isOrdered"></param>
         /// <param name="listenerName"></param>
         /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
-        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatefulService service, Func<T, Task> handler, string listenerName = null, string routingKey = null) where T : class
+        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatefulService service, Func<T, Task> handler, bool isOrdered = true, string listenerName = null, string routingKey = null) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), typeof(T), handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), typeof(T), handler, isOrdered);
         }
 
         /// <summary>
@@ -170,11 +172,12 @@ namespace SoCreate.ServiceFabric.PubSub
         /// <param name="brokerClient"></param>
         /// <param name="actor"></param>
         /// <param name="handler"></param>
+        /// <param name="isOrdered"></param>
         /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         /// <returns></returns>
-        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, ActorBase actor, Func<T, Task> handler, string routingKey = null) where T : class
+        public static Task SubscribeAsync<T>(this IBrokerClient brokerClient, ActorBase actor, Func<T, Task> handler, bool isOrdered = true, string routingKey = null) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(actor, routingKey), typeof(T), handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(actor, routingKey), typeof(T), handler, isOrdered);
         }
 
         /// <summary>
@@ -212,19 +215,19 @@ namespace SoCreate.ServiceFabric.PubSub
 
         // subscribe/unsubscribe using Type (useful when processing Subscribe attributes)
 
-        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatelessService service, Type messageType, Func<T, Task> handler, string listenerName = null, string routingKey = null) where T : class
+        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatelessService service, Type messageType, Func<T, Task> handler, string listenerName = null, string routingKey = null, bool isOrdered = true) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), messageType, handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), messageType, handler, isOrdered);
         }
 
-        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatefulService service, Type messageType, Func<T, Task> handler, string listenerName = null, string routingKey = null) where T : class
+        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, StatefulService service, Type messageType, Func<T, Task> handler, string listenerName = null, string routingKey = null, bool isOrdered = true) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), messageType, handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(service, listenerName, routingKey), messageType, handler, isOrdered);
         }
 
-        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, ActorBase actor, Type messageType, Func<T, Task> handler, string routingKey = null) where T : class
+        internal static Task SubscribeAsync<T>(this IBrokerClient brokerClient, ActorBase actor, Type messageType, Func<T, Task> handler, string routingKey = null, bool isOrdered = true) where T : class
         {
-            return brokerClient.SubscribeAsync(CreateReferenceWrapper(actor, routingKey), messageType, handler);
+            return brokerClient.SubscribeAsync(CreateReferenceWrapper(actor, routingKey), messageType, handler, isOrdered);
         }
 
         internal static Task UnsubscribeAsync(this IBrokerClient brokerClient, StatelessService service, Type messageType)

@@ -1,5 +1,6 @@
 ﻿using System.Fabric;
 using System.Threading.Tasks;
+using SoCreate.ServiceFabric.PubSub;
 using SoCreate.ServiceFabric.PubSubDemo.SampleEvents;
 using SoCreate.ServiceFabric.PubSub.Subscriber;
 
@@ -17,6 +18,13 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleStatelessSubscriber
 
         [Subscribe]
         private Task HandleSampleEvent(SampleEvent sampleEvent)
+        {
+            ServiceEventSource.Current.ServiceMessage(Context, $"Processing {sampleEvent.GetType()}: {sampleEvent.Message} on SampleStatelessSubscriber");
+            return Task.CompletedTask;
+        }
+        
+        [Subscribe(QueueType.Unordered)]
+        private Task HandleSampleUnorderedEvent(SampleUnorderedEvent sampleEvent)
         {
             ServiceEventSource.Current.ServiceMessage(Context, $"Processing {sampleEvent.GetType()}: {sampleEvent.Message} on SampleStatelessSubscriber");
             return Task.CompletedTask;

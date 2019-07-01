@@ -27,7 +27,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
 
         public Task Subscribe()
         {
-            return _brokerClient.SubscribeAsync<SampleEvent>(this, HandleMessageSampleEvent);
+            return _brokerClient.SubscribeAsync<SampleEvent>(this, HandleMessageSampleEvent, true);
         }
 
         private Task HandleMessageSampleEvent(SampleEvent message)

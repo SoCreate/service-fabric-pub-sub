@@ -36,8 +36,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
 
         public string Description
 		{
-
-			get
+	        get
 			{
 				string description;
 

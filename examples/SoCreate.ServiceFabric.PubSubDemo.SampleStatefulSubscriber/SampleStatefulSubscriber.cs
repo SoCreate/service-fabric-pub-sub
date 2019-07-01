@@ -21,5 +21,12 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleStatefulSubscriber
             ServiceEventSource.Current.ServiceMessage(Context, $"Processing {sampleEvent.GetType()}: {sampleEvent.Message} on SampleStatefulSubscriber");
             return Task.CompletedTask;
         }
+        
+        [Subscribe(QueueType.Unordered)]
+        private Task HandleSampleUnorderedEvent(SampleUnorderedEvent sampleEvent)
+        {
+            ServiceEventSource.Current.ServiceMessage(Context, $"Processing {sampleEvent.GetType()}: {sampleEvent.Message} on SampleStatelessSubscriber");
+            return Task.CompletedTask;
+        }
     }
 }
