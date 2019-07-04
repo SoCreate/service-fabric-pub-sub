@@ -20,8 +20,9 @@ namespace SoCreate.ServiceFabric.PubSub
         /// <param name="referenceWrapper"></param>
         /// <param name="messageType"></param>
         /// <param name="handler"></param>
+        /// <param name="isOrdered"></param>
         /// <returns></returns>
-        Task SubscribeAsync<T>(ReferenceWrapper referenceWrapper, Type messageType, Func<T, Task> handler) where T : class;
+        Task SubscribeAsync<T>(ReferenceWrapper referenceWrapper, Type messageType, Func<T, Task> handler, bool isOrdered) where T : class;
 
         /// <summary>
         /// Unregisters this Service or Actor as a subscriber for messages of type <paramref name="messageType"/> with the <see cref="BrokerService"/>.

@@ -14,23 +14,40 @@ namespace SoCreate.ServiceFabric.PubSub.Subscriber
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class SubscribeAttribute : Attribute
     {
+        public QueueType QueueType { get; }
+
+        public string RoutingKey { get; }
+        
+        public Func<object, Task> Handler { get; set; }
+        
+        public SubscribeAttribute(QueueType type = QueueType.Ordered, string routingKey = null)
+        {
+            QueueType = type;
+            RoutingKey = routingKey;
+        }
+    }
+
+    public enum QueueType
+    {
+        Ordered,
+        Unordered
     }
 
     public static class SubscriberExtensions
     {
-        public static Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers(this ISubscriberService service)
+        public static Dictionary<Type, SubscribeAttribute> DiscoverSubscribeAttributes(this ISubscriberService service)
         {
             return DiscoverHandlers(service);
         }
 
-        public static Dictionary<Type, Func<object, Task>> DiscoverMessageHandlers(this ISubscriberActor service)
+        public static Dictionary<Type, SubscribeAttribute> DiscoverSubscribeAttributes(this ISubscriberActor service)
         {
             return DiscoverHandlers(service);
         }
 
-        private static Dictionary<Type, Func<object, Task>> DiscoverHandlers(object service)
+        private static Dictionary<Type, SubscribeAttribute> DiscoverHandlers(object service)
         {
-            var handlers = new Dictionary<Type, Func<object, Task>>();
+            var subscribeAttributes = new Dictionary<Type, SubscribeAttribute>();
             var taskType = typeof(Task);
             var methods = service.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             foreach (var method in methods)
@@ -44,10 +61,11 @@ namespace SoCreate.ServiceFabric.PubSub.Subscriber
                 var parameters = method.GetParameters();
                 if (parameters.Length != 1 || !taskType.IsAssignableFrom(method.ReturnType)) continue;
 
-                handlers[parameters[0].ParameterType] = m => (Task) method.Invoke(service, new[] {m});
+                subscribeAttribute.Handler = m => (Task) method.Invoke(service, new[] {m});
+                subscribeAttributes[parameters[0].ParameterType] = subscribeAttribute;
             }
 
-            return handlers;
+            return subscribeAttributes;
         }
     }
 }

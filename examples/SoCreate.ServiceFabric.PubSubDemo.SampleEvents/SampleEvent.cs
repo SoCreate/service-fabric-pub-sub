@@ -13,4 +13,16 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleEvents
             Id = Guid.NewGuid();
         }
     }
+    
+    public class SampleUnorderedEvent
+    {
+        public Guid Id { get; set; }
+
+        public string Message { get; set; }
+
+        public SampleUnorderedEvent()
+        {
+            Id = Guid.NewGuid();
+        }
+    }
 }

@@ -75,16 +75,24 @@ namespace SoCreate.ServiceFabric.PubSub.Subscriber
         /// <returns></returns>
         protected virtual async Task Subscribe()
         {
-            foreach (var handler in this.DiscoverMessageHandlers())
+            foreach (var subscription in this.DiscoverSubscribeAttributes())
             {
+                var subscribeAttribute = subscription.Value;
+                
                 try
                 {
-                    await _brokerClient.SubscribeAsync(this, handler.Key, handler.Value, ListenerName);
-                    LogMessage($"Registered Service:'{Context.ServiceName}' as Subscriber of {handler.Key}.");
+                    await _brokerClient.SubscribeAsync(
+                        this,
+                        subscription.Key,
+                        subscribeAttribute.Handler,
+                        ListenerName,
+                        subscribeAttribute.RoutingKey,
+                        subscribeAttribute.QueueType == QueueType.Ordered);
+                    LogMessage($"Registered Service:'{Context.ServiceName}' as Subscriber of {subscription.Key}.");
                 }
                 catch (Exception ex)
                 {
-                    LogMessage($"Failed to register Service:'{Context.ServiceName}' as Subscriber of {handler.Key}. Error:'{ex.Message}'.");
+                    LogMessage($"Failed to register Service:'{Context.ServiceName}' as Subscriber of {subscription.Key}. Error:'{ex.Message}'.");
                     throw;
                 }
             }

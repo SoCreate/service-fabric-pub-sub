@@ -3,7 +3,6 @@ using System.Fabric;
 using System.Fabric.Description;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
-using SoCreate.ServiceFabric.PubSub.Helpers;
 
 namespace SoCreate.ServiceFabric.PubSub.Subscriber
 {
@@ -121,9 +120,17 @@ namespace SoCreate.ServiceFabric.PubSub.Subscriber
             _loggingCallback?.Invoke($"Registering subscriptions for service '{_context.ServiceName}'.");
             try
             {
-                foreach (var subscription in _service.DiscoverMessageHandlers())
+                foreach (var subscription in _service.DiscoverSubscribeAttributes())
                 {
-                    await _brokerClient.SubscribeAsync(_service, subscription.Key, subscription.Value).ConfigureAwait(false);
+                    var subscribeAttribute = subscription.Value;
+                    
+                    await _brokerClient.SubscribeAsync(
+                        _service,
+                        subscription.Key,
+                        subscribeAttribute.Handler,
+                        routingKey: subscribeAttribute.RoutingKey,
+                        isOrdered: subscribeAttribute.QueueType == QueueType.Ordered)
+                        .ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -138,7 +145,7 @@ namespace SoCreate.ServiceFabric.PubSub.Subscriber
 
             try
             {
-                foreach (var subscription in _service.DiscoverMessageHandlers())
+                foreach (var subscription in _service.DiscoverSubscribeAttributes())
                 {
                     await _brokerClient.UnsubscribeAsync(_service, subscription.Key).ConfigureAwait(false);
                 }

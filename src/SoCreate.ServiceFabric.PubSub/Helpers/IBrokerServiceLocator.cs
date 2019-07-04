@@ -7,7 +7,7 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
     public interface IBrokerServiceLocator
     {
         /// <summary>
-        /// Registers the default <see cref="BrokerServiceBase"/> by name.
+        /// Registers the default <see cref="BrokerService"/> by name.
         /// </summary>
         /// <returns></returns>
         Task RegisterAsync();

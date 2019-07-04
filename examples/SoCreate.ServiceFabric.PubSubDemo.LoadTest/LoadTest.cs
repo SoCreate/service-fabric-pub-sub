@@ -58,7 +58,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.LoadTest
             // Subscribe to all types
             foreach (var type in _messageTypes)
             {
-                await _brokerClient.SubscribeAsync<object>(this.CreateReferenceWrapper(), type, message => null);
+                await _brokerClient.SubscribeAsync<object>(this.CreateReferenceWrapper(), type, message => null, true);
             }
 
             ServiceEventSource.Current.ServiceMessage(Context, "Load Test begin.");

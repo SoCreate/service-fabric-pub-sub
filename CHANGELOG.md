@@ -1,3 +1,10 @@
+# 11.0.0 (2019-07-01)
+### Features
+* **BrokerService**: BrokerService now supports both ordered and unordered queues.
+* **SubscribeAttribute**: Adding options to configure queue type (ordered or unordered) and routingKey.
+### Breaking Changes
+* **BrokerService**: BrokerServiceUnordered was removed.  BrokerServiceBase was removed.
+
 # 10.0.0 (2019-05-30)
 ### Features
 * **Broker Events**: Added MessagePublished event.  Thanks to @BoeseB for suggesting this feature!

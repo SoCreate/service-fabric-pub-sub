@@ -14,7 +14,8 @@ namespace SoCreate.ServiceFabric.PubSub
         /// </summary>
         /// <param name="reference">Reference to the service or actor to register.</param>
         /// <param name="messageTypeName">The full type name of the message to subscribe to.</param>
-        Task SubscribeAsync(ReferenceWrapper reference, string messageTypeName);
+        /// <param name="isOrdered"></param>
+        Task SubscribeAsync(ReferenceWrapper reference, string messageTypeName, bool isOrdered);
 
         /// <summary>
         /// Unregisters a Service or Actor as a subscriber for messages.
