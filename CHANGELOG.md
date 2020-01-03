@@ -1,3 +1,7 @@
+# 12.0.0 (2020-01-02)
+### Breaking Changes
+* **Nuget**: Upgraded nuget packages (SF 4.0.457).
+
 # 11.0.0 (2019-07-01)
 ### Features
 * **BrokerService**: BrokerService now supports both ordered and unordered queues.
