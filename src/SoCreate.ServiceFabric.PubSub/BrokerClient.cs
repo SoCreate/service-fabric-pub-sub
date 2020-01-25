@@ -53,7 +53,7 @@ namespace SoCreate.ServiceFabric.PubSub
         public async Task SubscribeAsync<T>(ReferenceWrapper referenceWrapper, Type messageType, Func<T, Task> handler, bool isOrdered = true) where T : class
         {
             Handlers[messageType] = message => handler((T)message);
-            var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType);
+            var brokerService = await _brokerServiceLocator.GetBrokerServiceForMessageAsync(messageType.FullName);
             await brokerService.SubscribeAsync(referenceWrapper, messageType.FullName, isOrdered);
         }
 
