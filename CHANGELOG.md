@@ -1,3 +1,7 @@
+# 12.0.1 (2020-01-27)
+### Bug Fix
+* **SubscribeAsync**: Fixed bug getting the message type name from generic type.  Thanks to @tbuquet for reporting and fixing this bug!
+
 # 12.0.0 (2020-01-02)
 ### Breaking Changes
 * **Nuget**: Upgraded nuget packages (SF 4.0.457).
@@ -42,8 +46,8 @@
 ### Features
 * **BrokerClient**: Replaced Helper classes with a single `BrokerClient` that handles all interaction with the Broker.
 ### Breaking Changes
-* **Removed obsolete code**: BrokerActor, RelayBrokerActor, extension methods, Helper classes.  Removed the `ServiceFabric.PubSubActors.Interfaces` library.  
-* **IBrokerService**: Simplified `IBrokerService` interface to have `Subscribe()` and `Unsubscribe()` taking a generic `ReferenceWrapper` instead of multiple versions of `Register` and `Unregister` for different subscriber types. 
+* **Removed obsolete code**: BrokerActor, RelayBrokerActor, extension methods, Helper classes.  Removed the `ServiceFabric.PubSubActors.Interfaces` library.
+* **IBrokerService**: Simplified `IBrokerService` interface to have `Subscribe()` and `Unsubscribe()` taking a generic `ReferenceWrapper` instead of multiple versions of `Register` and `Unregister` for different subscriber types.
 
 # 7.6.2 (2019-03-04)
 ### Bug Fixes
@@ -76,7 +80,7 @@
 
 # 7.4.0 (2018-07-04)
 ### Features
-* **NETSTANDARD2.0**: Added .NET Standard 2.0 version to the package. 
+* **NETSTANDARD2.0**: Added .NET Standard 2.0 version to the package.
 * **SF Remoting**: Allow SF Remoting V1/V2 for full framework. Requested by alexmarshall132 and danijel-peric in issue #45.
 
 # 7.3.7 (2018-06-26)
@@ -92,7 +96,7 @@
 * **ServiceReferenceWrapper**: Fixed null ref issue in `ServiceReferenceWrapper` after restarting broker. As reported by danijel-peric in issue #41.
 ### Dependencies
 * **Nuget**: Upgraded nuget packages (SF 3.1.283).
- 
+
 # 7.3.4 (2018-05-08)
 ### Features
 * **Named Listeners**: Added support for named listeners
@@ -183,7 +187,7 @@
 ### Features
 * **Helpers**: Moving from extension methods to injectable helpers for test support.
 ### Dependencies
-* **Nuget**: Updated nuget packages (new SDK). 
+* **Nuget**: Updated nuget packages (new SDK).
 
 # 4.4.13 (2016-08-26)
 ### Bug Fixes
@@ -191,7 +195,7 @@
 
 # 4.4.0 (2016-08-24)
 ### Features
-* **BrokerService**: Improved BrokerService throughput. 
+* **BrokerService**: Improved BrokerService throughput.
 * **Load Test Demo**: Added load test demo app.
 
 # 4.2.0 (2016-08-05)
