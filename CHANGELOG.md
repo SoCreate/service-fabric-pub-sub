@@ -1,3 +1,7 @@
+# 12.1.0 (2020-06-03)
+### Dependencies
+* **Nuget**: Upgraded nuget packages (SF 4.1.409).
+
 # 12.0.1 (2020-01-27)
 ### Bug Fix
 * **SubscribeAsync**: Fixed bug getting the message type name from generic type.  Thanks to @tbuquet for reporting and fixing this bug!
