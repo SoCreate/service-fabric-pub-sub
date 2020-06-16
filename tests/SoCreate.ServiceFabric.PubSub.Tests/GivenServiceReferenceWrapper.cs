@@ -13,7 +13,7 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
         [TestMethod]
         public void WhenDeserializing_ThenHashingHelperIsNotNull()
         {
-            var serviceRef = new ServiceReferenceWrapper(new ServiceReference(), "A=B");
+            var serviceRef = new ServiceReferenceWrapper(new ServiceReference(), "A", "B");
             var serializer = new DataContractSerializer(typeof(ServiceReferenceWrapper));
             using (var stream = new MemoryStream())
             {
@@ -33,7 +33,7 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
         [TestMethod]
         public void WhenDeserializing_ThenRoutingKeyIsPreserved()
         {
-            var serviceRef = new ServiceReferenceWrapper(new ServiceReference(), "A=B");
+            var serviceRef = new ServiceReferenceWrapper(new ServiceReference(), "A", "B");
             var serializer = new DataContractSerializer(typeof(ServiceReferenceWrapper));
             using (var stream = new MemoryStream())
             {
@@ -41,14 +41,15 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
                 stream.Position = 0;
 
                 var cloneServiceRef = (ServiceReferenceWrapper)serializer.ReadObject(stream);
-                Assert.AreEqual("A=B", cloneServiceRef.RoutingKey);
+                Assert.AreEqual("A", cloneServiceRef.RoutingKeyName);
+                Assert.AreEqual("B", cloneServiceRef.RoutingKeyValue);
             }
         }
 
         [TestMethod]
         public void WhenDeserializing_ThenNameIsPreserved()
         {
-            var serviceRef = new ServiceReferenceWrapper(new ServiceReference(), "A=B");
+            var serviceRef = new ServiceReferenceWrapper(new ServiceReference(), "A", "B");
             var serializer = new DataContractSerializer(typeof(ServiceReferenceWrapper));
             using (var stream = new MemoryStream())
             {
