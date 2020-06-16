@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using SoCreate.ServiceFabric.PubSub.Helpers;
@@ -14,7 +15,6 @@ namespace SoCreate.ServiceFabric.PubSub.State
     [KnownType(typeof(ServiceReferenceWrapper))]
     public abstract class ReferenceWrapper : IEquatable<ReferenceWrapper>, IComparable<ReferenceWrapper>
     {
-        private readonly string[] _routingKeyValue;
         private IHashingHelper _hashingHelper;
 
         /// <summary>
@@ -39,10 +39,15 @@ namespace SoCreate.ServiceFabric.PubSub.State
         public abstract string Name { get; }
 
         /// <summary>
-        /// Gets the optional routing key.
+        /// Gets the optional routing key name.
         /// </summary>
         [DataMember]
-        public string RoutingKey { get; private set; }
+        public string RoutingKeyName { get; private set; }
+        /// <summary>
+        /// Gets the optional routing key value.
+        /// </summary>
+        [DataMember]
+        public string RoutingKeyValue { get; private set; }
 
         public int SkipCount { get; set; }
 
@@ -52,12 +57,14 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// <summary>
         /// Creates a new instance with an optional routing key.
         /// </summary>
-        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
-        protected ReferenceWrapper(string routingKey = null)
+        /// <param name="routingKeyName">Optional Message property path used for routing</param>
+        /// <param name="routingKeyValue">Optional value to match with message payload content used for routing.</param>
+        protected ReferenceWrapper(string routingKeyName = null, string routingKeyValue = null)
         {
-            _routingKeyValue = routingKey?.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
-            if (_routingKeyValue != null && _routingKeyValue.Length != 2) throw new ArgumentException($"When {nameof(routingKey)} is provided, it must be similar to 'Key=Value'.");
-            RoutingKey = routingKey;
+            
+            if ((routingKeyName is object && routingKeyValue is null && routingKeyName.Length > 0) || (routingKeyName is null && routingKeyValue is object)) throw new ArgumentException($"{nameof(routingKeyName)} and {nameof(RoutingKeyValue)} must both be provided. RoutingKeyName must have a length of atleast 1");
+            RoutingKeyName = routingKeyName;
+            RoutingKeyValue = routingKeyValue;
         }
 
         /// <summary>
@@ -83,7 +90,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
         }
 
         /// <summary>
-        /// Determines whether to deliver the message to the subscriber, based on <see cref="RoutingKey"/> and <see cref="MessageWrapper.Payload"/>.
+        /// Determines whether to deliver the message to the subscriber, based on <see cref="RoutingKeyName"/> and <see cref="MessageWrapper.Payload"/>.
         /// Not intended to be called from user code.
         /// </summary>
         /// <param name="message"></param>
@@ -92,13 +99,15 @@ namespace SoCreate.ServiceFabric.PubSub.State
         {
             if (!(MessageWrapperExtensions.PayloadSerializer is DefaultPayloadSerializer))
                 return true;
-            if (_routingKeyValue == null)
+            if (RoutingKeyName is null || RoutingKeyValue is null)
                 return true;
 
             var token = MessageWrapperExtensions.PayloadSerializer.Deserialize<JToken>(message.Payload);
-            string value = (string)token.SelectToken(_routingKeyValue[0]);
-
-            return string.Equals(_routingKeyValue[1], value, StringComparison.InvariantCultureIgnoreCase);
+            string value = (string)token.SelectToken(RoutingKeyName);
+            if(value is null)
+                return false;
+            var regex = new Regex("^" + Regex.Escape(RoutingKeyValue).Replace(@"\*", ".*") + "$");
+            return regex.IsMatch(value);
         }
 
         public bool ShouldProcessMessages()

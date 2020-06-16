@@ -128,7 +128,8 @@ namespace SoCreate.ServiceFabric.PubSub.Subscriber
                         _service,
                         subscription.Key,
                         subscribeAttribute.Handler,
-                        routingKey: subscribeAttribute.RoutingKey,
+                        routingKeyName: subscribeAttribute.RoutingKeyName,
+                        routingKeyValue: subscribeAttribute.RoutingKeyValue,
                         isOrdered: subscribeAttribute.QueueType == QueueType.Ordered)
                         .ConfigureAwait(false);
                 }

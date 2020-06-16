@@ -101,7 +101,8 @@ namespace SoCreate.ServiceFabric.PubSub.Subscriber
                         subscription.Key,
                         subscribeAttribute.Handler,
                         ListenerName,
-                        subscribeAttribute.RoutingKey,
+                        subscribeAttribute.RoutingKeyName,
+                        subscribeAttribute.RoutingKeyValue,
                         subscribeAttribute.QueueType == QueueType.Ordered);
                     LogMessage($"Registered Service:'{Context.ServiceName}' as Subscriber of {subscription.Key}.");
                 }

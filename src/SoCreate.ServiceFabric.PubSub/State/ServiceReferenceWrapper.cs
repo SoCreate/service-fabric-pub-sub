@@ -38,9 +38,10 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// Creates a new instance using the provided <see cref="ServiceReference"/>.
         /// </summary>
         /// <param name="serviceReference"></param>
-        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
-        public ServiceReferenceWrapper(ServiceReference serviceReference, string routingKey = null)
-            : base(routingKey)
+        /// <param name="routingKeyName">Optional Message property path used for routing</param>
+        /// <param name="routingKeyValue">Optional value to match with message payload content used for routing.</param>
+        public ServiceReferenceWrapper(ServiceReference serviceReference, string routingKeyName = null, string routingKeyValue= null)
+            : base(routingKeyName, routingKeyValue)
         {
             ServiceReference = serviceReference ?? throw new ArgumentNullException(nameof(serviceReference));
         }
@@ -122,7 +123,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// <inheritdoc />
         public override Task PublishAsync(MessageWrapper message)
         {
-            if (string.IsNullOrWhiteSpace(RoutingKey) || ShouldDeliverMessage(message))
+            if (string.IsNullOrWhiteSpace(RoutingKeyName) || ShouldDeliverMessage(message))
             {
                 ServicePartitionKey partitionKey;
                 switch (ServiceReference.PartitionKind)

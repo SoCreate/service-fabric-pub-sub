@@ -34,10 +34,11 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// Creates a new instance using the provided <see cref="Microsoft.ServiceFabric.Actors.ActorReference"/>.
         /// </summary>
         /// <param name="actorReference"></param>
-        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
+        /// <param name="routingKeyName">Optional Message property path used for routing</param>
+        /// <param name="routingKeyValue">Optional value to match with message payload content used for routing.</param>
         /// <remarks>Only works when using the <see cref="DefaultPayloadSerializer"/>. Uses <see cref="JToken"/>.SelectToken to find message property.</remarks>
-        public ActorReferenceWrapper(ActorReference actorReference, string routingKey = null)
-            : base(routingKey)
+        public ActorReferenceWrapper(ActorReference actorReference, string routingKeyName = null, string routingKeyValue = null)
+            : base(routingKeyName, routingKeyValue)
         {
             if (actorReference == null) throw new ArgumentNullException(nameof(actorReference));
             if (actorReference.ActorId == null) throw new ArgumentException(nameof(actorReference.ActorId));
@@ -105,7 +106,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// <inheritdoc />
         public override Task PublishAsync(MessageWrapper message)
         {
-            if (string.IsNullOrWhiteSpace(RoutingKey) || ShouldDeliverMessage(message))
+            if (string.IsNullOrWhiteSpace(RoutingKeyName) || ShouldDeliverMessage(message))
             {
                 var actor = (ISubscriberActor)ActorReference.Bind(typeof(ISubscriberActor));
                 return actor.ReceiveMessageAsync(message);

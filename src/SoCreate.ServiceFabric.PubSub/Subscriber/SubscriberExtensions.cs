@@ -16,14 +16,16 @@ namespace SoCreate.ServiceFabric.PubSub.Subscriber
     {
         public QueueType QueueType { get; }
 
-        public string RoutingKey { get; }
-        
+        public string RoutingKeyName { get; }
+        public string RoutingKeyValue { get; }
+
         public Func<object, Task> Handler { get; set; }
         
-        public SubscribeAttribute(QueueType type = QueueType.Ordered, string routingKey = null)
+        public SubscribeAttribute(QueueType type = QueueType.Ordered, string routingKeyName = null, string routingKeyValue = null)
         {
             QueueType = type;
-            RoutingKey = routingKey;
+            RoutingKeyName = routingKeyName;
+            RoutingKeyValue = routingKeyValue;
         }
     }
 
