@@ -14,8 +14,12 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleStatefulSubscriber
         {
             Logger = message => ServiceEventSource.Current.ServiceMessage(Context, message);
         }
-
-        [Subscribe]
+        /// <summary>
+        /// This Subscription should only get SampleEvents who messages end in a
+        /// </summary>
+        /// <param name="sampleEvent"></param>
+        /// <returns></returns>
+        [Subscribe(routingKeyName: "Message", routingKeyValue: "*1")]
         private Task HandleSampleEvent(SampleEvent sampleEvent)
         {
             ServiceEventSource.Current.ServiceMessage(Context, $"Processing {sampleEvent.GetType()}: {sampleEvent.Message} on SampleStatefulSubscriber");
