@@ -96,9 +96,10 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// <returns></returns>
         public bool ShouldDeliverMessage(MessageWrapper message)
         {
+            if (string.IsNullOrWhiteSpace(RoutingKeyName))
+                return true;
             if (!(MessageWrapperExtensions.PayloadSerializer is DefaultPayloadSerializer))
                 return true;
-
             var token = MessageWrapperExtensions.PayloadSerializer.Deserialize<JToken>(message.Payload);
             string value = (string)token.SelectToken(RoutingKeyName);
 

@@ -105,7 +105,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// <inheritdoc />
         public override Task PublishAsync(MessageWrapper message)
         {
-            if (string.IsNullOrWhiteSpace(RoutingKey) || ShouldDeliverMessage(message))
+            if (ShouldDeliverMessage(message))
             {
                 var actor = (ISubscriberActor)ActorReference.Bind(typeof(ISubscriberActor));
                 return actor.ReceiveMessageAsync(message);
