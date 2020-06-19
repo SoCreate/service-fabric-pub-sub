@@ -109,7 +109,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
             var token = MessageWrapperExtensions.PayloadSerializer.Deserialize<JToken>(message.Payload);
             string value = (string)token.SelectToken(RoutingKeyName);
 
-            return string.Equals(RoutingKeyValue, value, StringComparison.InvariantCultureIgnoreCase);
+            return new Regex(RoutingKeyValue).IsMatch(value);    
         }
 
         public bool ShouldProcessMessages()
