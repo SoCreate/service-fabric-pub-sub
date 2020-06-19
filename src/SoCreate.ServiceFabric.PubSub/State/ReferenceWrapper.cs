@@ -61,9 +61,15 @@ namespace SoCreate.ServiceFabric.PubSub.State
         protected ReferenceWrapper(string routingKey = null)
         {
             var routingKeyArray = routingKey?.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
-            if (routingKeyArray != null && routingKeyArray.Length != 2) throw new ArgumentException($"When {nameof(routingKey)} is provided, it must be similar to 'Key=Value'.");
-            RoutingKeyName = routingKeyArray[0];
-            RoutingKeyValue = routingKeyArray[1];
+            if (!(routingKeyArray is null) && routingKeyArray.Length != 2)
+            {
+                throw new ArgumentException($"When {nameof(routingKey)} is provided, it must be similar to 'Key=Value'.");
+            }
+            else if (routingKeyArray is object)
+            {
+                RoutingKeyName = routingKeyArray[0];
+                RoutingKeyValue = routingKeyArray[1];
+            }
         }
 
         /// <summary>
