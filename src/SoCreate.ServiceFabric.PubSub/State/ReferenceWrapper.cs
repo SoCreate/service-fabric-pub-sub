@@ -95,7 +95,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
         }
 
         /// <summary>
-        /// Determines whether to deliver the message to the subscriber, based on <see cref="RoutingKeyName"/> and <see cref="MessageWrapper.Payload"/>.
+        /// Determines whether to deliver the message to the subscriber, based on <see cref="RoutingKeyName"/>, <see cref="RoutingKeyValue"/> and <see cref="MessageWrapper.Payload"/>.
         /// Not intended to be called from user code.
         /// </summary>
         /// <param name="message"></param>
