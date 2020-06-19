@@ -65,7 +65,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
             {
                 throw new ArgumentException($"When {nameof(routingKey)} is provided, it must be similar to 'Key=Value'.");
             }
-            else if (routingKeyArray is object)
+            else if (!(routingKeyArray is null))
             {
                 RoutingKeyName = routingKeyArray[0];
                 RoutingKeyValue = routingKeyArray[1];
