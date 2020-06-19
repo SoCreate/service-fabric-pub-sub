@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using SoCreate.ServiceFabric.PubSub.Helpers;
@@ -14,7 +15,6 @@ namespace SoCreate.ServiceFabric.PubSub.State
     [KnownType(typeof(ServiceReferenceWrapper))]
     public abstract class ReferenceWrapper : IEquatable<ReferenceWrapper>, IComparable<ReferenceWrapper>
     {
-        private readonly string[] _routingKeyValue;
         private IHashingHelper _hashingHelper;
 
         /// <summary>
@@ -39,10 +39,15 @@ namespace SoCreate.ServiceFabric.PubSub.State
         public abstract string Name { get; }
 
         /// <summary>
-        /// Gets the optional routing key.
+        /// Gets the optional routing key name.
         /// </summary>
         [DataMember]
-        public string RoutingKey { get; private set; }
+        public string RoutingKeyName { get; private set; }
+        /// <summary>
+        /// Gets the optional routing key value.
+        /// </summary>
+        [DataMember]
+        public string RoutingKeyValue { get; private set; }
 
         public int SkipCount { get; set; }
 
@@ -55,9 +60,10 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
         protected ReferenceWrapper(string routingKey = null)
         {
-            _routingKeyValue = routingKey?.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
-            if (_routingKeyValue != null && _routingKeyValue.Length != 2) throw new ArgumentException($"When {nameof(routingKey)} is provided, it must be similar to 'Key=Value'.");
-            RoutingKey = routingKey;
+            var routingKeyArray = routingKey?.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+            if (routingKeyArray != null && routingKeyArray.Length != 2) throw new ArgumentException($"When {nameof(routingKey)} is provided, it must be similar to 'Key=Value'.");
+            RoutingKeyName = routingKeyArray[0];
+            RoutingKeyValue = routingKeyArray[1];
         }
 
         /// <summary>
@@ -83,7 +89,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
         }
 
         /// <summary>
-        /// Determines whether to deliver the message to the subscriber, based on <see cref="RoutingKey"/> and <see cref="MessageWrapper.Payload"/>.
+        /// Determines whether to deliver the message to the subscriber, based on <see cref="RoutingKeyName"/> and <see cref="MessageWrapper.Payload"/>.
         /// Not intended to be called from user code.
         /// </summary>
         /// <param name="message"></param>
@@ -92,13 +98,11 @@ namespace SoCreate.ServiceFabric.PubSub.State
         {
             if (!(MessageWrapperExtensions.PayloadSerializer is DefaultPayloadSerializer))
                 return true;
-            if (_routingKeyValue == null)
-                return true;
 
             var token = MessageWrapperExtensions.PayloadSerializer.Deserialize<JToken>(message.Payload);
-            string value = (string)token.SelectToken(_routingKeyValue[0]);
+            string value = (string)token.SelectToken(RoutingKeyName);
 
-            return string.Equals(_routingKeyValue[1], value, StringComparison.InvariantCultureIgnoreCase);
+            return string.Equals(RoutingKeyValue, value, StringComparison.InvariantCultureIgnoreCase);
         }
 
         public bool ShouldProcessMessages()
