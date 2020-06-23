@@ -1,3 +1,10 @@
+# 12.2.0 (2020-06-23)
+Big thanks to @Calidus for contributing this feature and bug fix!
+### Features
+* **RoutingKey**: RoutingKey value is now a Regex to provide more flexibility.
+### Bug Fix
+* **RoutingKey**: ReferenceWrapper was updated to properly serialize the RoutingKey.
+
 # 12.1.0 (2020-06-03)
 ### Dependencies
 * **Nuget**: Upgraded nuget packages (SF 4.1.409).

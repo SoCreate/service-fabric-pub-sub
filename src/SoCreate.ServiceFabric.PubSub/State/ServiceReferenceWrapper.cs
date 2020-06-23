@@ -122,7 +122,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// <inheritdoc />
         public override Task PublishAsync(MessageWrapper message)
         {
-            if (string.IsNullOrWhiteSpace(RoutingKey) || ShouldDeliverMessage(message))
+            if (ShouldDeliverMessage(message))
             {
                 ServicePartitionKey partitionKey;
                 switch (ServiceReference.PartitionKind)

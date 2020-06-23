@@ -41,7 +41,8 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
                 stream.Position = 0;
 
                 var cloneServiceRef = (ServiceReferenceWrapper)serializer.ReadObject(stream);
-                Assert.AreEqual("A=B", cloneServiceRef.RoutingKey);
+                Assert.AreEqual("A", cloneServiceRef.RoutingKeyName);
+                Assert.AreEqual("B", cloneServiceRef.RoutingKeyValue);
             }
         }
 
