@@ -57,16 +57,19 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// <summary>
         /// Creates a new instance with an optional routing key.
         /// </summary>
-        /// <param name="routingKey">Optional routing key to filter messages based on content. 'Key=Value' where Key is a message property path and Value is the value to match with message payload content.</param>
+        /// <param name="routingKey">
+        /// Optional routing key to filter messages based on content.
+        /// 'Name=Value' where Name is a message property path and Value is the value to match with message payload content.
+        /// </param>
         protected ReferenceWrapper(string routingKey = null)
         {
             var routingKeyArray = routingKey?.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
-            if (!(routingKeyArray is null) && routingKeyArray.Length != 2)
+            if (!(routingKeyArray is null))
             {
-                throw new ArgumentException($"When {nameof(routingKey)} is provided, it must be similar to 'Key=Value'.");
-            }
-            else if (!(routingKeyArray is null))
-            {
+                if (routingKeyArray.Length != 2)
+                {
+                    throw new ArgumentException($"When {nameof(routingKey)} is provided, it must be similar to 'Key=Value'.");
+                }
                 RoutingKeyName = routingKeyArray[0];
                 RoutingKeyValue = routingKeyArray[1];
             }
@@ -109,7 +112,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
             var token = MessageWrapperExtensions.PayloadSerializer.Deserialize<JToken>(message.Payload);
             string value = (string)token.SelectToken(RoutingKeyName);
 
-            return new Regex(RoutingKeyValue).IsMatch(value);    
+            return new Regex(RoutingKeyValue).IsMatch(value);
         }
 
         public bool ShouldProcessMessages()
