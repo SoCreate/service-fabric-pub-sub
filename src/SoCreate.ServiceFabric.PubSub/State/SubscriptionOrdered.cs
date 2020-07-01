@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data;
@@ -47,10 +46,10 @@ namespace SoCreate.ServiceFabric.PubSub.State
         {
             return await TimeoutRetryHelper.ExecuteInTransaction(_stateManager, (tx, token, state) => Queue.GetCountAsync(tx), cancellationToken: cancellationToken);
         }
-        
-        public async Task DeliverMessageAsync(MessageWrapper messageWrapper)
+
+        public async Task DeliverMessageAsync(MessageWrapper messageWrapper, IProxyFactories proxyFactories)
         {
-            await SubscriptionDetails.ServiceOrActorReference.PublishAsync(messageWrapper);
+            await SubscriptionDetails.ServiceOrActorReference.PublishAsync(messageWrapper, proxyFactories);
         }
     }
 }

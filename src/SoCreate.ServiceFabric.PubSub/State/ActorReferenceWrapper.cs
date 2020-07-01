@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using SoCreate.ServiceFabric.PubSub.Helpers;
 using SoCreate.ServiceFabric.PubSub.Subscriber;
+using Microsoft.ServiceFabric.Actors.Client;
 
 namespace SoCreate.ServiceFabric.PubSub.State
 {
@@ -83,8 +84,10 @@ namespace SoCreate.ServiceFabric.PubSub.State
                 case ActorIdKind.Guid:
                 case ActorIdKind.Long:
                     return ActorReference.ActorId.GetHashCode();
+
                 case ActorIdKind.String:
                     return unchecked((int)HashingHelper.HashString(ActorReference.ActorId.GetStringId()));
+
                 default:
                     throw new InvalidOperationException($"Unexpected ActorReference kind: '{ActorReference.ActorId.Kind}'.");
             }
@@ -103,11 +106,22 @@ namespace SoCreate.ServiceFabric.PubSub.State
         }
 
         /// <inheritdoc />
-        public override Task PublishAsync(MessageWrapper message)
+        public override Task PublishAsync(MessageWrapper message, IProxyFactories proxyFactories)
         {
             if (ShouldDeliverMessage(message))
             {
-                var actor = (ISubscriberActor)ActorReference.Bind(typeof(ISubscriberActor));
+                ISubscriberActor actor;
+
+                if (proxyFactories == null)
+                {
+                    actor = (ISubscriberActor)ActorReference.Bind(typeof(ISubscriberActor));
+                }
+                else
+                {
+                    var actorProxyFactory = new ActorProxyFactory(proxyFactories.GetActorRemotingClientFactory());
+                    actor = actorProxyFactory.CreateActorProxy<ISubscriberActor>(ActorReference.ServiceUri, ActorReference.ActorId, ActorReference.ListenerName);
+                }
+
                 return actor.ReceiveMessageAsync(message);
             }
 

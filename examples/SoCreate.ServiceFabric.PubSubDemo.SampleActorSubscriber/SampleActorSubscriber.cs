@@ -5,10 +5,11 @@ using SoCreate.ServiceFabric.PubSub;
 using SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.Interfaces;
 using SoCreate.ServiceFabric.PubSubDemo.SampleEvents;
 using SoCreate.ServiceFabric.PubSub.State;
+using SoCreate.ServiceFabric.PubSubDemo.Common.Configuration;
 
 namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
 {
-    [ActorService(Name = nameof(SampleActorSubscriber))]
+    [ActorService(Name = nameof(SampleActorSubscriberService))]
     [StatePersistence(StatePersistence.None)]
     internal class SampleActorSubscriber : Actor, ISampleActorSubscriber
     {
@@ -17,7 +18,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
         public SampleActorSubscriber(ActorService actorService, ActorId actorId)
             : base(actorService, actorId)
         {
-            _brokerClient = new BrokerClient();
+            _brokerClient = FabricConfiguration.GetBrokerClient() ?? new BrokerClient();
         }
 
         public Task ReceiveMessageAsync(MessageWrapper message)

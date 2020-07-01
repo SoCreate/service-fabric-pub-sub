@@ -7,6 +7,7 @@ using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using SoCreate.ServiceFabric.PubSub;
+using SoCreate.ServiceFabric.PubSubDemo.Common.Configuration;
 
 namespace SoCreate.ServiceFabric.PubSubDemo.Api
 {
@@ -37,7 +38,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.Api
                                     .ConfigureServices(
                                         services => services
                                             .AddSingleton(serviceContext)
-                                            .AddSingleton<IBrokerClient, BrokerClient>()
+                                            .AddSingleton<IBrokerClient>(FabricConfiguration.GetBrokerClient() ?? new BrokerClient())
                                     )
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()

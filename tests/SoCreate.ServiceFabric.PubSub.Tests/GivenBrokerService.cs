@@ -99,7 +99,7 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
         }
     }
 
-    public class TestMessage {}
+    public class TestMessage { }
 
     public class MockServiceReferenceWrapper : ServiceReferenceWrapper
     {
@@ -110,7 +110,7 @@ namespace SoCreate.ServiceFabric.PubSub.Tests
             _isBroken = isBroken;
         }
 
-        public override Task PublishAsync(MessageWrapper message)
+        public override Task PublishAsync(MessageWrapper message, IProxyFactories proxyFactories)
         {
             if (_isBroken)
             {

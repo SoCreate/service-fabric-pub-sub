@@ -10,8 +10,8 @@
     <Parameter Name="SampleStatefulSubscriber_MinReplicaSetSize" Value="1" />
     <Parameter Name="SampleStatefulSubscriber_TargetReplicaSetSize" Value="1" />
     <Parameter Name="SampleStatelessSubscriber_InstanceCount" Value="1" />
-    <Parameter Name="SampleActorSubscriber_PartitionCount" Value="1" />
-    <Parameter Name="SampleActorSubscriber_MinReplicaSetSize" Value="1" />
-    <Parameter Name="SampleActorSubscriber_TargetReplicaSetSize" Value="1" />
+    <Parameter Name="SampleActorSubscriberService_MinReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="SampleActorSubscriberService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="SampleActorSubscriberService_TargetReplicaSetSize" DefaultValue="1" />
   </Parameters>
 </Application>

@@ -44,10 +44,10 @@ namespace SoCreate.ServiceFabric.PubSub.State
         {
             return Task.FromResult(Queue.Count);
         }
-        
-        public async Task DeliverMessageAsync(MessageWrapper messageWrapper)
+
+        public async Task DeliverMessageAsync(MessageWrapper messageWrapper, IProxyFactories proxyFactories)
         {
-            await SubscriptionDetails.ServiceOrActorReference.PublishAsync(messageWrapper);
+            await SubscriptionDetails.ServiceOrActorReference.PublishAsync(messageWrapper, proxyFactories);
         }
     }
 }

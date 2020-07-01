@@ -1,14 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 16
+# Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2AFC9CA4-793C-43A3-A4C0-E654116BC030}"
 	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
 		CHANGELOG.md = CHANGELOG.md
 		CONTRIBUTING.md = CONTRIBUTING.md
 		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoCreate.ServiceFabric.PubSub", "src\SoCreate.ServiceFabric.PubSub\SoCreate.ServiceFabric.PubSub.csproj", "{266D0C63-57EE-4C0D-873F-B3235B062CF4}"
@@ -37,7 +37,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoCreate.ServiceFabric.PubS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.Interfaces", "examples\SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.Interfaces\SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.Interfaces.csproj", "{807579CF-1B5F-43AB-A1E7-BF9E439EF4B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoCreate.ServiceFabric.PubSubDemo.LoadTest", "examples\SoCreate.ServiceFabric.PubSubDemo.LoadTest\SoCreate.ServiceFabric.PubSubDemo.LoadTest.csproj", "{67B33F05-BE87-4947-B3ED-D2E7FA688551}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoCreate.ServiceFabric.PubSubDemo.LoadTest", "examples\SoCreate.ServiceFabric.PubSubDemo.LoadTest\SoCreate.ServiceFabric.PubSubDemo.LoadTest.csproj", "{67B33F05-BE87-4947-B3ED-D2E7FA688551}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoCreate.ServiceFabric.PubSubDemo.Common", "examples\SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.Common\SoCreate.ServiceFabric.PubSubDemo.Common.csproj", "{AC8B93CA-B48D-4EFC-978D-F9A129EDA551}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -135,6 +137,14 @@ Global
 		{67B33F05-BE87-4947-B3ED-D2E7FA688551}.Release|Any CPU.Build.0 = Release|Any CPU
 		{67B33F05-BE87-4947-B3ED-D2E7FA688551}.Release|x64.ActiveCfg = Release|Any CPU
 		{67B33F05-BE87-4947-B3ED-D2E7FA688551}.Release|x64.Build.0 = Release|Any CPU
+		{AC8B93CA-B48D-4EFC-978D-F9A129EDA551}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC8B93CA-B48D-4EFC-978D-F9A129EDA551}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC8B93CA-B48D-4EFC-978D-F9A129EDA551}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AC8B93CA-B48D-4EFC-978D-F9A129EDA551}.Debug|x64.Build.0 = Debug|Any CPU
+		{AC8B93CA-B48D-4EFC-978D-F9A129EDA551}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC8B93CA-B48D-4EFC-978D-F9A129EDA551}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC8B93CA-B48D-4EFC-978D-F9A129EDA551}.Release|x64.ActiveCfg = Release|Any CPU
+		{AC8B93CA-B48D-4EFC-978D-F9A129EDA551}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,6 +161,7 @@ Global
 		{FF8B6DB5-38D8-4B01-A34E-CCF11FD0405B} = {4266FF61-7F71-4E97-90F0-218E4BF979C3}
 		{807579CF-1B5F-43AB-A1E7-BF9E439EF4B7} = {4266FF61-7F71-4E97-90F0-218E4BF979C3}
 		{67B33F05-BE87-4947-B3ED-D2E7FA688551} = {4266FF61-7F71-4E97-90F0-218E4BF979C3}
+		{AC8B93CA-B48D-4EFC-978D-F9A129EDA551} = {4266FF61-7F71-4E97-90F0-218E4BF979C3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5FBF19E-4755-4441-8C64-DB8E4A040B44}
