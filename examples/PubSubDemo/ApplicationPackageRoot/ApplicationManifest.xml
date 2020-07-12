@@ -10,8 +10,8 @@
     <Parameter Name="SampleStatefulSubscriber_PartitionCount" DefaultValue="1" />
     <Parameter Name="SampleStatefulSubscriber_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="SampleStatelessSubscriber_InstanceCount" DefaultValue="-1" />
-    <Parameter Name="SampleActorSubscriberService_MinReplicaSetSize" DefaultValue="10" />
-    <Parameter Name="SampleActorSubscriberService_PartitionCount" DefaultValue="3" />
+    <Parameter Name="SampleActorSubscriberService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="SampleActorSubscriberService_PartitionCount" DefaultValue="10" />
     <Parameter Name="SampleActorSubscriberService_TargetReplicaSetSize" DefaultValue="3" />
     <!-- Set to true when you want to test a non default Remoting Serialization -->
     <Parameter Name="UseCustomServiceRemotingClientFactory" DefaultValue="false" />

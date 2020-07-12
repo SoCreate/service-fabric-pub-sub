@@ -5,7 +5,6 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using SoCreate.ServiceFabric.PubSub.Helpers;
 using SoCreate.ServiceFabric.PubSub.Subscriber;
-using Microsoft.ServiceFabric.Actors.Client;
 
 namespace SoCreate.ServiceFabric.PubSub.State
 {
@@ -110,17 +109,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
         {
             if (ShouldDeliverMessage(message))
             {
-                ISubscriberActor actor;
-
-                if (proxyFactories == null)
-                {
-                    actor = (ISubscriberActor)ActorReference.Bind(typeof(ISubscriberActor));
-                }
-                else
-                {
-                    var actorProxyFactory = new ActorProxyFactory(proxyFactories.GetActorRemotingClientFactory());
-                    actor = actorProxyFactory.CreateActorProxy<ISubscriberActor>(ActorReference.ServiceUri, ActorReference.ActorId, ActorReference.ListenerName);
-                }
+                var actor = proxyFactories.CreateActorProxy<ISubscriberActor>(ActorReference);
 
                 return actor.ReceiveMessageAsync(message);
             }

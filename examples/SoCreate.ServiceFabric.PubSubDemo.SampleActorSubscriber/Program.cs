@@ -32,8 +32,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
 
                 if (FabricConfiguration.UseCustomServiceRemotingClientFactory)
                 {
-                    var actorProxyFactory = new ActorProxyFactory(FabricConfiguration.GetProxyFactories().GetActorRemotingClientFactory());
-                    actorSubscriber = actorProxyFactory.CreateActorProxy<ISampleActorSubscriber>(new Uri("fabric:/PubSubDemo/SampleActorSubscriberService"), ActorId.CreateRandom());
+                    actorSubscriber = FabricConfiguration.GetProxyFactories().CreateActorProxy<ISampleActorSubscriber>(new Uri("fabric:/PubSubDemo/SampleActorSubscriberService"), ActorId.CreateRandom());
                 }
                 else
                 {

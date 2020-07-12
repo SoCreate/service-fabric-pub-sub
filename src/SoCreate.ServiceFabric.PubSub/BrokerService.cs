@@ -92,7 +92,7 @@ namespace SoCreate.ServiceFabric.PubSub
 
             _brokerEventsManager = brokerEventsManager ?? new DefaultBrokerEventsManager();
             _subscriptionFactory = new SubscriptionFactory(StateManager);
-            _proxyFactories = proxyFactories;
+            _proxyFactories = proxyFactories ?? new ProxyFactories();
         }
 
         /// <summary>

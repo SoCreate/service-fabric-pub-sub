@@ -38,7 +38,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.Api
                                     .ConfigureServices(
                                         services => services
                                             .AddSingleton(serviceContext)
-                                            .AddSingleton<IBrokerClient>(FabricConfiguration.GetBrokerClient() ?? new BrokerClient())
+                                            .AddSingleton<IBrokerClient>(new BrokerClient(FabricConfiguration.GetBrokerServiceLocator()))
                                     )
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()

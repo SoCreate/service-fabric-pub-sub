@@ -2,7 +2,6 @@ using System;
 using System.Fabric;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
 using SoCreate.ServiceFabric.PubSub.Subscriber;
@@ -127,30 +126,8 @@ namespace SoCreate.ServiceFabric.PubSub.State
         {
             if (ShouldDeliverMessage(message))
             {
-                ServicePartitionKey partitionKey;
-                switch (ServiceReference.PartitionKind)
-                {
-                    case ServicePartitionKind.Singleton:
-                        partitionKey = ServicePartitionKey.Singleton;
-                        break;
+                var client = proxyFactories.CreateServiceProxy<ISubscriberService>(ServiceReference);
 
-                    case ServicePartitionKind.Int64Range:
-                        partitionKey = new ServicePartitionKey(ServiceReference.PartitionKey);
-                        break;
-
-                    case ServicePartitionKind.Named:
-                        partitionKey = new ServicePartitionKey(ServiceReference.PartitionName);
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                var serviceProxyFactory = proxyFactories == null ?
-                    ServiceProxyFactoryLazy.Value :
-                    new ServiceProxyFactory(proxyFactories.GetServiceRemotingClientFactory());
-
-                var client = serviceProxyFactory.CreateServiceProxy<ISubscriberService>(ServiceReference.ServiceUri, partitionKey);
                 return client.ReceiveMessageAsync(message);
             }
 

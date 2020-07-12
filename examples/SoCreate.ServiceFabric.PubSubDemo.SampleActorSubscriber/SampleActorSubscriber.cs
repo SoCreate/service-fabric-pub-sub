@@ -18,7 +18,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
         public SampleActorSubscriber(ActorService actorService, ActorId actorId)
             : base(actorService, actorId)
         {
-            _brokerClient = FabricConfiguration.GetBrokerClient() ?? new BrokerClient();
+            _brokerClient = new BrokerClient(FabricConfiguration.GetBrokerServiceLocator());
         }
 
         public Task ReceiveMessageAsync(MessageWrapper message)
