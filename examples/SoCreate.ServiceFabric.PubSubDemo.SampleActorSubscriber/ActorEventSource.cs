@@ -21,6 +21,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
         private ActorEventSource() : base() { }
 
         #region Keywords
+
         // Event keywords can be used to categorize events.
         // Each keyword is a bit flag. A single event can be associated with multiple keywords (via EventAttribute.Keywords property).
         // Keywords must be defined as a public class named 'Keywords' inside EventSource that uses them.
@@ -28,9 +29,11 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
         {
             public const EventKeywords HostInitialization = (EventKeywords)0x1L;
         }
-        #endregion
+
+        #endregion Keywords
 
         #region Events
+
         // Define an instance method for each event you want to record and apply an [Event] attribute to it.
         // The method name is the name of the event.
         // Pass any parameters you want to record with the event (only primitive integer types, DateTime, Guid & string are allowed).
@@ -50,6 +53,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
         }
 
         private const int MessageEventId = 1;
+
         [Event(MessageEventId, Level = EventLevel.Informational, Message = "{0}")]
         public void Message(string message)
         {
@@ -87,11 +91,12 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
         // This results in more efficient parameter handling, but requires explicit allocation of EventData structure and unsafe code.
         // To enable this code path, define UNSAFE conditional compilation symbol and turn on unsafe code support in project properties.
         private const int ActorMessageEventId = 2;
+
         [Event(ActorMessageEventId, Level = EventLevel.Informational, Message = "{9}")]
         private
-    #if UNSAFE
+#if UNSAFE
             unsafe
-    #endif
+#endif
             void ActorMessage(
             string actorType,
             string actorId,
@@ -104,7 +109,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
             string nodeName,
             string message)
         {
-    #if !UNSAFE
+#if !UNSAFE
             WriteEvent(
                     ActorMessageEventId,
                     actorType,
@@ -117,7 +122,7 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
                     replicaOrInstanceId,
                     nodeName,
                     message);
-    #else
+#else
                 const int numArgs = 10;
                 fixed (char* pActorType = actorType, pActorId = actorId, pApplicationTypeName = applicationTypeName, pApplicationName = applicationName, pServiceTypeName = serviceTypeName, pServiceName = serviceName, pNodeName = nodeName, pMessage = message)
                 {
@@ -135,19 +140,22 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
 
                     WriteEventCore(ActorMessageEventId, numArgs, eventData);
                 }
-    #endif
+#endif
         }
 
         private const int ActorHostInitializationFailedEventId = 3;
+
         [Event(ActorHostInitializationFailedEventId, Level = EventLevel.Error, Message = "Actor host initialization failed", Keywords = Keywords.HostInitialization)]
         public void ActorHostInitializationFailed(string exception)
         {
             WriteEvent(ActorHostInitializationFailedEventId, exception);
         }
-        #endregion
+
+        #endregion Events
 
         #region Private Methods
-    #if UNSAFE
+
+#if UNSAFE
             private int SizeInBytes(string s)
             {
                 if (s == null)
@@ -159,7 +167,8 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
                     return (s.Length + 1) * sizeof(char);
                 }
             }
-    #endif
-        #endregion
+#endif
+
+        #endregion Private Methods
     }
 }

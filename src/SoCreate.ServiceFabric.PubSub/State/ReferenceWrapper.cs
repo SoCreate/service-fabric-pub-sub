@@ -43,6 +43,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// </summary>
         [DataMember]
         public string RoutingKeyName { get; private set; }
+
         /// <summary>
         /// Gets the optional routing key value.
         /// </summary>
@@ -80,7 +81,7 @@ namespace SoCreate.ServiceFabric.PubSub.State
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public abstract Task PublishAsync(MessageWrapper message);
+        public abstract Task PublishAsync(MessageWrapper message, IProxyFactories proxyFactories);
 
         int IComparable<ReferenceWrapper>.CompareTo(ReferenceWrapper other)
         {

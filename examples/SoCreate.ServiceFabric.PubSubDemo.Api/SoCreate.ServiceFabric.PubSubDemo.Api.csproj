@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\SoCreate.ServiceFabric.PubSub\SoCreate.ServiceFabric.PubSub.csproj" />
+    <ProjectReference Include="..\SoCreate.ServiceFabric.PubSubDemo.Common\SoCreate.ServiceFabric.PubSubDemo.Common.csproj" />
     <ProjectReference Include="..\SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.Interfaces\SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.Interfaces.csproj" />
     <ProjectReference Include="..\SoCreate.ServiceFabric.PubSubDemo.SampleEvents\SoCreate.ServiceFabric.PubSubDemo.SampleEvents.csproj" />
   </ItemGroup>

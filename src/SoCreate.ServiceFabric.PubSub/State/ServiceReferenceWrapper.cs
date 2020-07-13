@@ -1,6 +1,3 @@
-using Microsoft.ServiceFabric.Services.Client;
-using Microsoft.ServiceFabric.Services.Remoting.Client;
-using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
 using System;
 using System.Fabric;
 using System.Runtime.Serialization;
@@ -15,9 +12,6 @@ namespace SoCreate.ServiceFabric.PubSub.State
     [DataContract]
     public class ServiceReferenceWrapper : ReferenceWrapper
     {
-        private static readonly Lazy<IServiceProxyFactory> ServiceProxyFactoryLazy =
-            new Lazy<IServiceProxyFactory>(() => new ServiceProxyFactory(c => new FabricTransportServiceRemotingClientFactory()));
-
         public override string Name => ServiceReference.Description;
 
         /// <summary>
@@ -94,12 +88,15 @@ namespace SoCreate.ServiceFabric.PubSub.State
             {
                 case ServicePartitionKind.Singleton:
                     break;
+
                 case ServicePartitionKind.Int64Range:
                     identifier = $"{identifier}-{ServiceReference.PartitionKey}";
                     break;
+
                 case ServicePartitionKind.Named:
                     identifier = $"{identifier}-{ServiceReference.PartitionName}";
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -120,26 +117,12 @@ namespace SoCreate.ServiceFabric.PubSub.State
         }
 
         /// <inheritdoc />
-        public override Task PublishAsync(MessageWrapper message)
+        public override Task PublishAsync(MessageWrapper message, IProxyFactories proxyFactories)
         {
             if (ShouldDeliverMessage(message))
             {
-                ServicePartitionKey partitionKey;
-                switch (ServiceReference.PartitionKind)
-                {
-                    case ServicePartitionKind.Singleton:
-                        partitionKey = ServicePartitionKey.Singleton;
-                        break;
-                    case ServicePartitionKind.Int64Range:
-                        partitionKey = new ServicePartitionKey(ServiceReference.PartitionKey);
-                        break;
-                    case ServicePartitionKind.Named:
-                        partitionKey = new ServicePartitionKey(ServiceReference.PartitionName);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                var client = ServiceProxyFactoryLazy.Value.CreateServiceProxy<ISubscriberService>(ServiceReference.ServiceUri, partitionKey);
+                var client = proxyFactories.CreateServiceProxy<ISubscriberService>(ServiceReference);
+
                 return client.ReceiveMessageAsync(message);
             }
 

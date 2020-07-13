@@ -10,48 +10,99 @@
     <Parameter Name="SampleStatefulSubscriber_PartitionCount" DefaultValue="1" />
     <Parameter Name="SampleStatefulSubscriber_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="SampleStatelessSubscriber_InstanceCount" DefaultValue="-1" />
-    <Parameter Name="SampleActorSubscriber_PartitionCount" DefaultValue="10" />
-    <Parameter Name="SampleActorSubscriber_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="SampleActorSubscriber_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="SampleActorSubscriberService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="SampleActorSubscriberService_PartitionCount" DefaultValue="10" />
+    <Parameter Name="SampleActorSubscriberService_TargetReplicaSetSize" DefaultValue="3" />
+    <!-- Set to true when you want to test a non default Remoting Serialization -->
+    <Parameter Name="UseCustomServiceRemotingClientFactory" DefaultValue="false" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion
        should match the Name and Version attributes of the ServiceManifest element defined in the
        ServiceManifest.xml file. -->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="LoadTestPkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="ConfigurationSettings">
+            <Parameter Name="UseCustomServiceRemotingClientFactory" Value="[UseCustomServiceRemotingClientFactory]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
   </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="BrokerPkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="ConfigurationSettings">
+            <Parameter Name="UseCustomServiceRemotingClientFactory" Value="[UseCustomServiceRemotingClientFactory]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
   </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="ApiPkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="ConfigurationSettings">
+            <Parameter Name="UseCustomServiceRemotingClientFactory" Value="[UseCustomServiceRemotingClientFactory]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
   </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="SampleStatefulSubscriberPkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="ConfigurationSettings">
+            <Parameter Name="UseCustomServiceRemotingClientFactory" Value="[UseCustomServiceRemotingClientFactory]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
   </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="SampleStatelessSubscriberPkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="ConfigurationSettings">
+            <Parameter Name="UseCustomServiceRemotingClientFactory" Value="[UseCustomServiceRemotingClientFactory]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
   </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="SampleActorSubscriberPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="ConfigurationSettings">
+            <Parameter Name="UseCustomServiceRemotingClientFactory" Value="[UseCustomServiceRemotingClientFactory]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
   </ServiceManifestImport>
   <DefaultServices>
-    <!-- The section below creates instances of service types, when an instance of this
-         application type is created. You can also create one or more instances of service type using the
-         ServiceFabric PowerShell module.
-
-         The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
     <!-- Don't deploy the load test by default
     <Service Name="LoadTest" ServicePackageActivationMode="ExclusiveProcess">
       <StatelessService ServiceTypeName="LoadTestType" InstanceCount="[LoadTest_InstanceCount]">
         <SingletonPartition />
       </StatelessService>
     </Service> -->
+    <!-- The section below creates instances of service types, when an instance of this
+         application type is created. You can also create one or more instances of service type using the
+         ServiceFabric PowerShell module.
+
+         The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
     <Service Name="Broker" ServicePackageActivationMode="ExclusiveProcess">
       <StatefulService ServiceTypeName="BrokerType" TargetReplicaSetSize="[Broker_TargetReplicaSetSize]" MinReplicaSetSize="[Broker_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[Broker_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
@@ -72,9 +123,9 @@
         <SingletonPartition />
       </StatelessService>
     </Service>
-    <Service Name="SampleActorSubscriber" GeneratedIdRef="bceebe78-1d5c-4158-a44d-f8e67f89109c|None">
-      <StatefulService ServiceTypeName="SampleActorSubscriberType" TargetReplicaSetSize="[SampleActorSubscriber_TargetReplicaSetSize]" MinReplicaSetSize="[SampleActorSubscriber_MinReplicaSetSize]">
-        <UniformInt64Partition PartitionCount="[SampleActorSubscriber_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+    <Service Name="SampleActorSubscriberService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="SampleActorSubscriberServiceType" TargetReplicaSetSize="[SampleActorSubscriberService_TargetReplicaSetSize]" MinReplicaSetSize="[SampleActorSubscriberService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[SampleActorSubscriberService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>
     </Service>
   </DefaultServices>

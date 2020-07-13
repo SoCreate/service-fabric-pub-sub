@@ -3,6 +3,7 @@ using System.Threading;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Client;
 using Microsoft.ServiceFabric.Actors.Runtime;
+using SoCreate.ServiceFabric.PubSubDemo.Common.Configuration;
 using SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber.Interfaces;
 
 namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
@@ -21,10 +22,23 @@ namespace SoCreate.ServiceFabric.PubSubDemo.SampleActorSubscriber
                 // are automatically populated when you build this project.
                 // For more information, see https://aka.ms/servicefabricactorsplatform
 
-                ActorRuntime.RegisterActorAsync<SampleActorSubscriber> (
-                   (context, actorType) => new ActorService(context, actorType)).GetAwaiter().GetResult();
+                ActorRuntime.RegisterActorAsync<SampleActorSubscriber>(
+                   (context, actorType) => new SampleActorSubscriberService(
+                       context,
+                       actorType,
+                       (actorService, actorId) => new SampleActorSubscriber(actorService, actorId))).GetAwaiter().GetResult();
 
-                var actorSubscriber = ActorProxy.Create<ISampleActorSubscriber>(ActorId.CreateRandom(), new Uri("fabric:/PubSubDemo/SampleActorSubscriber"));
+                ISampleActorSubscriber actorSubscriber;
+
+                if (FabricConfiguration.UseCustomServiceRemotingClientFactory)
+                {
+                    actorSubscriber = FabricConfiguration.GetProxyFactories().CreateActorProxy<ISampleActorSubscriber>(new Uri("fabric:/PubSubDemo/SampleActorSubscriberService"), ActorId.CreateRandom());
+                }
+                else
+                {
+                    actorSubscriber = ActorProxy.Create<ISampleActorSubscriber>(ActorId.CreateRandom(), new Uri("fabric:/PubSubDemo/SampleActorSubscriberService"));
+                }
+
                 actorSubscriber.Subscribe().GetAwaiter().GetResult();
 
                 Thread.Sleep(Timeout.Infinite);

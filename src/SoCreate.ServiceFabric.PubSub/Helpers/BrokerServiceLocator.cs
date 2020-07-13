@@ -4,8 +4,6 @@ using System.Fabric;
 using System.Fabric.Description;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Client;
-using Microsoft.ServiceFabric.Services.Remoting.Client;
-using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
 
 namespace SoCreate.ServiceFabric.PubSub.Helpers
 {
@@ -15,20 +13,19 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
         private readonly List<ServicePartitionKey> _cachedPartitionKeys = new List<ServicePartitionKey>();
         private readonly FabricClient _fabricClient;
         private const string BrokerName = nameof(BrokerService);
-        private readonly IServiceProxyFactory _serviceProxyFactory;
+        private readonly IProxyFactories _proxyFactories;
         private Uri _brokerServiceUri;
 
         /// <summary>
         /// Creates a new default instance.
         /// </summary>
-        public BrokerServiceLocator(Uri brokerServiceUri = null, IHashingHelper hashingHelper = null)
+        public BrokerServiceLocator(Uri brokerServiceUri = null, IHashingHelper hashingHelper = null, IProxyFactories proxyFactories = null)
         {
             _hashingHelper = hashingHelper ?? new HashingHelper();
             _fabricClient = new FabricClient();
-            _serviceProxyFactory = new ServiceProxyFactory(c => new FabricTransportServiceRemotingClientFactory());
+            _proxyFactories = proxyFactories ?? new ProxyFactories();
             _brokerServiceUri = brokerServiceUri;
         }
-
 
         /// <inheritdoc />
         public async Task RegisterAsync()
@@ -42,7 +39,7 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             var resolvedPartition = await GetPartitionForMessageAsync(message);
-            return _serviceProxyFactory.CreateServiceProxy<IBrokerService>(
+            return _proxyFactories.CreateServiceProxy<IBrokerService>(
                 await LocateAsync(), resolvedPartition, listenerName: BrokerService.ListenerName);
         }
 
@@ -50,7 +47,7 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
         public async Task<IBrokerService> GetBrokerServiceForMessageAsync(string messageTypeName)
         {
             var resolvedPartition = await GetPartitionForMessageAsync(messageTypeName);
-            return _serviceProxyFactory.CreateServiceProxy<IBrokerService>(
+            return _proxyFactories.CreateServiceProxy<IBrokerService>(
                 await LocateAsync(), resolvedPartition, listenerName: BrokerService.ListenerName);
         }
 
@@ -61,7 +58,7 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
             var brokerServiceUri = await LocateAsync();
             foreach (var partition in await GetBrokerPartitionKeys())
             {
-                serviceProxies.Add(_serviceProxyFactory.CreateServiceProxy<IBrokerService>(
+                serviceProxies.Add(_proxyFactories.CreateServiceProxy<IBrokerService>(
                     brokerServiceUri, partition, listenerName: BrokerService.ListenerName));
             }
 
@@ -164,7 +161,7 @@ namespace SoCreate.ServiceFabric.PubSub.Helpers
             int hashCode;
             unchecked
             {
-                hashCode = (int) _hashingHelper.HashString(messageTypeName);
+                hashCode = (int)_hashingHelper.HashString(messageTypeName);
             }
             int index = Math.Abs(hashCode % partitionKeys.Count);
             return partitionKeys[index];

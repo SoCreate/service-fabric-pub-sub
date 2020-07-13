@@ -83,8 +83,10 @@ namespace SoCreate.ServiceFabric.PubSub.State
                 case ActorIdKind.Guid:
                 case ActorIdKind.Long:
                     return ActorReference.ActorId.GetHashCode();
+
                 case ActorIdKind.String:
                     return unchecked((int)HashingHelper.HashString(ActorReference.ActorId.GetStringId()));
+
                 default:
                     throw new InvalidOperationException($"Unexpected ActorReference kind: '{ActorReference.ActorId.Kind}'.");
             }
@@ -103,11 +105,12 @@ namespace SoCreate.ServiceFabric.PubSub.State
         }
 
         /// <inheritdoc />
-        public override Task PublishAsync(MessageWrapper message)
+        public override Task PublishAsync(MessageWrapper message, IProxyFactories proxyFactories)
         {
             if (ShouldDeliverMessage(message))
             {
-                var actor = (ISubscriberActor)ActorReference.Bind(typeof(ISubscriberActor));
+                var actor = proxyFactories.CreateActorProxy<ISubscriberActor>(ActorReference);
+
                 return actor.ReceiveMessageAsync(message);
             }
 

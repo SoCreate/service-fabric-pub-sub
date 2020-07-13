@@ -1,3 +1,8 @@
+# 12.3.0 (2020-07-13)
+Big thanks to @pretyk for contributing this feature!
+### Features
+* **Custom ServiceFabricProxyFactory**: Creation of Proxies for remoting was abstracted into `IProxyFactories`.  Users can now customize how proxies are created by implementing `IProxyFactories` and providing the instance to `BrokerService` and `BrokerClient`.
+
 # 12.2.0 (2020-06-23)
 Big thanks to @Calidus for contributing this feature and bug fix!
 ### Features

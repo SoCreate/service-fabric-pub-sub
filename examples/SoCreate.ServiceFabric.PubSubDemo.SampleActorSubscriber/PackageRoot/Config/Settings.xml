@@ -2,12 +2,15 @@
 <Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns="http://schemas.microsoft.com/2011/01/fabric">
-  <Section Name="SampleActorSubscriberReplicatorConfig">
-    <Parameter Name="ReplicatorEndpoint" Value="SampleActorSubscriberReplicatorEndpoint" />
+  <Section Name="SampleActorSubscriberServiceReplicatorConfig">
+    <Parameter Name="ReplicatorEndpoint" Value="SampleActorSubscriberServiceReplicatorEndpoint" />
     <Parameter Name="BatchAcknowledgementInterval" Value="0.005" />
   </Section>
-  <Section Name="SampleActorSubscriberReplicatorSecurityConfig">
+  <Section Name="SampleActorSubscriberServiceReplicatorSecurityConfig">
     <Parameter Name="CredentialType" Value="None" />
+  </Section>
+  <Section Name="ConfigurationSettings">
+    <Parameter Name="UseCustomServiceRemotingClientFactory" Value="" MustOverride="true" />
   </Section>
   <!-- The content will be generated during build -->
 </Settings>
