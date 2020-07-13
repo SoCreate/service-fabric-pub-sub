@@ -2,8 +2,6 @@ using System;
 using System.Fabric;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Remoting.Client;
-using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
 using SoCreate.ServiceFabric.PubSub.Subscriber;
 
 namespace SoCreate.ServiceFabric.PubSub.State
@@ -14,9 +12,6 @@ namespace SoCreate.ServiceFabric.PubSub.State
     [DataContract]
     public class ServiceReferenceWrapper : ReferenceWrapper
     {
-        private static readonly Lazy<IServiceProxyFactory> ServiceProxyFactoryLazy =
-            new Lazy<IServiceProxyFactory>(() => new ServiceProxyFactory(c => new FabricTransportServiceRemotingClientFactory()));
-
         public override string Name => ServiceReference.Description;
 
         /// <summary>

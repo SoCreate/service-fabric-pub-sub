@@ -7,7 +7,7 @@ using Microsoft.ServiceFabric.Services.Remoting.Client;
 using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
 using SoCreate.ServiceFabric.PubSub.State;
 
-namespace SoCreate.ServiceFabric.PubSub
+namespace SoCreate.ServiceFabric.PubSub.Helpers
 {
     public class ProxyFactories : IProxyFactories
     {

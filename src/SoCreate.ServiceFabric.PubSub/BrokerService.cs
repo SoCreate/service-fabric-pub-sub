@@ -103,7 +103,7 @@ namespace SoCreate.ServiceFabric.PubSub
         /// <param name="enableAutoDiscovery"></param>
         /// <param name="brokerEvents"></param>
         protected BrokerService(StatefulServiceContext serviceContext,
-            IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true, IBrokerEventsManager brokerEvents = null)
+            IReliableStateManagerReplica2 reliableStateManagerReplica, bool enableAutoDiscovery = true, IBrokerEventsManager brokerEvents = null, IProxyFactories proxyFactories = null)
             : base(serviceContext, reliableStateManagerReplica)
         {
             if (enableAutoDiscovery)
@@ -116,6 +116,7 @@ namespace SoCreate.ServiceFabric.PubSub
 
             _brokerEventsManager = brokerEvents ?? new DefaultBrokerEventsManager();
             _subscriptionFactory = new SubscriptionFactory(StateManager);
+            _proxyFactories = proxyFactories ?? new ProxyFactories();
         }
 
         protected virtual void SetupEvents(IBrokerEvents events)
