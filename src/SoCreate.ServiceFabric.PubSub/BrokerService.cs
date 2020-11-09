@@ -136,16 +136,22 @@ namespace SoCreate.ServiceFabric.PubSub
 
             var brokerState = await TimeoutRetryHelper.Execute((token, state) => StateManager.GetOrAddAsync<IReliableDictionary<string, BrokerServiceState>>(messageTypeName));
 
+            var subscriptionDetails = new SubscriptionDetails(reference, messageTypeName, isOrdered);
+
+            ISubscription subscription = null;
             await TimeoutRetryHelper.ExecuteInTransaction(StateManager, async (tx, token, state) =>
             {
-                var subscriptionDetails = new SubscriptionDetails(reference, messageTypeName, isOrdered);
-                var subscription = await _subscriptionFactory.CreateAsync(tx, subscriptionDetails);
+                subscription = await _subscriptionFactory.CreateAsync(tx, subscriptionDetails);
                 await brokerState.AddOrUpdateSubscription(tx, Subscribers, subscriptionDetails);
 
-                _subscriptions.AddOrUpdate(subscriptionDetails.QueueName, subscription, (key, old) => subscription);
                 ServiceEventSourceMessage($"Registered subscriber: {reference.Name}");
                 await _brokerEventsManager.OnSubscribedAsync(subscriptionDetails.QueueName, reference, messageTypeName);
             }, cancellationToken: CancellationToken.None);
+
+            if (subscription != null)
+            {
+                _subscriptions.AddOrUpdate(subscriptionDetails.QueueName, subscription, (key, old) => subscription);
+            }
         }
 
         /// <summary>
