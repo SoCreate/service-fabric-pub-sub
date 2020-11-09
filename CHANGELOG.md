@@ -1,3 +1,7 @@
+# 12.3.1 (2020-11-09)
+### Bug Fix
+* **Issue #90**: Fixed race condition where the process loop can try to start processing a queue before it is created.  Thanks to @BoeseB for reporting this bug. 
+
 # 12.3.0 (2020-07-13)
 Big thanks to @pretyk for contributing this feature!
 ### Features
