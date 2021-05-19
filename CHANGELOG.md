@@ -1,3 +1,7 @@
+# 13.0.0 (2021-05-19)
+### Breaking Changes
+* **Nuget**: Upgraded nuget packages (SF 5.*).
+
 # 12.3.1 (2020-11-09)
 ### Bug Fix
 * **Issue #90**: Fixed race condition where the process loop can try to start processing a queue before it is created.  Thanks to @BoeseB for reporting this bug. 
