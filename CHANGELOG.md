@@ -1,3 +1,8 @@
+# 14.0.0 (2021-09-15)
+Upgrade to .NET Core 5.  Thanks to @waynemunro.
+### Breaking Changes
+* **.NET Core**: Upgraded to .NET Core 5.
+
 # 13.0.0 (2021-05-19)
 ### Breaking Changes
 * **Nuget**: Upgraded nuget packages (SF 5.*).
