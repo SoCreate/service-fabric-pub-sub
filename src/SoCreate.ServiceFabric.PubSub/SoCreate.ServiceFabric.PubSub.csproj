@@ -3,7 +3,7 @@
     <Description>SoCreate.ServiceFabric.PubSub adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. Documentation: http://service-fabric-pub-sub.socreate.it</Description>
     <Copyright>© SoCreate. All rights reserved.</Copyright>
     <AssemblyTitle>SoCreate.ServiceFabric.PubSub</AssemblyTitle>
-    <Version>13.0.0</Version>
+    <Version>14.0.0</Version>
     <Company>SoCreate</Company>
     <Authors>Loek Duys, SoCreate</Authors>
     <TargetFramework>net5.0</TargetFramework>
