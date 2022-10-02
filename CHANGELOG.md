@@ -3,6 +3,7 @@
 Upgrade to .NET Core 6.  Thanks to @waynemunro.
 ### Breaking Changes
 * **.NET Core**: Upgraded to .NET Core 6.
+* **Nuget**: Upgraded nuget packages
 
 # 14.0.0 (2021-09-15)
 Upgrade to .NET Core 5.  Thanks to @waynemunro.
