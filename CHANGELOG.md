@@ -1,3 +1,10 @@
+
+# 15.0.0 (2022-10-03)
+Upgrade to .NET 6.  Thanks to @waynemunro.
+### Breaking Changes
+* **.NET Core**: Upgraded to .NET 6.
+* **Nuget**: Upgraded nuget packages
+
 # 14.0.0 (2021-09-15)
 Upgrade to .NET Core 5.  Thanks to @waynemunro.
 ### Breaking Changes

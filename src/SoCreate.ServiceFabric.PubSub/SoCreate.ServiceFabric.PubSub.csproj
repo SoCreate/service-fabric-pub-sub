@@ -3,10 +3,10 @@
     <Description>SoCreate.ServiceFabric.PubSub adds pub/sub behaviour to your Reliable Actors and Services in Service Fabric. Documentation: http://service-fabric-pub-sub.socreate.it</Description>
     <Copyright>© SoCreate. All rights reserved.</Copyright>
     <AssemblyTitle>SoCreate.ServiceFabric.PubSub</AssemblyTitle>
-    <Version>14.0.0</Version>
+    <Version>15.0.0</Version>
     <Company>SoCreate</Company>
     <Authors>Loek Duys, SoCreate</Authors>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <Platform>x64</Platform>
     <PackageId>SoCreate.ServiceFabric.PubSub</PackageId>
@@ -21,11 +21,11 @@
     <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="5.*" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="6.0.1107" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Fabric.MSBuild" Version="1.7.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="5.*" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="5.*" />
-    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="6.0.1107" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="6.0.1107" />
+    <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
   </ItemGroup>
 </Project>
