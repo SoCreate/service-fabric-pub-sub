@@ -1,8 +1,8 @@
 
-# 14.0.1 (2022-10-02)
-Upgrade to .NET Core 6.  Thanks to @waynemunro.
+# 15.0.0 (2022-10-03)
+Upgrade to .NET 6.  Thanks to @waynemunro.
 ### Breaking Changes
-* **.NET Core**: Upgraded to .NET Core 6.
+* **.NET Core**: Upgraded to .NET 6.
 * **Nuget**: Upgraded nuget packages
 
 # 14.0.0 (2021-09-15)
