@@ -5,9 +5,15 @@ pool:
   name: Hosted Windows 2019 with VS2019
 variables:
   buildConfiguration: Release
+  dotNetSDKVersion: '6.0.x'
   projectPaths: src/**/*.csproj
   testProjectPaths: 'tests/**/*[Tt]ests/*.csproj'
 steps:
+  - task: UseDotNet@2
+    displayName: 'Install .NET $(dotNetSDKVersion) SDK'
+    inputs:
+      packageType: 'sdk'
+      version: $(dotNetSDKVersion)
   - task: DotNetCoreCLI@2
     displayName: Test
     inputs:
