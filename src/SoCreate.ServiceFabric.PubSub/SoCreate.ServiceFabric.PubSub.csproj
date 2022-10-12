@@ -21,11 +21,11 @@
     <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="6.0.1107" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="6.0.1121" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Fabric.MSBuild" Version="1.7.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="6.0.1107" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="6.0.1107" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="6.0.1121" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="6.0.1121" />
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
   </ItemGroup>
 </Project>
